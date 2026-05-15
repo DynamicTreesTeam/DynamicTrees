@@ -1,4 +1,4 @@
-// 26.1.1	2026-05-13T21:05:44.656838094	Loot Tables
+// 26.1.1	2026-05-14T21:45:17.106281879	Loot Tables
 3ff99ae4223c6dc6f4ed715c8fa3f4796cdd9439 data/dynamictrees/loot_table/blocks/acacia_leaves.json
 2ac66fbd2e0b38eaabe31a9fac03c037bf9384b6 data/dynamictrees/loot_table/blocks/apple.json
 5f0998fa925b03e8e595619fc1abefa11e6763c2 data/dynamictrees/loot_table/blocks/azalea_leaves.json
@@ -25,6 +25,7 @@ f89a489fce49b6a8f1ea90e3ffcbdd3d9877ae8a data/dynamictrees/loot_table/trees/bran
 6792c51ac1ab3dfabc55b2badb04698f5c05b810 data/dynamictrees/loot_table/trees/branches/mangrove_branch.json
 438bc3e96aaa519a85c31d2bbe8fe00b3c8f9ca4 data/dynamictrees/loot_table/trees/branches/oak_branch.json
 fd51954590de101c50bbf97a98ae70dffa02bd5a data/dynamictrees/loot_table/trees/branches/pale_oak_branch.json
+3fcc759b6230f86038edd1d5ef7424359378c3fa data/dynamictrees/loot_table/trees/branches/pale_oak_creaking_heart.json
 63ae723f270361fb5f909414086490b449bf6f97 data/dynamictrees/loot_table/trees/branches/spruce_branch.json
 e1f52545461a6856dd6bd3f8fe2d33d5393db525 data/dynamictrees/loot_table/trees/branches/stripped_acacia_branch.json
 ef7d1dd4c85ee6df12a2dd68544cea8fe2dfbdbf data/dynamictrees/loot_table/trees/branches/stripped_birch_branch.json

@@ -63,7 +63,6 @@ public final class LeavesPropertiesResourceLoader extends JsonRegistryResourceLo
                                             + "\" as family \"" + processedRegName + "\" was not found.")
                     ));
                 })
-                .register("particle_chance", Float.class, LeavesProperties::setLeavesParticleChance)
                 .register("particle", JsonElement.class, this::processParticle)
                 .register("particle_color", Integer.class, LeavesProperties::setForceParticleColor);
 
@@ -104,24 +103,12 @@ public final class LeavesPropertiesResourceLoader extends JsonRegistryResourceLo
 
     @Override
     protected void applyLoadAppliers(JsonRegistryResourceLoader<LeavesProperties>.LoadData loadData, JsonObject json) {
-        final LeavesProperties leavesProperties = loadData.getResource();
-        this.readCustomBlockRegistryName(leavesProperties, json);
+        super.applyLoadAppliers(loadData, json);
 
         if (this.shouldGenerateBlocks(json)) {
+            final LeavesProperties leavesProperties = loadData.getResource();
             this.generateBlocks(leavesProperties, json);
         }
-
-        super.applyLoadAppliers(loadData, json);
-    }
-
-    private void readCustomBlockRegistryName(LeavesProperties leavesProperties, JsonObject json) {
-        JsonResult.forInput(json)
-                .mapIfContains("particle_chance", JsonElement.class, JsonDeserializers.FLOAT::deserialize
-                ).ifSuccessOrElse(
-                        chance->leavesProperties.setLeavesParticleChance(chance.get()),
-                        error -> this.logError(leavesProperties.getRegistryName(), error),
-                        warning -> this.logWarning(leavesProperties.getRegistryName(), warning)
-                );
     }
 
     private Boolean shouldGenerateBlocks(JsonObject json) {
@@ -138,6 +125,13 @@ public final class LeavesPropertiesResourceLoader extends JsonRegistryResourceLo
 
         leavesProperties.setRequiresShears(true);
 
+        readCustomBlockRegistryName(leavesProperties, json);
+        readParticleChance(leavesProperties, json);
+
+        leavesProperties.generateDynamicLeaves(blockProperties);
+    }
+
+    private void readCustomBlockRegistryName(LeavesProperties leavesProperties, JsonObject json) {
         JsonResult.forInput(json)
                 .mapIfContains("block_registry_name", JsonElement.class, input ->
                         IdentifierDeserializer.create(leavesProperties.getRegistryName().getNamespace())
@@ -147,8 +141,17 @@ public final class LeavesPropertiesResourceLoader extends JsonRegistryResourceLo
                         error -> this.logError(leavesProperties.getRegistryName(), error),
                         warning -> this.logWarning(leavesProperties.getRegistryName(), warning)
                 );
+    }
 
-        leavesProperties.generateDynamicLeaves(blockProperties);
+    private void readParticleChance(LeavesProperties leavesProperties, JsonObject json) {
+        JsonResult.forInput(json)
+                .mapIfContains("particle_chance", JsonElement.class, input ->
+                        JsonDeserializers.FLOAT.deserialize(input).orElseThrow(), leavesProperties.getLeavesParticleChance()
+                ).ifSuccessOrElse(
+                        leavesProperties::setLeavesParticleChance,
+                        error -> this.logError(leavesProperties.getRegistryName(), error),
+                        warning -> this.logWarning(leavesProperties.getRegistryName(), warning)
+                );
     }
 
     @SuppressWarnings("unchecked")

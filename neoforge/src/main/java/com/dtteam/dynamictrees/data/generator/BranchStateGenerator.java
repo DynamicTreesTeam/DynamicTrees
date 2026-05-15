@@ -13,6 +13,7 @@ import net.minecraft.world.level.block.Block;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 /**
  * @author Harley O'Connor
@@ -31,11 +32,14 @@ public class BranchStateGenerator implements Generator<BlockModelGenerators, Fam
         final Map<String, Identifier> textures = new HashMap<>();
         input.addBranchTextures(textures::put, primitiveLogPath, primitiveLog);
 
-        BasicLoaderBuilder builder = BasicLoaderBuilder.loaderBuilders.get(input.getBranchLoader())
-                .apply(textures, input);
+        BasicLoaderBuilder builder = getBranchLoader(input).apply(textures, input);
 
         generators.blockStateOutput.accept(
                 MultiVariantGenerator.dispatch(branch, MultiVariant.of(builder)));
+    }
+
+    protected BiFunction<Map<String, Identifier>, Family, BasicLoaderBuilder> getBranchLoader(Family input) {
+        return BasicLoaderBuilder.loaderBuilders.get(input.getBranchLoader());
     }
 
     @Override

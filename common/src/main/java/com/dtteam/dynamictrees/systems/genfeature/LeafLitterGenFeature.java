@@ -119,7 +119,7 @@ public class LeafLitterGenFeature extends GenFeature {
             final BlockState checkState = level.getBlockState(checkPos);
             if (level.isEmptyBlock(checkPos)) continue;
 
-            if (checkState.isFaceSturdy(level, checkPos, Direction.UP)) {
+            if (checkState.isFaceSturdy(level, checkPos, Direction.UP) && level.isEmptyBlock(checkPos.above())) {
                 return checkPos.above();
             }
             break;

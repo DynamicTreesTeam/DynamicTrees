@@ -165,9 +165,9 @@ public class ClientModEventHandler {
 
     //These locs are accessed by the model data generators
     public static final Identifier BRANCH = DynamicTrees.location("branch");
-    public static final Identifier THICK_BRANCH = DynamicTrees.location("thick_branch");
     public static final Identifier SURFACE_ROOT = DynamicTrees.location("surface_root");
     public static final Identifier ROOTS = DynamicTrees.location("roots");
+    public static final Identifier CREAKING_HEART = DynamicTrees.location("creaking_heart");
     public static final Identifier LARGE_PALM_FRONDS = DynamicTrees.location("large_palm_fronds");
     public static final Identifier MEDIUM_PALM_FRONDS = DynamicTrees.location("medium_palm_fronds");
     public static final Identifier SMALL_PALM_FRONDS = DynamicTrees.location("small_palm_fronds");

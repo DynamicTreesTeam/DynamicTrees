@@ -19,10 +19,7 @@ import com.dtteam.dynamictrees.systems.genfeature.GenFeature;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeatures;
 import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKit;
 import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKits;
-import com.dtteam.dynamictrees.tree.family.Family;
-import com.dtteam.dynamictrees.tree.family.NetherFungusFamily;
-import com.dtteam.dynamictrees.tree.family.PalmFamily;
-import com.dtteam.dynamictrees.tree.family.AerialRootsFamily;
+import com.dtteam.dynamictrees.tree.family.*;
 import com.dtteam.dynamictrees.tree.species.*;
 import com.dtteam.dynamictrees.treepack.Resources;
 import com.dtteam.dynamictrees.worldgen.featurecancellation.FeatureCancellers;
@@ -53,6 +50,8 @@ public class CommonModEventHandler {
         event.registerType(DynamicTrees.location("nether_fungus"), NetherFungusFamily.TYPE);
         event.registerType(DynamicTrees.location("aerial_roots"), AerialRootsFamily.TYPE);
         event.registerType(DynamicTrees.location("palm"), PalmFamily.TYPE);
+        event.registerType(DynamicTrees.location("alt_branch"), AltBranchFamily.TYPE);
+        event.registerType(DynamicTrees.location("creaking_heart"), CreakingHeartFamily.TYPE);
     }
 
     @SubscribeEvent

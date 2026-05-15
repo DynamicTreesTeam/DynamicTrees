@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "": {
+      "type": "dynamictrees:branch",
+      "family": "dynamictrees:pale_oak",
+      "textures": {
+        "bark": "minecraft:block/creaking_heart_awake",
+        "rings": "minecraft:block/creaking_heart_top_awake"
+      }
+    }
+  }
+}

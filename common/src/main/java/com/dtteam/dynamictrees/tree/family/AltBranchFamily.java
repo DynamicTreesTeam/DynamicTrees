@@ -8,7 +8,9 @@ import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.branch.ThickBranchBlock;
 import com.dtteam.dynamictrees.utility.IdentifierUtils;
 import com.dtteam.dynamictrees.utility.Optionals;
+import net.minecraft.data.tags.TagAppender;
 import net.minecraft.resources.Identifier;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 
@@ -16,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class AltBranchFamily extends Family {
@@ -33,7 +36,11 @@ public class AltBranchFamily extends Family {
     public void setupBlocks() {
         super.setupBlocks();
 
-        this.altBranch = setupBranch(createAltBranch(getBranchName("alt_")), false);
+        this.altBranch = setupBranch(createAltBranch(altBranchName()), false);
+    }
+
+    protected Identifier altBranchName(){
+        return getBranchName("alt_") ;
     }
 
     protected BranchBlock createAltBranchBlock(Identifier name) {
@@ -84,6 +91,10 @@ public class AltBranchFamily extends Family {
         return generators;
     }
 
+    public Identifier getAltBranchLoader() {
+        return getBranchLoader();
+    }
+
     @Override
     public void addBranchTextures(BiConsumer<String, Identifier> textureConsumer, Identifier primitiveLogLocation, Block sourceBlock) {
         Optional<Block> primAlt = getPrimitiveAltLog();
@@ -102,6 +113,20 @@ public class AltBranchFamily extends Family {
             return;
         }
         super.addBranchTextures(textureConsumer, primitiveLogLocation, sourceBlock);
+    }
+
+    public void addGeneratedBlockTags (Function<TagKey<Block>, TagAppender<Block, Block>> tagAppender){
+        super.addGeneratedBlockTags(tagAppender);
+        getAltBranch().ifPresent(branch -> {
+            tierTag(getDefaultBranchHarvestTier(), tagAppender).ifPresent(tagBuilder -> tagBuilder.add(branch));
+            defaultBranchTags().forEach(tag -> {
+                if (!isOnlyIfLoaded()) {
+                    tagAppender.apply(tag).add(branch);
+                } else {
+                    tagAppender.apply(tag).addOptional(branch);
+                }
+            });
+        });
     }
 
 }

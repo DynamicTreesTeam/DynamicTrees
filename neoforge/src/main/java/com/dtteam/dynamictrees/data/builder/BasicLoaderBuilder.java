@@ -39,6 +39,9 @@ public final class BasicLoaderBuilder extends InvariantLoaderBuilder {
                                 textures.get("overlay_end"),
                                 textures.get("side"),
                                 Optional.ofNullable(family))));
+        loaderBuilders.put(
+                ClientModEventHandler.CREAKING_HEART, (textures, family)->
+                        new BasicLoaderBuilder(()-> new UnbakedBranchModel(textures.get("bark_awake"), textures.get("rings_awake"), Optional.ofNullable(family))));
     }
 
     private final Supplier<CustomUnbakedBlockStateModel> unbakedSupplier;
