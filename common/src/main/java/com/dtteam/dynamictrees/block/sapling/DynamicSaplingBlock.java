@@ -29,6 +29,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
@@ -117,14 +118,20 @@ public class DynamicSaplingBlock extends Block implements BonemealableBlock {
 
     @Override
     public void performBonemeal(@NotNull ServerLevel level, @NotNull RandomSource rand, @NotNull BlockPos pos, @NotNull BlockState state) {
+        performBonemeal(level, pos, state);
+    }
+
+    public boolean performBonemeal(@NonNull Level level, @NonNull BlockPos pos, @NonNull BlockState state) {
         if (this.canSurvive(state, level, pos)) {
             final Species species = this.getSpecies().selfOrLocationOverride(level, pos);;
             if (species.canSaplingGrow(level, pos)) {
                 species.transitionToTree(level, pos);
+                return true;
             }
         } else {
             this.dropBlock(level, state, pos);
         }
+        return false;
     }
 
     @Override

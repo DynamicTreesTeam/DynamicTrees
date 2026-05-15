@@ -9,6 +9,7 @@ import com.dtteam.dynamictrees.block.NullTreePart;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.branch.TrunkShellBlock;
 import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
+import com.dtteam.dynamictrees.block.sapling.DynamicSaplingBlock;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.block.soil.SoilBlockDecayer;
 import com.dtteam.dynamictrees.client.ParticleHelper;
@@ -45,11 +46,16 @@ public class TreeHelper {
      */
     public static void growPulse(Level level, BlockPos rootPos) {
         BlockState rootyState = level.getBlockState(rootPos);
-        SoilBlock dirt = TreeHelper.getRooty(rootyState);
-        if (dirt != null) {
-            dirt.updateTree(rootyState, level, rootPos, level.getRandom(), false);
-            ageVolume(level, rootPos, 8, 32, 1, false);//blindly age a cuboid volume
+        if (rootyState.getBlock() instanceof DynamicSaplingBlock sapling){
+            sapling.performBonemeal(level, rootPos, rootyState);
+        } else {
+            SoilBlock dirt = TreeHelper.getRooty(rootyState);
+            if (dirt != null) {
+                dirt.updateTree(rootyState, level, rootPos, level.getRandom(), false);
+                ageVolume(level, rootPos, 8, 32, 1, false);//blindly age a cuboid volume
+            }
         }
+
     }
 
     /**
