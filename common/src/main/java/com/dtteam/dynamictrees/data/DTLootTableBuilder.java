@@ -6,6 +6,7 @@ import com.dtteam.dynamictrees.loot.condition.VoluntarySeedDropChance;
 import com.dtteam.dynamictrees.loot.entry.SeedItemLootPoolEntry;
 import com.dtteam.dynamictrees.loot.function.MultiplyByLogsCount;
 import com.dtteam.dynamictrees.loot.function.MultiplyBySticksCount;
+import com.dtteam.dynamictrees.loot.function.MultiplyByTotalVolume;
 import com.dtteam.dynamictrees.utility.ItemUtils;
 import net.minecraft.advancements.criterion.*;
 import net.minecraft.core.HolderLookup;
@@ -24,6 +25,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
 import net.minecraft.world.level.storage.loot.entries.LootPoolSingletonContainer;
+import net.minecraft.world.level.storage.loot.functions.ApplyBonusCount;
 import net.minecraft.world.level.storage.loot.functions.ApplyExplosionDecay;
 import net.minecraft.world.level.storage.loot.functions.LimitCount;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
@@ -203,6 +205,19 @@ public class DTLootTableBuilder {
                                 )
                 )
         ).setParamSet(LootContextParamSets.BLOCK);
+    }
+
+    public static LootTable.Builder createCreakingHeartDrops(Block primitiveLogBlock, Item resinItem, HolderLookup.Provider registries) {
+        return createSelfDropDispatchTable(
+                primitiveLogBlock,
+                hasSilkTouch(registries),
+                LootItem.lootTableItem(resinItem)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 3.0F)))
+                        .apply(ApplyBonusCount.addUniformBonusCount(ItemUtils.getEnchantment(Enchantments.FORTUNE, registries)))
+                        .apply(LimitCount.limitCount(IntRange.upperBound(9)))
+                        .apply(MultiplyByTotalVolume.multiplyByTotalVolume())
+                        .apply(ApplyExplosionDecay.explosionDecay())).setParamSet(DTLootParameterSets.BRANCHES);
+
     }
 
 }

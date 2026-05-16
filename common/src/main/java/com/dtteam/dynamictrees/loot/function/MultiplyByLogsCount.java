@@ -1,7 +1,6 @@
 package com.dtteam.dynamictrees.loot.function;
 
 import com.dtteam.dynamictrees.loot.DTLootContextParams;
-import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.systems.nodemapper.NetVolumeNode;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -30,11 +29,6 @@ public final class MultiplyByLogsCount extends LootItemConditionalFunction {
     public MapCodec<? extends LootItemConditionalFunction> codec() {
         return CODEC;
     }
-
-    //    @Override
-//    public LootItemFunctionType<? extends LootItemConditionalFunction> getType() {
-//        return DTRegistries.MULTIPLY_LOGS_COUNT.get();
-//    }
 
     @Override
     protected ItemStack run(ItemStack stack, LootContext context) {

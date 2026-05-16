@@ -8,6 +8,8 @@ import com.dtteam.dynamictrees.block.branch.CreakingHeartBranchBlock;
 import com.dtteam.dynamictrees.block.branch.ThickBranchBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -22,6 +24,7 @@ public class CreakingHeartFamily extends AltBranchFamily {
     public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(CreakingHeartFamily::new);
 
     protected float heartHardnessMultiplier = 10;
+    protected Item heartDropItem = Items.RESIN_CLUMP;
 
     public CreakingHeartFamily(Identifier name) {
         super(name);
@@ -105,4 +108,15 @@ public class CreakingHeartFamily extends AltBranchFamily {
         super.addBranchTextures(textureConsumer, primitiveLogLocation, sourceBlock);
     }
 
+    public void setHeartHardnessMultiplier(float heartHardnessMultiplier) {
+        this.heartHardnessMultiplier = heartHardnessMultiplier;
+    }
+
+    public void setHeartDropItem(Item heartDropItem) {
+        this.heartDropItem = heartDropItem;
+    }
+
+    public Item getHeartDropItem() {
+        return heartDropItem;
+    }
 }

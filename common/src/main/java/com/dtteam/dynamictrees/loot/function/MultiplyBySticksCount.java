@@ -30,11 +30,6 @@ public final class MultiplyBySticksCount extends LootItemConditionalFunction {
         return CODEC;
     }
 
-    //    @Override
-//    public LootItemFunctionType<? extends LootItemConditionalFunction> getType() {
-//        return DTRegistries.MULTIPLY_STICKS_COUNT.get();
-//    }
-
     @Override
     protected ItemStack run(ItemStack stack, LootContext context) {
         final Integer volume = context.getOptionalParameter(DTLootContextParams.VOLUME);

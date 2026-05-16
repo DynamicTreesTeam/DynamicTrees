@@ -25,6 +25,7 @@ import com.dtteam.dynamictrees.loot.entry.SeedItemLootPoolEntry;
 import com.dtteam.dynamictrees.loot.entry.WeightedItemLootPoolEntry;
 import com.dtteam.dynamictrees.loot.function.MultiplyByLogsCount;
 import com.dtteam.dynamictrees.loot.function.MultiplyBySticksCount;
+import com.dtteam.dynamictrees.loot.function.MultiplyByTotalVolume;
 import com.dtteam.dynamictrees.loot.function.MultiplyCount;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.systems.BranchConnectables;
@@ -272,6 +273,8 @@ public class DTRegistries {
             .registerLootFunctionType("multiply_logs_count", MultiplyByLogsCount.CODEC);
     public static final Supplier<MapCodec<MultiplyBySticksCount>> MULTIPLY_STICKS_COUNT = Services.REGISTRY.getRegistryLoader()
             .registerLootFunctionType("multiply_sticks_count", MultiplyBySticksCount.CODEC);
+    public static final Supplier<MapCodec<MultiplyByTotalVolume>> MULTIPLY_TOTAL_VOLUME = Services.REGISTRY.getRegistryLoader()
+            .registerLootFunctionType("multiply_total_volume", MultiplyByTotalVolume.CODEC);
 
     ///////////////////////////////////////////
     // WORLDGEN

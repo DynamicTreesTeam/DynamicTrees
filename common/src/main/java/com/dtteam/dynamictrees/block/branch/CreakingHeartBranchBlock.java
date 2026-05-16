@@ -1,11 +1,13 @@
 package com.dtteam.dynamictrees.block.branch;
 
 import com.dtteam.dynamictrees.api.network.MapSignal;
+import com.dtteam.dynamictrees.data.DTLootTableBuilder;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.tree.TreeHelper;
-import com.dtteam.dynamictrees.tree.family.AltBranchFamily;
+import com.dtteam.dynamictrees.tree.family.CreakingHeartFamily;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
@@ -27,6 +29,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.CreakingHeartState;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.storage.loot.LootTable;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
@@ -69,8 +72,7 @@ public class CreakingHeartBranchBlock extends BasicBranchBlock implements Entity
     }
 
     public static boolean hasRequiredLogs(BlockState state, LevelReader level, BlockPos pos) {
-        return state.getBlock() instanceof CreakingHeartBranchBlock
-                && level.getBlockState(pos.above()).getBlock() instanceof BranchBlock
+        return level.getBlockState(pos.above()).getBlock() instanceof BranchBlock
                 && level.getBlockState(pos.below()).getBlock() instanceof BranchBlock;
     }
 
@@ -152,21 +154,15 @@ public class CreakingHeartBranchBlock extends BasicBranchBlock implements Entity
     protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
         if (state.getValue(STATE) == CreakingHeartState.UPROOTED) return 0;
 
-        int signal;
-        if (level.getBlockEntity(pos) instanceof CreakingHeartBranchBlockEntity creakingHeartBlockEntity) {
-            signal = creakingHeartBlockEntity.getAnalogOutputSignal();
-        } else {
-            signal = 0;
-        }
+        if (level.getBlockEntity(pos) instanceof CreakingHeartBranchBlockEntity creakingHeartBlockEntity)
+            return creakingHeartBlockEntity.getAnalogOutputSignal();
 
-        return signal;
+        return 0;
     }
 
     @Override
     public Optional<Block> getPrimitiveLog() {
-        if (getFamily() instanceof AltBranchFamily altLogFamily)
-            return altLogFamily.getPrimitiveAltLog();
-        return super.getPrimitiveLog();
+        return getFamily().getPrimitiveAltLog();
     }
 
     @Override
@@ -174,10 +170,14 @@ public class CreakingHeartBranchBlock extends BasicBranchBlock implements Entity
         return getPrimitiveLog().map(block -> block.defaultBlockState().getSoundType()).orElseGet(() -> super.getSoundType(state));
     }
 
+    public CreakingHeartFamily getFamily() {
+        return (CreakingHeartFamily) super.getFamily();
+    }
+
     /**
      * We unfortunately cannot use {@link BranchBlock#analyse(BlockState, LevelAccessor, BlockPos, Direction, MapSignal)}
      * As it requires a {@link LevelAccessor} and we only have a {@link BlockGetter}.
-     * BFS
+     * We use BFS instead. Should be fine as long as the trees remain small
      */
     @Nullable
     public static BlockPos findFromBranch(BlockState state, BlockGetter level, BlockPos pos, int stepsLeft, HashSet<BlockPos> explored, @Nullable Direction from){
@@ -201,4 +201,8 @@ public class CreakingHeartBranchBlock extends BasicBranchBlock implements Entity
         return findFromBranch(state, level, pos, stepsLeft, new HashSet<>(), null);
     }
 
+    @Override
+    public LootTable.Builder createBranchDrops(HolderLookup.Provider registries) {
+        return DTLootTableBuilder.createCreakingHeartDrops(getPrimitiveLog().get(), getFamily().getHeartDropItem(), registries);
+    }
 }

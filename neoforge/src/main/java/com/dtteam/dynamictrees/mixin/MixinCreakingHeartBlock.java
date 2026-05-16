@@ -15,8 +15,8 @@ public class MixinCreakingHeartBlock {
 
     @Inject(method = "hasRequiredLogs", at = @At("HEAD"), cancellable = true)
     private static void hasRequiredLogs(BlockState state, LevelReader level, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        if (CreakingHeartBranchBlock.hasRequiredLogs(state, level, pos)){
-            cir.setReturnValue(true);
+        if (state.getBlock() instanceof CreakingHeartBranchBlock){
+            cir.setReturnValue(CreakingHeartBranchBlock.hasRequiredLogs(state, level, pos));
         }
     }
 

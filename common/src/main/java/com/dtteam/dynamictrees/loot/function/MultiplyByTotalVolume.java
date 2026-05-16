@@ -1,6 +1,7 @@
 package com.dtteam.dynamictrees.loot.function;
 
-import com.mojang.serialization.Codec;
+import com.dtteam.dynamictrees.loot.DTLootContextParams;
+import com.dtteam.dynamictrees.systems.nodemapper.NetVolumeNode;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.item.ItemStack;
@@ -11,21 +12,14 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 
 import java.util.List;
 
-/**
- * @author Harley O'Connor
- */
-public final class MultiplyCount extends LootItemConditionalFunction {
+public final class MultiplyByTotalVolume extends LootItemConditionalFunction {
 
-    public static final MapCodec<MultiplyCount> CODEC = RecordCodecBuilder.mapCodec(
+    public static final MapCodec<MultiplyByTotalVolume> CODEC = RecordCodecBuilder.mapCodec(
             instance -> commonFields(instance)
-                    .and(Codec.FLOAT.fieldOf("multiplier").forGetter(c->c.multiplier))
-                    .apply(instance, MultiplyCount::new));
+                    .apply(instance, MultiplyByTotalVolume::new));
 
-    private final float multiplier;
-
-    public MultiplyCount(List<LootItemCondition> conditions, float multiplier) {
+    public MultiplyByTotalVolume(List<LootItemCondition> conditions) {
         super(conditions);
-        this.multiplier = multiplier;
     }
 
     @Override
@@ -35,12 +29,15 @@ public final class MultiplyCount extends LootItemConditionalFunction {
 
     @Override
     protected ItemStack run(ItemStack stack, LootContext context) {
-        stack.setCount((int) (stack.getCount() * multiplier));
+        final Integer volume = context.getOptionalParameter(DTLootContextParams.VOLUME);
+        assert volume != null;
+        float multiplier = (float)volume / NetVolumeNode.Volume.VOXELSPERLOG;
+        stack.setCount(Math.round(stack.getCount() * multiplier));
         return stack;
     }
 
-    public static LootItemFunction.Builder multiplyCount() {
-        return () -> new MultiplyCount(List.of(), 1.0F);
+    public static LootItemFunction.Builder multiplyByTotalVolume() {
+        return () -> new MultiplyByTotalVolume(List.of());
     }
 
 }
