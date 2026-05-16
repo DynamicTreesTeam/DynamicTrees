@@ -336,7 +336,6 @@ public class TreeHelper {
 
 
     //Branches
-
     public static boolean isBranch(Block block) {
         return block instanceof BranchBlock;//Oh shuddap you java purists.. this is minecraft!
     }

@@ -441,6 +441,42 @@ public record BranchModelPart(QuadCollection quads, boolean useAmbientOcclusion,
 
     }
 
+    public static class UnbakedHeartCore extends UnbakedCore{
+
+        protected Material.Baked materialEnd;
+        public UnbakedHeartCore(Material.Baked material, Material.Baked materialEnd) {
+            super(material);
+            this.materialEnd = materialEnd;
+        }
+
+        public PartMap<BranchModelPart> bakeAllSides(ModelBaker baker, int radius, Direction.Axis axis) {
+
+            PartMap<QuadCollection.Builder> builders = createBuilders();
+
+            CuboidModelElement part = generateCorePart(radius, axis, false);
+            addUnculledFaces(baker, builders::get, part, material, materialEnd, axis);
+
+            return buildParts(builders, material, materialEnd, axis);
+        }
+
+        private static void addUnculledFaces(ModelBaker baker, Function<Direction, QuadCollection.Builder> builders, CuboidModelElement part, Material.Baked material, Material.Baked materialEnds, Direction.Axis axis) {
+            for (Map.Entry<Direction, CuboidFace> e : part.faces().entrySet()) {
+                Direction face = e.getKey();
+                Material.Baked mat = face.getAxis() == axis ? materialEnds : material;
+                builders.apply(face).addUnculledFace(ModelHelper.makeBakedQuad(baker, part, e.getValue(), mat, face));
+            }
+        }
+
+        protected static @NotNull PartMap<BranchModelPart> buildParts(PartMap<QuadCollection.Builder> builders, Material.Baked material, Material.Baked materialEnds, Direction.Axis axis) {
+            PartMap<BranchModelPart> parts = new PartMap<>();
+            for (BranchMultiPartHolder.NullableDirection dir : BranchMultiPartHolder.NullableDirection.values()){
+                Material.Baked mat = dir.getDirection() != null && dir.getDirection().getAxis() == axis ? materialEnds : material;
+                parts.put(dir, new BranchModelPart(builders.get(dir).build(), true, mat));
+            }
+            return parts;
+        }
+    }
+
     private static Direction[] directionsOfAxis(Direction.Axis axis){
         return Arrays.stream(Direction.values()).filter(d -> d.getAxis() == axis).toList().toArray(Direction[]::new);
     }

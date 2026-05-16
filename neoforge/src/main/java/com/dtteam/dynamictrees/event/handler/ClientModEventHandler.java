@@ -168,23 +168,24 @@ public class ClientModEventHandler {
     public static final Identifier SURFACE_ROOT = DynamicTrees.location("surface_root");
     public static final Identifier ROOTS = DynamicTrees.location("roots");
     public static final Identifier CREAKING_HEART = DynamicTrees.location("creaking_heart");
+    public static final Identifier POTTED_DYNAMIC_SAPLING = DynamicTrees.location("potted_dynamic_sapling");
+    public static final Identifier AERIAL_ROOTS_SOIL = DynamicTrees.location("aerial_roots_soil");
     public static final Identifier LARGE_PALM_FRONDS = DynamicTrees.location("large_palm_fronds");
     public static final Identifier MEDIUM_PALM_FRONDS = DynamicTrees.location("medium_palm_fronds");
     public static final Identifier SMALL_PALM_FRONDS = DynamicTrees.location("small_palm_fronds");
-    public static final Identifier POTTED_DYNAMIC_SAPLING = DynamicTrees.location("potted_dynamic_sapling");
-    public static final Identifier AERIAL_ROOTS_SOIL = DynamicTrees.location("aerial_roots_soil");
 
     @SubscribeEvent
     public static void onModelRegistryEvent(RegisterBlockStateModels event) {
         // Register model loaders for baked models.
         event.registerModel(BRANCH, UnbakedBranchModel.CODEC);
         event.registerModel(ROOTS, UnbakedRootsModel.CODEC);
+        event.registerModel(CREAKING_HEART, UnbakedCreakingHeartModel.CODEC);
         event.registerModel(SURFACE_ROOT, SurfaceRootBlockStateModel.Unbaked.CODEC);
         event.registerModel(POTTED_DYNAMIC_SAPLING, PottedSaplingBlockStateModel.Unbaked.CODEC);
+        event.registerModel(AERIAL_ROOTS_SOIL, AerialRootsSoilBlockStateModel.Unbaked.CODEC);
 //        event.register(LARGE_PALM_FRONDS, new PalmLeavesModelLoader(0));
 //        event.register(MEDIUM_PALM_FRONDS, new PalmLeavesModelLoader(1));
 //        event.register(SMALL_PALM_FRONDS, new PalmLeavesModelLoader(2));
-        event.registerModel(AERIAL_ROOTS_SOIL, AerialRootsSoilBlockStateModel.Unbaked.CODEC);
     }
 
     @SubscribeEvent

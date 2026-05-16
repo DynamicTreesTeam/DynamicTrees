@@ -78,8 +78,13 @@ public class CreakingHeartBranchBlock extends BasicBranchBlock implements Entity
     }
 
     public static boolean hasRequiredLogs(BlockState state, LevelReader level, BlockPos pos) {
-        return level.getBlockState(pos.above()).getBlock() instanceof BranchBlock
-                && level.getBlockState(pos.below()).getBlock() instanceof BranchBlock;
+        int count = 0;
+        for (Direction dir : Direction.values()){
+            if (level.getBlockState(pos.offset(dir.getUnitVec3i())).getBlock() instanceof BranchBlock)
+                count++;
+            if (count >= 2) return true;
+        }
+        return false;
     }
 
     protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
@@ -187,7 +192,11 @@ public class CreakingHeartBranchBlock extends BasicBranchBlock implements Entity
      */
     @Nullable
     public static BlockPos findFromBranch(BlockState state, BlockGetter level, BlockPos pos, int stepsLeft, HashSet<BlockPos> explored, @Nullable Direction from){
-        if (state.getBlock() instanceof CreakingHeartBranchBlock) return pos;
+        if (state.getBlock() instanceof CreakingHeartBranchBlock) {
+            //Deactivated hearts don't count.
+            if (state.getValue(STATE) == CreakingHeartState.UPROOTED) return null;
+            return pos;
+        }
         if (stepsLeft <= 0) return null;
         explored.add(pos);
         for (Direction dir : Direction.values()){

@@ -1,27 +1,30 @@
 {
   "variants": {
     "creaking_heart_state=awake": {
-      "type": "dynamictrees:branch",
+      "type": "dynamictrees:creaking_heart",
       "family": "dynamictrees:pale_oak",
       "textures": {
-        "bark": "minecraft:block/creaking_heart_awake",
-        "rings": "minecraft:block/creaking_heart_top_awake"
+        "bark": "minecraft:block/pale_oak_log",
+        "heart_bark": "minecraft:block/creaking_heart_awake",
+        "heart_rings": "minecraft:block/creaking_heart_top_awake"
       }
     },
     "creaking_heart_state=dormant": {
-      "type": "dynamictrees:branch",
+      "type": "dynamictrees:creaking_heart",
       "family": "dynamictrees:pale_oak",
       "textures": {
-        "bark": "minecraft:block/creaking_heart_dormant",
-        "rings": "minecraft:block/creaking_heart_top_dormant"
+        "bark": "minecraft:block/pale_oak_log",
+        "heart_bark": "minecraft:block/creaking_heart_dormant",
+        "heart_rings": "minecraft:block/creaking_heart_top_dormant"
       }
     },
     "creaking_heart_state=uprooted": {
-      "type": "dynamictrees:branch",
+      "type": "dynamictrees:creaking_heart",
       "family": "dynamictrees:pale_oak",
       "textures": {
-        "bark": "minecraft:block/creaking_heart",
-        "rings": "minecraft:block/creaking_heart_top"
+        "bark": "minecraft:block/pale_oak_log",
+        "heart_bark": "minecraft:block/creaking_heart",
+        "heart_rings": "minecraft:block/creaking_heart_top"
       }
     }
   }

@@ -44,7 +44,7 @@
         {
             "name": "creaking_heart",
             "properties": {
-                "place_chance": 0.4
+                "place_chance": 0.3
             }
         }
     ],
