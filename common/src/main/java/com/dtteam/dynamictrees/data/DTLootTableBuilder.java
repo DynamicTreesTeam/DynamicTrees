@@ -207,12 +207,12 @@ public class DTLootTableBuilder {
         ).setParamSet(LootContextParamSets.BLOCK);
     }
 
-    public static LootTable.Builder createCreakingHeartDrops(Block primitiveLogBlock, Item resinItem, HolderLookup.Provider registries) {
+    public static LootTable.Builder createCreakingHeartDrops(Block primitiveLogBlock, Item resinItem, int minResin, int maxResin, HolderLookup.Provider registries) {
         return createSelfDropDispatchTable(
                 primitiveLogBlock,
                 hasSilkTouch(registries),
                 LootItem.lootTableItem(resinItem)
-                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 3.0F)))
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(maxResin, minResin)))
                         .apply(ApplyBonusCount.addUniformBonusCount(ItemUtils.getEnchantment(Enchantments.FORTUNE, registries)))
                         .apply(LimitCount.limitCount(IntRange.upperBound(9)))
                         .apply(MultiplyByTotalVolume.multiplyByTotalVolume())

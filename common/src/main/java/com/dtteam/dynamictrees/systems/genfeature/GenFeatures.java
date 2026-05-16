@@ -47,6 +47,7 @@ public final class GenFeatures {
     public static final GenFeature ROOT_SYSTEM = new RootSystemGenFeature(DynamicTrees.location("root_system"));
 
     public static final GenFeature LEAF_LITTER = new LeafLitterGenFeature(DynamicTrees.location("leaf_litter"));
+    public static final GenFeature CREAKING_HEART = new CreakingHeartGenFeature(DynamicTrees.location("creaking_heart"));
 
     public static void register(final Registry<GenFeature> registry) {
         registry.registerAll(FRUIT, POD,
@@ -55,7 +56,7 @@ public final class GenFeatures {
                 ROT_SOIL, VINES, PODZOL, BUSH, MUSHROOM_ROT,
                 HUGE_MUSHROOM, HUGE_MUSHROOMS,  BIOME_PREDICATE,
                 RANDOM_PREDICATE, ALTERNATIVE_LEAVES, ROOT_SYSTEM,
-                LEAF_LITTER);
+                LEAF_LITTER, CREAKING_HEART);
     }
 
 }

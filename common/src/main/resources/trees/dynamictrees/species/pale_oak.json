@@ -40,6 +40,12 @@
                 "max_length": 8,
                 "quantity": 24
             }
+        },
+        {
+            "name": "creaking_heart",
+            "properties": {
+                "place_chance": 0.4
+            }
         }
     ],
     "lang_overrides": {

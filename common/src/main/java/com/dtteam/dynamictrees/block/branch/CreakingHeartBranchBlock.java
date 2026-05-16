@@ -29,6 +29,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.CreakingHeartState;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.storage.loot.LootTable;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,7 +42,12 @@ public class CreakingHeartBranchBlock extends BasicBranchBlock implements Entity
 
     public CreakingHeartBranchBlock(Identifier name, Properties properties) {
         super(name, properties);
+    }
+
+    @Override
+    public BlockState[] createBranchStates(IntegerProperty radiusProperty, int maxRadius) {
         registerDefaultState(defaultBlockState().setValue(STATE, CreakingHeartState.DORMANT));
+        return super.createBranchStates(radiusProperty, maxRadius);
     }
 
     @Override
@@ -203,6 +209,7 @@ public class CreakingHeartBranchBlock extends BasicBranchBlock implements Entity
 
     @Override
     public LootTable.Builder createBranchDrops(HolderLookup.Provider registries) {
-        return DTLootTableBuilder.createCreakingHeartDrops(getPrimitiveLog().get(), getFamily().getHeartDropItem(), registries);
+        return DTLootTableBuilder.createCreakingHeartDrops(getPrimitiveLog().get(),
+                getFamily().getHeartDropItem(), 1, 3, registries);
     }
 }

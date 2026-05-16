@@ -78,7 +78,7 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
      * @return The {@code array} cache of {@link BlockState}s.
      */
     public BlockState[] createBranchStates(final IntegerProperty radiusProperty, final int maxRadius) {
-        this.registerDefaultState(this.stateDefinition.any().setValue(radiusProperty, 4).setValue(WATERLOGGED, false));
+        this.registerDefaultState(defaultBlockState().setValue(radiusProperty, 4).setValue(WATERLOGGED, false));
 
         final BlockState[] branchStates = new BlockState[maxRadius + 1];
 

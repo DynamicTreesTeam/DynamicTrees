@@ -162,7 +162,7 @@
       "species": "pale_oak",
       "density": {
         "math": {
-          "div": [ "noise", 2.0 ]
+          "div": [ "noise", 2.5 ]
         }
       },
       "multipass": true
