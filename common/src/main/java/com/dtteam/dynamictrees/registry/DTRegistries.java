@@ -30,7 +30,6 @@ import com.dtteam.dynamictrees.loot.function.MultiplyCount;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.systems.BranchConnectables;
 import com.dtteam.dynamictrees.tree.TreeHelper;
-import com.dtteam.dynamictrees.tree.family.AltBranchFamily;
 import com.dtteam.dynamictrees.tree.family.CreakingHeartFamily;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
@@ -189,7 +188,7 @@ public class DTRegistries {
         return ()-> Family.REGISTRY.getAll().stream()
                 .filter(f -> f instanceof CreakingHeartFamily chf && chf.registerDefaultBlockEntity())
                 .map(f -> (CreakingHeartFamily)f)
-                .map(AltBranchFamily::getAltBranch)
+                .map(CreakingHeartFamily::getHeartBranch)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toSet());

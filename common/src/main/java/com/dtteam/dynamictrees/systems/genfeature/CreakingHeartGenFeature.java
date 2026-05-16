@@ -46,8 +46,8 @@ public class CreakingHeartGenFeature extends GenFeature {
         if (context.random().nextFloat() > configuration.get(PLACE_CHANCE)) return false;
         if (TreeHelper.getRadius(context.level(), context.pos().above()) < configuration.get(FRUITING_RADIUS)) return false;
 
-        int height = context.species().getGrowthLogicKit().getLowestBranchHeight(new PositionalSpeciesContext(context.levelContext().level(), context.pos(), context.species()));
-        BranchBlock heart = ((CreakingHeartFamily)context.species().getFamily()).getAltBranch().get();
+        int height = getLowestBranchHeight(context);
+        BranchBlock heart = getCreakingHeart(context);
 
         int limit = configuration.get(MAX_HEIGHT);
         for (int i=1; i<limit; i++){
@@ -61,6 +61,14 @@ public class CreakingHeartGenFeature extends GenFeature {
             }
         }
         return false;
+    }
+
+    private int getLowestBranchHeight(PostGenerationContext context) {
+        return context.species().getGrowthLogicKit().getLowestBranchHeight(new PositionalSpeciesContext(context.levelContext().level(), context.pos(), context.species()));
+    }
+
+    private BranchBlock getCreakingHeart(PostGenerationContext context) {
+        return ((CreakingHeartFamily) context.species().getFamily()).getHeartBranch().get();
     }
 
     private boolean isRadiusJustRight(BlockState branchState, GenFeatureConfiguration configuration){

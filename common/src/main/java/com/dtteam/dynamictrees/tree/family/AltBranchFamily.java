@@ -116,7 +116,7 @@ public class AltBranchFamily extends Family {
             textureConsumer.accept("rings", rings);
             return;
         }
-        DynamicTrees.LOG.error("Attempted to load alt branch textures for family {} but the provided block {} was not it's alt branch.", getRegistryName(), primAlt);
+        super.addBranchTextures(textureConsumer, primitiveLogLocation, sourceBlock);
     }
 
     public void addGeneratedBlockTags (Function<TagKey<Block>, TagAppender<Block, Block>> tagAppender){

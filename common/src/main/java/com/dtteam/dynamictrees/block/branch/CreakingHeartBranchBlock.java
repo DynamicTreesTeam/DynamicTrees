@@ -102,7 +102,6 @@ public class CreakingHeartBranchBlock extends BasicBranchBlock implements Entity
         return state;
     }
 
-
     @Override
     public @Nullable BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
         return new CreakingHeartBranchBlockEntity(blockPos, blockState);
@@ -215,6 +214,15 @@ public class CreakingHeartBranchBlock extends BasicBranchBlock implements Entity
     @Override
     public LootTable.Builder createBranchDrops(HolderLookup.Provider registries) {
         return DTLootTableBuilder.createCreakingHeartDrops(getPrimitiveLog().get(),
-                ((CreakingHeartFamily)getFamily()).getHeartDropItem(), 1, 3, registries);
+                ((CreakingHeartFamily)getFamily()).getResinItem(), 1, 3, registries);
+    }
+
+    public void addResinToBranch(BlockState state, Level level, BlockPos pos){
+        CreakingHeartFamily family = (CreakingHeartFamily)getFamily();
+        if (family.getAltBranch().isEmpty() || family.getBranch().isEmpty()) return;
+        BranchBlock branchBlock = TreeHelper.getBranch(state);
+        if (branchBlock == null || branchBlock != family.getBranch().get()) return;
+        int radius = TreeHelper.getRadius(state);
+        family.getAltBranch().get().setRadius(level, pos, radius, null, 3);
     }
 }

@@ -1,6 +1,7 @@
 package com.dtteam.dynamictrees.utility;
 
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -31,7 +32,7 @@ public final class NullUtils {
      * @param <T>             The type of the given {@link Object}.
      * @return {@code true} if the given {@link Object} is {@code null}; {@code false} otherwise.
      */
-    public static <T> boolean consumeIfNonnull(@Nullable final T obj, final Consumer<T> nonnullConsumer) {
+    public static <T> boolean consumeIfNonnull(@Nullable final T obj, final Consumer<@NonNull T> nonnullConsumer) {
         if (isNotNull(obj)) {
             nonnullConsumer.accept(obj);
             return true;
@@ -47,7 +48,7 @@ public final class NullUtils {
         return null;
     }
 
-    public static <T, R> R applyIfNonnull(@Nullable T obj, final Function<T, R> function, final R defaultReturn) {
+    public static <T, R> R applyIfNonnull(@Nullable T obj, final Function<@NonNull T, R> function, final R defaultReturn) {
         if (isNotNull(obj)) {
             return function.apply(obj);
         }

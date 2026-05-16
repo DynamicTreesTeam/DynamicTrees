@@ -35,6 +35,7 @@ public class DataGenerators {
         registerBlockModelGenerator(Family.class, DynamicTrees.location("roots"), RootsStateGenerator::new);
         registerBlockModelGenerator(Family.class, DynamicTrees.location("creaking_heart"), CreakingHeartStateGenerator::new);
         registerBlockModelGenerator(Family.class, DynamicTrees.location("alt_branch"), AltBranchStateGenerator::new);
+        registerBlockModelGenerator(Family.class, DynamicTrees.location("resin_branch"), ResinBranchStateGenerator::new);
         registerItemModelGenerator(Family.class, DynamicTrees.location("branch_item"), BranchItemModelGenerator::new);
         registerItemModelGenerator(Family.class, DynamicTrees.location("roots_item"), RootsItemModelGenerator::new);
         registerLangGenerator(Family.class, DynamicTrees.location("family_lang"), FamilyLangGenerator::new);

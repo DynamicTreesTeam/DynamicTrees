@@ -5,14 +5,10 @@ import com.dtteam.dynamictrees.data.builder.BasicLoaderBuilder;
 import com.dtteam.dynamictrees.tree.family.AltBranchFamily;
 import com.dtteam.dynamictrees.tree.family.Family;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.block.Block;
 
 import java.util.Map;
 import java.util.function.BiFunction;
 
-/**
- * @author Harley O'Connor
- */
 public class AltBranchStateGenerator extends BranchStateGenerator {
 
     @Override

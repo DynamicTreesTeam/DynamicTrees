@@ -34,8 +34,12 @@ public class BranchStateGenerator implements Generator<BlockModelGenerators, Fam
 
         BasicLoaderBuilder builder = getBranchLoader(input).apply(textures, input);
 
+        acceptOutput(generators, input, dependencies, branch, builder);
+    }
+
+    protected void acceptOutput(BlockModelGenerators generators, Family input, Dependencies dependencies, BranchBlock branch, BasicLoaderBuilder branchBuilder) {
         generators.blockStateOutput.accept(
-                MultiVariantGenerator.dispatch(branch, MultiVariant.of(builder)));
+                MultiVariantGenerator.dispatch(branch, MultiVariant.of(branchBuilder)));
     }
 
     protected void addTextures(Family input, Map<String, Identifier> textures, Identifier primitiveLogPath, Block primitiveLog) {

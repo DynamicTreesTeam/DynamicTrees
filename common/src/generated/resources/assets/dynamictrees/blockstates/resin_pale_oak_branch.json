@@ -1,12 +1,24 @@
 {
-  "variants": {
-    "": {
-      "type": "dynamictrees:branch",
-      "family": "dynamictrees:pale_oak",
-      "textures": {
-        "bark": "minecraft:block/pale_oak_log",
-        "rings": "minecraft:block/pale_oak_log_top"
+  "multipart": [
+    {
+      "apply": {
+        "type": "dynamictrees:branch",
+        "family": "dynamictrees:pale_oak",
+        "textures": {
+          "bark": "minecraft:block/pale_oak_log",
+          "rings": "minecraft:block/pale_oak_log_top"
+        }
+      }
+    },
+    {
+      "apply": {
+        "type": "dynamictrees:branch",
+        "family": "dynamictrees:pale_oak",
+        "textures": {
+          "bark": "minecraft:block/resin_clump",
+          "rings": "dynamictrees:block/air"
+        }
       }
     }
-  }
+  ]
 }

@@ -96,7 +96,8 @@ public final class FamilyResourceLoader extends JsonRegistryResourceLoader<Famil
     private void registerPaleOakAppliers(){
         this.gatherDataAppliers
                 .register("primitive_heart", CreakingHeartFamily.class, Block.class, CreakingHeartFamily::setPrimitiveHeartLog)
-                .register("heart_drop_item", CreakingHeartFamily.class, Item.class, CreakingHeartFamily::setHeartDropItem);
+                .register("resin_item", CreakingHeartFamily.class, Item.class, CreakingHeartFamily::setResinItem)
+                .register("resin_block", CreakingHeartFamily.class, Block.class, CreakingHeartFamily::setResinBlock);
         this.setupAppliers
                 .register("primitive_heart", CreakingHeartFamily.class, Block.class, CreakingHeartFamily::setPrimitiveHeartLog);
         this.reloadAppliers

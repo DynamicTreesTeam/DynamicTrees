@@ -3,10 +3,7 @@ package com.dtteam.dynamictrees.tree.family;
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
-import com.dtteam.dynamictrees.block.branch.BasicBranchBlock;
-import com.dtteam.dynamictrees.block.branch.BranchBlock;
-import com.dtteam.dynamictrees.block.branch.CreakingHeartBranchBlock;
-import com.dtteam.dynamictrees.block.branch.ThickBranchBlock;
+import com.dtteam.dynamictrees.block.branch.*;
 import com.dtteam.dynamictrees.utility.IdentifierUtils;
 import com.dtteam.dynamictrees.utility.Optionals;
 import net.minecraft.core.BlockPos;
@@ -16,6 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.LinkedList;
@@ -31,7 +29,8 @@ public class CreakingHeartFamily extends AltBranchFamily {
     public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(CreakingHeartFamily::new);
 
     protected float heartHardnessMultiplier = 10;
-    protected Item heartDropItem = Items.RESIN_CLUMP;
+    protected Item resinItem = Items.RESIN_CLUMP;
+    protected Block resinBlock = Blocks.RESIN_CLUMP;
     protected Supplier<BranchBlock> heartBranch;
     protected Block primitiveHeartLog;
 
@@ -94,6 +93,24 @@ public class CreakingHeartFamily extends AltBranchFamily {
         return DynamicTrees.location("creaking_heart");
     }
 
+    public void addHeartTextures(BiConsumer<String, Identifier> textureConsumer, Identifier primitiveLogLocation, Block sourceBlock, String state) {
+        Optional<Block> primHeart = getPrimitiveHeartLog();
+        if (primHeart.isPresent() && primHeart.get() == sourceBlock){
+            String u = state.isEmpty() ? "" : "_";
+            Identifier barkAwake = primitiveLogLocation.withSuffix(u+state);
+            Identifier ringsAwake = primitiveLogLocation.withSuffix("_top"+u+state);
+            String textureName = state+u+"heart_branch";
+            if (this.textureOverrides.containsKey(textureName))
+                barkAwake = this.textureOverrides.get(textureName);
+            if (this.textureOverrides.containsKey(textureName+"_top"))
+                ringsAwake = this.textureOverrides.get(textureName+"_top");
+
+            textureConsumer.accept("heart_bark", barkAwake);
+            textureConsumer.accept("heart_rings", ringsAwake);
+        }
+        DynamicTrees.LOG.error("Attempted to load heart branch textures for family {} but the provided block {} was not it's heart branch.", getRegistryName(), primHeart);
+    }
+
     ///////////////////////////////////////////
     // OTHER BRANCHES
     ///////////////////////////////////////////
@@ -119,32 +136,8 @@ public class CreakingHeartFamily extends AltBranchFamily {
 
     @Override
     protected BranchBlock createAltBranchBlock(Identifier name) {
-        final BasicBranchBlock branch = this.isThick() ? new ThickBranchBlock(name, this.getProperties()){
-            @Override
-            public Optional<Block> getPrimitiveLog() {
-                if (getFamily() instanceof AltBranchFamily altLogFamily)
-                    return altLogFamily.getPrimitiveAltLog();
-                return super.getPrimitiveLog();
-            }
-            @Override
-            public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
-                return ((CreakingHeartFamily)getFamily()).getHeartHardness(state, level, pos, super.getHardness(state, level, pos));
-            }
-        } : new BasicBranchBlock(name, this.getProperties()){
-            @Override
-            public Optional<Block> getPrimitiveLog() {
-                if (getFamily() instanceof AltBranchFamily altLogFamily)
-                    return altLogFamily.getPrimitiveAltLog();
-                return super.getPrimitiveLog();
-            }
-            @Override
-            public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
-                return ((CreakingHeartFamily)getFamily()).getHeartHardness(state, level, pos, super.getHardness(state, level, pos));
-            }
-        };
-        if (this.isFireProof()) {
-            branch.setFireSpreadSpeed(0).setFlammability(0);
-        }
+        final BasicBranchBlock branch = new ResinBranchBlock(name, this.getProperties());
+        if (this.isFireProof()) branch.setFireSpreadSpeed(0).setFlammability(0);
         return branch;
     }
 
@@ -153,20 +146,25 @@ public class CreakingHeartFamily extends AltBranchFamily {
         return getBranchName("resin_");
     }
 
-//    @Override
-//    protected Identifier altBranchModelGenerator() {
-//        return DynamicTrees.location("resin_branch");
-//    }
-
-//    @Override
-//    public Identifier getAltBranchLoader() {
-//        return DynamicTrees.location("resin_branch");
-//    }
+    @Override
+    protected Identifier altBranchModelGenerator() {
+        return DynamicTrees.location("resin_branch");
+    }
 
     @Override
     public Family setPrimitiveLog(Block primitiveLog) {
         setPrimitiveAltLog(primitiveLog);
         return super.setPrimitiveLog(primitiveLog);
+    }
+
+    public void addResinTextures(BiConsumer<String, Identifier> textureConsumer, Identifier primitiveResinLocation) {
+        Identifier resin = primitiveResinLocation;
+        if (this.textureOverrides.containsKey("resin")) {
+            resin = this.textureOverrides.get("resin");
+        }
+
+        textureConsumer.accept("bark", resin);
+        textureConsumer.accept("rings", DynamicTrees.location("block/air"));
     }
 
     ///////////////////////////////////////////
@@ -192,35 +190,24 @@ public class CreakingHeartFamily extends AltBranchFamily {
         return baseHardness;
     }
 
-    public void addHeartTextures(BiConsumer<String, Identifier> textureConsumer, Identifier primitiveLogLocation, Block sourceBlock, String state) {
-        Optional<Block> primHeart = getPrimitiveHeartLog();
-        if (primHeart.isPresent() && primHeart.get() == sourceBlock){
-            String u = state.isEmpty() ? "" : "_";
-            Identifier barkAwake = primitiveLogLocation.withSuffix(u+state);
-            Identifier ringsAwake = primitiveLogLocation.withSuffix("_top"+u+state);
-            String textureName = state+u+"heart_branch";
-            if (this.textureOverrides.containsKey(textureName))
-                barkAwake = this.textureOverrides.get(textureName);
-            if (this.textureOverrides.containsKey(textureName+"_top"))
-                ringsAwake = this.textureOverrides.get(textureName+"_top");
-
-            textureConsumer.accept("heart_bark", barkAwake);
-            textureConsumer.accept("heart_rings", ringsAwake);
-        }
-        DynamicTrees.LOG.error("Attempted to load heart branch textures for family {} but the provided block {} was not it's heart branch.", getRegistryName(), primHeart);
-    }
-
     public void setHeartHardnessMultiplier(float heartHardnessMultiplier) {
         this.heartHardnessMultiplier = heartHardnessMultiplier;
     }
 
-    public void setHeartDropItem(Item heartDropItem) {
-        this.heartDropItem = heartDropItem;
+    public void setResinItem(Item resinItem) {
+        this.resinItem = resinItem;
     }
 
-    public Item getHeartDropItem() {
-        return heartDropItem;
+    public Item getResinItem() {
+        return resinItem;
     }
 
+    public void setResinBlock(Block resinBlock) {
+        this.resinBlock = resinBlock;
+    }
+
+    public Optional<Block> getResinBlock() {
+        return Optional.ofNullable(resinBlock);
+    }
 
 }

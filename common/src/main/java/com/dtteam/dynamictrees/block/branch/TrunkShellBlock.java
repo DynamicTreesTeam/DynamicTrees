@@ -93,7 +93,7 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
     ///////////////////////////////////////////
 
     /** NeoForge override */ @SuppressWarnings("unused")
-    public boolean  onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, ItemStack toolStack, boolean willHarvest, FluidState fluid) {
+    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, ItemStack toolStack, boolean willHarvest, FluidState fluid) {
         return NullUtils.applyIfNonnull(this.getMuse(level, state, pos),
                 muse -> Services.INTERACTION.blockDestroyByPlayer(muse.state, level, muse.pos, player, willHarvest, level.getFluidState(pos)),
                 false
@@ -139,6 +139,13 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         return state;
+    }
+
+    @Override
+    protected void attack(BlockState state, Level level, BlockPos pos, Player player) {
+        NullUtils.consumeIfNonnull(this.getMuse(level, state, pos),
+                muse -> muse.state.attack(level, muse.pos, player)
+        );
     }
 
     @Override
