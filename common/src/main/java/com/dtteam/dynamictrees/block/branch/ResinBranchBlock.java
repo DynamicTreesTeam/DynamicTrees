@@ -45,7 +45,7 @@ public class ResinBranchBlock extends ThickBranchBlock {
         int currentRadius = TreeHelper.getRadius(state);
         family.getBranch().get().setRadius(level, pos, currentRadius, null, 3);
 
-        ItemStack resin = getResinStack(level.getRandom(), family);
+        ItemStack resin = getResinStack(level.getRandom(), family, currentRadius);
         if (player != null)
             player.addItem(resin);
         else
@@ -55,8 +55,9 @@ public class ResinBranchBlock extends ThickBranchBlock {
     }
 
 
-    private static ItemStack getResinStack(RandomSource random, CreakingHeartFamily family) {
-        return new ItemStack(family.getResinItem(), random.nextIntBetweenInclusive(2, 3));
+    private static ItemStack getResinStack(RandomSource random, CreakingHeartFamily family, int radius) {
+        int count = Math.max(1, Math.round(random.nextIntBetweenInclusive(2, 3) * (radius/8f)));
+        return new ItemStack(family.getResinItem(), count);
     }
 
     @Override

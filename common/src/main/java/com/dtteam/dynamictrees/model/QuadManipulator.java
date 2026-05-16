@@ -3,6 +3,7 @@ package com.dtteam.dynamictrees.model;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.renderer.block.dispatch.multipart.MultiPartModel;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.Direction;
@@ -12,9 +13,9 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.jspecify.annotations.NonNull;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 
 public class QuadManipulator {
@@ -22,7 +23,20 @@ public class QuadManipulator {
     public static final Direction[] everyFace = {Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST, null};
 
     public static List<BakedQuad> getQuads(BlockStateModel modelIn, BlockState stateIn, Vec3 offset, RandomSource rand, @Nullable ModelConnections modelData) {
-        return getQuads(modelIn, stateIn, offset, everyFace, rand, modelData);
+        if (modelIn instanceof MultiPartModel mpModel){
+            return getMultiPartQuads(mpModel, stateIn, offset, rand, modelData);
+        } else {
+            return getQuads(modelIn, stateIn, offset, everyFace, rand, modelData);
+        }
+    }
+
+    private static @NonNull List<BakedQuad> getMultiPartQuads(MultiPartModel mpModel, BlockState stateIn, Vec3 offset, RandomSource rand, @Nullable ModelConnections modelData) {
+        List<BakedQuad> list = new LinkedList<>();
+        for (BlockStateModel subModel : Optional.ofNullable(mpModel.models).orElse(Collections.emptyList())){
+            rand.setSeed(rand.nextLong());
+            list.addAll(getQuads(subModel, stateIn, offset, everyFace, rand, modelData));
+        }
+        return list;
     }
 
     public static List<BakedQuad> getQuads(BlockStateModel modelIn, BlockState stateIn, Vec3 offset, Direction[] sides, RandomSource rand, @Nullable ModelConnections modelData) {
