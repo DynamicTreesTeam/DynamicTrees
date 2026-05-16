@@ -1,4 +1,4 @@
-// 26.1.1	2026-05-16T01:43:55.785326234	Model Definitions - dynamictrees
+// 26.1.1	2026-05-16T16:05:49.3571099	Model Definitions - dynamictrees
 aed0fb7708785b5f2b1e0eefdbc26f0044b9614c assets/dynamictrees/blockstates/acacia_branch.json
 2606791521eac27fa77ebbeeea442b8073802a51 assets/dynamictrees/blockstates/acacia_leaves.json
 28a0cd7b38e1a854acd4f0c477573a9460811d82 assets/dynamictrees/blockstates/acacia_sapling.json
@@ -45,6 +45,7 @@ a653d3be879b872a06ec94c1deb51e4f5ba2d02a assets/dynamictrees/blockstates/pale_oa
 fad110de1eaee356d81187ace311aac41c91e3c4 assets/dynamictrees/blockstates/pale_oak_root.json
 58cd523a3c0401733164c08f687286250356eaac assets/dynamictrees/blockstates/pale_oak_sapling.json
 060bfe656612447de1671cb5964eea5921c5f972 assets/dynamictrees/blockstates/potted_sapling.json
+20985e4bc920cfb956460e007040555b79f3a6ee assets/dynamictrees/blockstates/resin_pale_oak_branch.json
 7b5a93d7d6c8cfb86a4412bcec6863be1f79237a assets/dynamictrees/blockstates/rooty_brown_terracotta.json
 8f50fddbdf92c5679a317fc2970f5423729dd017 assets/dynamictrees/blockstates/rooty_clay.json
 cd82dc2f30388797f1624419c6d711744d239c46 assets/dynamictrees/blockstates/rooty_coarse_dirt.json

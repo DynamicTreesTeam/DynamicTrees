@@ -30,12 +30,16 @@ public class BranchStateGenerator implements Generator<BlockModelGenerators, Fam
         Identifier primitiveLogPath = ModelLocationUtils.getModelLocation(primitiveLog);
 
         final Map<String, Identifier> textures = new HashMap<>();
-        input.addBranchTextures(textures::put, primitiveLogPath, primitiveLog);
+        addTextures(input, textures, primitiveLogPath, primitiveLog);
 
         BasicLoaderBuilder builder = getBranchLoader(input).apply(textures, input);
 
         generators.blockStateOutput.accept(
                 MultiVariantGenerator.dispatch(branch, MultiVariant.of(builder)));
+    }
+
+    protected void addTextures(Family input, Map<String, Identifier> textures, Identifier primitiveLogPath, Block primitiveLog) {
+        input.addBranchTextures(textures::put, primitiveLogPath, primitiveLog);
     }
 
     protected BiFunction<Map<String, Identifier>, Family, BasicLoaderBuilder> getBranchLoader(Family input) {

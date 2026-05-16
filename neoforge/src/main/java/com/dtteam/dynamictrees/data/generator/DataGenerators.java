@@ -31,10 +31,10 @@ public class DataGenerators {
     public static void register(){
         registerBlockModelGenerator(Family.class, DynamicTrees.location("branch"), BranchStateGenerator::new);
         registerBlockModelGenerator(Family.class, DynamicTrees.location("stripped_branch"), StrippedBranchStateGenerator::new);
-        registerBlockModelGenerator(Family.class, DynamicTrees.location("alt_branch"), AltBranchStateGenerator::new);
         registerBlockModelGenerator(Family.class, DynamicTrees.location("surface_root"), SurfaceRootStateGenerator::new);
         registerBlockModelGenerator(Family.class, DynamicTrees.location("roots"), RootsStateGenerator::new);
         registerBlockModelGenerator(Family.class, DynamicTrees.location("creaking_heart"), CreakingHeartStateGenerator::new);
+        registerBlockModelGenerator(Family.class, DynamicTrees.location("alt_branch"), AltBranchStateGenerator::new);
         registerItemModelGenerator(Family.class, DynamicTrees.location("branch_item"), BranchItemModelGenerator::new);
         registerItemModelGenerator(Family.class, DynamicTrees.location("roots_item"), RootsItemModelGenerator::new);
         registerLangGenerator(Family.class, DynamicTrees.location("family_lang"), FamilyLangGenerator::new);

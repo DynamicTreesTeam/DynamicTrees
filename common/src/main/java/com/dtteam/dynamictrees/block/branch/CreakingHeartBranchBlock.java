@@ -173,16 +173,12 @@ public class CreakingHeartBranchBlock extends BasicBranchBlock implements Entity
 
     @Override
     public Optional<Block> getPrimitiveLog() {
-        return getFamily().getPrimitiveAltLog();
+        return ((CreakingHeartFamily)getFamily()).getPrimitiveHeartLog();
     }
 
     @Override
     protected SoundType getSoundType(BlockState state) {
         return getPrimitiveLog().map(block -> block.defaultBlockState().getSoundType()).orElseGet(() -> super.getSoundType(state));
-    }
-
-    public CreakingHeartFamily getFamily() {
-        return (CreakingHeartFamily) super.getFamily();
     }
 
     /**
@@ -219,6 +215,6 @@ public class CreakingHeartBranchBlock extends BasicBranchBlock implements Entity
     @Override
     public LootTable.Builder createBranchDrops(HolderLookup.Provider registries) {
         return DTLootTableBuilder.createCreakingHeartDrops(getPrimitiveLog().get(),
-                getFamily().getHeartDropItem(), 1, 3, registries);
+                ((CreakingHeartFamily)getFamily()).getHeartDropItem(), 1, 3, registries);
     }
 }

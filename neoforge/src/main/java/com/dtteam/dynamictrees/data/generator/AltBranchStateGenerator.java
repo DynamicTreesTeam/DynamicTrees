@@ -5,6 +5,7 @@ import com.dtteam.dynamictrees.data.builder.BasicLoaderBuilder;
 import com.dtteam.dynamictrees.tree.family.AltBranchFamily;
 import com.dtteam.dynamictrees.tree.family.Family;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.block.Block;
 
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -29,7 +30,7 @@ public class AltBranchStateGenerator extends BranchStateGenerator {
                     .append(BRANCH, altFamily.getAltBranch())
                     .append(PRIMITIVE_LOG, altFamily.getPrimitiveAltLog());
         }
-        return super.gatherDependencies(input);
+        return new Dependencies();
     }
 
 }
