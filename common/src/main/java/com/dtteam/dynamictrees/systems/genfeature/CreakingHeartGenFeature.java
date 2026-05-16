@@ -49,9 +49,11 @@ public class CreakingHeartGenFeature extends GenFeature {
         int height = getLowestBranchHeight(context);
         BranchBlock heart = getCreakingHeart(context);
 
-        int limit = configuration.get(MAX_HEIGHT);
-        for (int i=1; i<limit; i++){
+        int maxHeight = configuration.get(MAX_HEIGHT);
+        for (int i=1; i<maxHeight; i++){
             BlockPos testPos = context.pos().above(height + i);
+            //If the heart is too high up the creaking won't spawn
+            if (height + i > maxHeight) return false;
             BlockState testState = context.level().getBlockState(testPos);
             if (!TreeHelper.isBranch(testState)) return false;
             if (isRadiusJustRight(testState, configuration)
