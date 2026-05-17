@@ -28,6 +28,8 @@ import com.dtteam.dynamictrees.loot.function.MultiplyBySticksCount;
 import com.dtteam.dynamictrees.loot.function.MultiplyByTotalVolume;
 import com.dtteam.dynamictrees.loot.function.MultiplyCount;
 import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.recipe.MegaSeedRecipe;
+import com.dtteam.dynamictrees.recipe.SeedConversionRecipe;
 import com.dtteam.dynamictrees.systems.BranchConnectables;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.family.CreakingHeartFamily;
@@ -59,6 +61,7 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.DyedItemColor;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -302,8 +305,12 @@ public class DTRegistries {
     public static final Supplier<StructurePoolElementType<@NotNull TreePoolElement>> TREE_STRUCTURE_POOL_ELEMENT_TYPE = Services.REGISTRY.getRegistryLoader()
             .registerStructurePoolElementType("tree_pool_element", () -> () -> TreePoolElement.CODEC);
 
-//    public static final Supplier<RecipeSerializer<SeedConversionRecipe>> SEED_CONVERSION_RECIPE_TYPE = Services.REGISTRY.getRegistryLoader()
-//            .registerRecipeType("seed_conversion", ()->new SimpleCraftingRecipeSerializer<>(SeedConversionRecipe::new));
-//    public static final Supplier<RecipeSerializer<MegaSeedRecipe>> MEGA_SEED_RECIPE_TYPE = Services.REGISTRY.getRegistryLoader()
-//            .registerRecipeType("mega_seed", ()->new SimpleCraftingRecipeSerializer<>(MegaSeedRecipe::new));
+    ///////////////////////////////////////////
+    // RECIPE
+    ///////////////////////////////////////////
+
+    public static final Supplier<RecipeSerializer<SeedConversionRecipe>> SEED_CONVERSION_RECIPE_TYPE = Services.REGISTRY.getRegistryLoader()
+            .registerRecipeType("seed_conversion", ()-> SeedConversionRecipe.SERIALIZER);
+    public static final Supplier<RecipeSerializer<MegaSeedRecipe>> MEGA_SEED_RECIPE_TYPE = Services.REGISTRY.getRegistryLoader()
+            .registerRecipeType("mega_seed", ()-> MegaSeedRecipe.SERIALIZER);
 }

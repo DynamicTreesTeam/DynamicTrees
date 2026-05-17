@@ -25,10 +25,16 @@ import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.Nullable;
 
 public class DirtBucket extends Item {
+
     public DirtBucket(Identifier id) {
         super(new Properties().stacksTo(1).setId(ResourceKey.create(Registries.ITEM, id)));
         DTRegistries.CREATIVE_TAB_ITEMS.add(this);
-        //craftingRemainingItem = new ItemStackTemplate(this);
+    }
+
+    @Override
+    public @Nullable ItemStackTemplate getCraftingRemainder() {
+        if (craftingRemainingItem == null) craftingRemainingItem = new ItemStackTemplate(this);
+        return super.getCraftingRemainder();
     }
 
     @Override

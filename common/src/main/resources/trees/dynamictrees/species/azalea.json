@@ -19,6 +19,7 @@
         },
         {
             "sapling_block": "flowering_azalea",
+            "can_craft_seed_to_sapling": false,
             "replace_sapling_when_placed": false
         }
     ],
