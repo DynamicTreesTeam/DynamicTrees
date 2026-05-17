@@ -6,6 +6,7 @@ import com.dtteam.dynamictrees.tree.family.CreakingHeartFamily;
 import com.dtteam.dynamictrees.tree.family.Family;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.TrailParticleOption;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.Util;
@@ -13,6 +14,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.CreakingHeartBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.Nullable;
@@ -100,4 +103,24 @@ public class CreakingHeartBranchBlockEntity extends CreakingHeartBlockEntity {
         });
         return Optional.ofNullable(placedResin.get());
     }
+
+    public static void emitParticlesToPosition(ServerLevel level, int count, boolean towardsSource, AABB destinationBox, AABB sourceBox) {
+        int color = towardsSource ? 16545810 : 6250335;
+        RandomSource random = level.getRandom();
+
+        for(double i = 0.0F; i < (double)count; ++i) {
+            Vec3 source = sourceBox.getMinPosition().add(random.nextDouble() * sourceBox.getXsize(), random.nextDouble() * sourceBox.getYsize(), random.nextDouble() * sourceBox.getZsize());
+            Vec3 destination = destinationBox.getMinPosition().add(random.nextDouble() * destinationBox.getXsize(), random.nextDouble() * destinationBox.getYsize(), random.nextDouble() * destinationBox.getZsize());
+            if (towardsSource) {
+                Vec3 foo = source;
+                source = destination;
+                destination = foo;
+            }
+
+            TrailParticleOption particleOption = new TrailParticleOption(destination, color, random.nextInt(40) + 10);
+            level.sendParticles(particleOption, true, true, source.x, source.y, source.z, 1, 0.0F, 0.0F, 0.0F, 0.0F);
+        }
+
+    }
+
 }

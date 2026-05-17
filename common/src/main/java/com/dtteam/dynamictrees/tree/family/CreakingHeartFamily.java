@@ -4,22 +4,32 @@ import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.block.branch.*;
+import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.utility.IdentifierUtils;
 import com.dtteam.dynamictrees.utility.Optionals;
 import net.minecraft.core.BlockPos;
+import net.minecraft.data.tags.TagAppender;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static com.dtteam.dynamictrees.utility.IdentifierUtils.suffix;
@@ -111,6 +121,20 @@ public class CreakingHeartFamily extends AltBranchFamily {
         DynamicTrees.LOG.error("Attempted to load heart branch textures for family {} but the provided block {} was not it's heart branch.", getRegistryName(), primHeart);
     }
 
+    public void addGeneratedBlockTags (Function<TagKey<Block>, TagAppender<Block, Block>> tagAppender){
+        super.addGeneratedBlockTags(tagAppender);
+        getHeartBranch().ifPresent(branch -> {
+            tierTag(getDefaultBranchHarvestTier(), tagAppender).ifPresent(tagBuilder -> tagBuilder.add(branch));
+            defaultBranchTags().forEach(tag -> {
+                if (!isOnlyIfLoaded()) {
+                    tagAppender.apply(tag).add(branch);
+                } else {
+                    tagAppender.apply(tag).addOptional(branch);
+                }
+            });
+        });
+    }
+
     ///////////////////////////////////////////
     // OTHER BRANCHES
     ///////////////////////////////////////////
@@ -122,16 +146,45 @@ public class CreakingHeartFamily extends AltBranchFamily {
             public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
                 return ((CreakingHeartFamily)getFamily()).getHeartHardness(state, level, pos, super.getHardness(state, level, pos));
             }
+
+            @Override
+            protected void attack(BlockState state, Level level, BlockPos pos, Player player) {
+                if (level instanceof ServerLevel serverLevel){
+                    BlockPos heartPos = ((CreakingHeartFamily)getFamily()).getHeartPos(state, level, pos);
+                    if (heartPos != null)
+                        sendParticlesFromHeart(serverLevel, heartPos, pos, state);
+                }
+                super.attack(state, level, pos, player);
+            }
         } : new BasicBranchBlock(name, this.getProperties()){
             @Override
             public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
                 return ((CreakingHeartFamily)getFamily()).getHeartHardness(state, level, pos, super.getHardness(state, level, pos));
+            }
+
+            @Override
+            protected void attack(BlockState state, Level level, BlockPos pos, Player player) {
+                if (level instanceof ServerLevel serverLevel){
+                    BlockPos heartPos = ((CreakingHeartFamily)getFamily()).getHeartPos(state, level, pos);
+                    if (heartPos != null)
+                        sendParticlesFromHeart(serverLevel, heartPos, pos, state);
+                }
+                super.attack(state, level, pos, player);
             }
         };
         if (this.isFireProof()) {
             branch.setFireSpreadSpeed(0).setFlammability(0);
         }
         return branch;
+    }
+
+    private static void sendParticlesFromHeart(ServerLevel level, BlockPos heartPos, BlockPos branchPos, BlockState branchState) {
+        int rad = TreeHelper.getRadius(branchState);
+        AABB source = AABB.unitCubeFromLowerCorner(Vec3.atLowerCornerOf(branchPos)).deflate(0.375).inflate(rad/12f);
+        AABB destination = AABB.unitCubeFromLowerCorner(Vec3.atLowerCornerOf(heartPos));
+
+        CreakingHeartBranchBlockEntity.emitParticlesToPosition(level, rad*2, false, destination, source);
+        CreakingHeartBranchBlockEntity.emitParticlesToPosition(level, rad*2, true, destination, source);
     }
 
     @Override
@@ -180,8 +233,11 @@ public class CreakingHeartFamily extends AltBranchFamily {
     }
 
     public boolean hasHeart(BlockState state, BlockGetter level, BlockPos pos){
-        BlockPos heart = CreakingHeartBranchBlock.findFromBranch(state, level, pos, this.getMaxSignalDepth());
-        return heart != null;
+        return getHeartPos(state, level, pos) != null;
+    }
+
+    private @Nullable BlockPos getHeartPos(BlockState state, BlockGetter level, BlockPos pos) {
+        return CreakingHeartBranchBlock.findFromBranch(state, level, pos, this.getMaxSignalDepth());
     }
 
     public float getHeartHardness(BlockState state, BlockGetter level, BlockPos pos, float baseHardness){

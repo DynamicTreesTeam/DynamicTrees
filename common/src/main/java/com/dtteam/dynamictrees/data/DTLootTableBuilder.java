@@ -216,8 +216,30 @@ public class DTLootTableBuilder {
                         .apply(ApplyBonusCount.addUniformBonusCount(ItemUtils.getEnchantment(Enchantments.FORTUNE, registries)))
                         .apply(LimitCount.limitCount(IntRange.upperBound(9)))
                         .apply(MultiplyByTotalVolume.multiplyByTotalVolume())
-                        .apply(ApplyExplosionDecay.explosionDecay())).setParamSet(DTLootParameterSets.BRANCHES);
+                        .apply(ApplyExplosionDecay.explosionDecay()))
+                .setParamSet(DTLootParameterSets.BRANCHES);
+    }
 
+    public static LootTable.Builder createResinBranchDrops(Block primitiveLogBlock, Item stickItem, Item resinItem, int minResin, int maxResin,  HolderLookup.Provider registries) {
+        return LootTable.lootTable().withPool(
+                LootPool.lootPool().setRolls(ConstantValue.exactly(1)).add(
+                        LootItem.lootTableItem(primitiveLogBlock)
+                                .apply(MultiplyByLogsCount.multiplyByLogsCount())
+                                .apply(ApplyExplosionDecay.explosionDecay())
+                )
+        ).withPool(
+                LootPool.lootPool().setRolls(UniformGenerator.between(maxResin, minResin)).add(
+                        LootItem.lootTableItem(resinItem)
+                                .apply(MultiplyByTotalVolume.multiplyByTotalVolume())
+                                .apply(ApplyExplosionDecay.explosionDecay())
+                )
+        ).withPool(
+                LootPool.lootPool().setRolls(ConstantValue.exactly(1)).add(
+                        LootItem.lootTableItem(stickItem)
+                                .apply(MultiplyBySticksCount.multiplyBySticksCount())
+                                .apply(ApplyExplosionDecay.explosionDecay())
+                )
+        ).setParamSet(DTLootParameterSets.BRANCHES);
     }
 
 }

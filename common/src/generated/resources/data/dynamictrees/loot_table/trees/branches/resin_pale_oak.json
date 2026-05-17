@@ -26,6 +26,28 @@
           "type": "minecraft:item",
           "functions": [
             {
+              "function": "dynamictrees:multiply_total_volume"
+            },
+            {
+              "function": "minecraft:explosion_decay"
+            }
+          ],
+          "name": "minecraft:resin_clump"
+        }
+      ],
+      "rolls": {
+        "type": "minecraft:uniform",
+        "max": 2.0,
+        "min": 3.0
+      }
+    },
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
               "function": "dynamictrees:multiply_sticks_count"
             },
             {

@@ -40,7 +40,7 @@ public class VinesGenFeature extends GenFeature {
         SIDE // Note that side vines will assume the vine uses the same blockstates as a vanilla vine.
     }
 
-    protected final BooleanProperty[] sideVineStates = new BooleanProperty[]{null, VineBlock.UP, VineBlock.NORTH, VineBlock.SOUTH, VineBlock.WEST, VineBlock.EAST};
+    protected final BooleanProperty[] sideVineStates = new BooleanProperty[]{null, null, VineBlock.NORTH, VineBlock.SOUTH, VineBlock.WEST, VineBlock.EAST};
 
     public static final ConfigurationProperty<Integer> MAX_LENGTH = ConfigurationProperty.integer("max_length");
     public static final ConfigurationProperty<Block> BLOCK = ConfigurationProperty.block("block");

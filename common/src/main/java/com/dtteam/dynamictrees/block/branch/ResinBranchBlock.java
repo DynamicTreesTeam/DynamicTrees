@@ -1,9 +1,11 @@
 package com.dtteam.dynamictrees.block.branch;
 
+import com.dtteam.dynamictrees.data.DTLootTableBuilder;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.family.AltBranchFamily;
 import com.dtteam.dynamictrees.tree.family.CreakingHeartFamily;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -17,6 +19,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
@@ -58,6 +61,12 @@ public class ResinBranchBlock extends ThickBranchBlock {
     private static ItemStack getResinStack(RandomSource random, CreakingHeartFamily family, int radius) {
         int count = Math.max(1, Math.round(random.nextIntBetweenInclusive(2, 3) * (radius/8f)));
         return new ItemStack(family.getResinItem(), count);
+    }
+
+    @Override
+    public LootTable.Builder createBranchDrops(HolderLookup.Provider registries) {
+        return DTLootTableBuilder.createResinBranchDrops(getPrimitiveLog().get(),
+                getFamily().getStick(), ((CreakingHeartFamily)getFamily()).getResinItem(), 2, 3, registries);
     }
 
     @Override
