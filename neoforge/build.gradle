@@ -2,7 +2,8 @@ plugins {
     id 'multiloader-loader'
     id 'net.neoforged.moddev'
 }
-version = "${version}${neoVersionAppend}"
+mod_version = "${mod_version}${neoVersionAppend}"
+version = mod_version
 
 neoForge {
     version = neoforge_version

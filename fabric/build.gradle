@@ -2,7 +2,8 @@ plugins {
     id 'multiloader-loader'
     id 'net.fabricmc.fabric-loom'
 }
-version = "${version}${fabricVersionAppend}"
+mod_version = "${mod_version}${fabricVersionAppend}"
+version = mod_version
 
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
