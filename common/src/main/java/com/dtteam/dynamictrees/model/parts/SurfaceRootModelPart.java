@@ -167,7 +167,7 @@ public record SurfaceRootModelPart(QuadCollection quads, boolean useAmbientOcclu
                     Vector3f[] limits = ModelHelper.AABBLimits(pieceBoundary);
 
                     CuboidModelElement part = new CuboidModelElement(limits[0], limits[1], mapFacesIn);
-                    builder.addCulledFace(face, ModelHelper.makeBakedQuad(baker, part, part.faces().get(face), material, face));
+                    builder.addUnculledFace(ModelHelper.makeBakedQuad(baker, part, part.faces().get(face), material, face));
                 }
             }
 

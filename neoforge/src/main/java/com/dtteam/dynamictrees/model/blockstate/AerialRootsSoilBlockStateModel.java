@@ -1,5 +1,6 @@
 package com.dtteam.dynamictrees.model.blockstate;
 
+import com.dtteam.dynamictrees.model.BlockStateModelWithRadius;
 import com.dtteam.dynamictrees.model.parts.AerialRootSoilModelPart;
 import com.dtteam.dynamictrees.registry.PottedSaplingBlockEntityNF;
 import com.dtteam.dynamictrees.tree.TreeHelper;
@@ -24,7 +25,7 @@ import java.util.Optional;
 
 public record AerialRootsSoilBlockStateModel(
         AerialRootSoilModelPart[] soilParts
-) implements DynamicBlockStateModel {
+) implements DynamicBlockStateModel, BlockStateModelWithRadius {
 
     @Override
     public Object createGeometryKey(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random) {
@@ -32,10 +33,14 @@ public record AerialRootsSoilBlockStateModel(
     }
 
     @Override
-    public void collectParts(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random, List<BlockStateModelPart> parts) {
-        int radius = TreeHelper.getRadius(state);
+    public void collectParts(BlockState state, List<BlockStateModelPart> parts, int radius) {
         if (radius == 0 || radius > 8) return;
         parts.add(soilParts[radius-1]);
+    }
+
+    @Override
+    public void collectParts(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random, List<BlockStateModelPart> parts) {
+        collectParts(state, parts, TreeHelper.getRadius(state));
     }
 
     public record Unbaked(Identifier end, Identifier overlay, Identifier overlay_end, Identifier side, Optional<Family> family) implements CustomUnbakedBlockStateModel {

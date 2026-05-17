@@ -1,5 +1,6 @@
 package com.dtteam.dynamictrees.model;
 
+import com.dtteam.dynamictrees.tree.TreeHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
@@ -45,10 +46,12 @@ public class QuadManipulator {
         if (stateIn == null) return outQuads;
 
         List<BlockStateModelPart> parts = new ArrayList<>();
-        if (modelData == null){
-            modelIn.collectParts(rand, parts);
-        } else if (modelIn instanceof BlockStateModelWithConnectionData branchModelIn) {
+        if (modelIn instanceof BlockStateModelWithRadius branchModelIn) {
+            branchModelIn.collectParts(stateIn, parts, TreeHelper.getRadius(stateIn));
+        } else if (modelIn instanceof BlockStateModelWithConnectionData branchModelIn && modelData != null) {
             branchModelIn.collectParts(stateIn, parts, modelData);
+        } else {
+            modelIn.collectParts(rand, parts);
         }
 
         for (BlockStateModelPart part : parts){

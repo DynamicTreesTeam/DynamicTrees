@@ -11,6 +11,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.data.tags.TagAppender;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -51,7 +53,6 @@ public class CreakingHeartFamily extends AltBranchFamily {
     ///////////////////////////////////////////
     // HEART BRANCH
     ///////////////////////////////////////////
-
 
     @Override
     public void setupBlocks() {
@@ -149,11 +150,7 @@ public class CreakingHeartFamily extends AltBranchFamily {
 
             @Override
             protected void attack(BlockState state, Level level, BlockPos pos, Player player) {
-                if (level instanceof ServerLevel serverLevel){
-                    BlockPos heartPos = ((CreakingHeartFamily)getFamily()).getHeartPos(state, level, pos);
-                    if (heartPos != null)
-                        sendParticlesFromHeart(serverLevel, heartPos, pos, state);
-                }
+                sendParticlesFromHeart(level, pos, state,(CreakingHeartFamily)getFamily());
                 super.attack(state, level, pos, player);
             }
         } : new BasicBranchBlock(name, this.getProperties()){
@@ -164,11 +161,7 @@ public class CreakingHeartFamily extends AltBranchFamily {
 
             @Override
             protected void attack(BlockState state, Level level, BlockPos pos, Player player) {
-                if (level instanceof ServerLevel serverLevel){
-                    BlockPos heartPos = ((CreakingHeartFamily)getFamily()).getHeartPos(state, level, pos);
-                    if (heartPos != null)
-                        sendParticlesFromHeart(serverLevel, heartPos, pos, state);
-                }
+                sendParticlesFromHeart(level, pos, state,(CreakingHeartFamily)getFamily());
                 super.attack(state, level, pos, player);
             }
         };
@@ -178,13 +171,19 @@ public class CreakingHeartFamily extends AltBranchFamily {
         return branch;
     }
 
-    private static void sendParticlesFromHeart(ServerLevel level, BlockPos heartPos, BlockPos branchPos, BlockState branchState) {
+    private static void sendParticlesFromHeart(Level level, BlockPos branchPos, BlockState branchState, CreakingHeartFamily family) {
+        if (!(level instanceof ServerLevel serverLevel)) return;
+        BlockPos heartPos = family.getHeartPos(branchState, level, branchPos);
+        if (heartPos == null) return;
+
         int rad = TreeHelper.getRadius(branchState);
         AABB source = AABB.unitCubeFromLowerCorner(Vec3.atLowerCornerOf(branchPos)).deflate(0.375).inflate(rad/12f);
         AABB destination = AABB.unitCubeFromLowerCorner(Vec3.atLowerCornerOf(heartPos));
 
-        CreakingHeartBranchBlockEntity.emitParticlesToPosition(level, rad*2, false, destination, source);
-        CreakingHeartBranchBlockEntity.emitParticlesToPosition(level, rad*2, true, destination, source);
+        CreakingHeartBranchBlockEntity.emitParticlesToPosition(serverLevel, rad*2, false, destination, source);
+        CreakingHeartBranchBlockEntity.emitParticlesToPosition(serverLevel, rad*2, true, destination, source);
+
+        serverLevel.playSound(null, branchPos, SoundEvents.CREAKING_HEART_HURT, SoundSource.BLOCKS, 0.5f, 1.0F);
     }
 
     @Override
@@ -232,10 +231,16 @@ public class CreakingHeartFamily extends AltBranchFamily {
         return true;
     }
 
+    /**
+     * This performs a DFS every time its called, avoid using it too often.
+     */
     public boolean hasHeart(BlockState state, BlockGetter level, BlockPos pos){
         return getHeartPos(state, level, pos) != null;
     }
 
+    /**
+     * This performs a DFS every time its called, avoid using it too often.
+     */
     private @Nullable BlockPos getHeartPos(BlockState state, BlockGetter level, BlockPos pos) {
         return CreakingHeartBranchBlock.findFromBranch(state, level, pos, this.getMaxSignalDepth());
     }
