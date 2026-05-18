@@ -1,0 +1,46 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "type": "dynamictrees:roots",
+        "opaque": false,
+        "textures": {
+          "side": "minecraft:block/mangrove_roots_side",
+          "top": "minecraft:block/mangrove_roots_top"
+        }
+      },
+      "when": {
+        "layer": "exposed"
+      }
+    },
+    {
+      "apply": {
+        "type": "dynamictrees:roots",
+        "opaque": true,
+        "textures": {
+          "side": "minecraft:block/muddy_mangrove_roots_side",
+          "top": "minecraft:block/muddy_mangrove_roots_top"
+        }
+      },
+      "when": {
+        "layer": "filled"
+      }
+    },
+    {
+      "apply": {
+        "model": "minecraft:block/mud"
+      },
+      "when": {
+        "layer": "covered"
+      }
+    },
+    {
+      "apply": {
+        "model": "minecraft:block/moss_carpet"
+      },
+      "when": {
+        "layer": "exposed|filled"
+      }
+    }
+  ]
+}

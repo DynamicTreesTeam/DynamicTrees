@@ -5,7 +5,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.BushBlock;
 import net.minecraft.world.level.block.VegetationBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
@@ -28,7 +27,7 @@ public class MixinVegetationBlock {
         BlockState belowBlockState = level.getBlockState(blockpos);
         if (belowBlockState.getBlock() instanceof BasicRootsBlock roots){
             if (belowBlockState.getValue(BasicRootsBlock.LAYER) == BasicRootsBlock.Layer.COVERED){
-                Block block = BasicRootsBlock.Layer.COVERED.getPrimitive(roots.getFamily()).orElse(null);
+                Block block = BasicRootsBlock.Layer.COVERED.getPrimitive(roots.getAerialFamily()).orElse(null);
                 if (block == null) return;
                 cir.setReturnValue(mayPlaceOn(block.defaultBlockState(), level, blockpos));
             }

@@ -1,4 +1,4 @@
-// 26.1.1	2026-05-16T21:38:17.836314372	Loot Tables
+// 26.1.2	2026-05-18T18:19:45.680265682	Loot Tables
 3ff99ae4223c6dc6f4ed715c8fa3f4796cdd9439 data/dynamictrees/loot_table/blocks/acacia_leaves.json
 2ac66fbd2e0b38eaabe31a9fac03c037bf9384b6 data/dynamictrees/loot_table/blocks/apple.json
 5f0998fa925b03e8e595619fc1abefa11e6763c2 data/dynamictrees/loot_table/blocks/azalea_leaves.json
@@ -56,6 +56,7 @@ f7c94ca36be1578aeb18a09bf49c3da6e07a0b9b data/dynamictrees/loot_table/trees/leav
 64f6dbb823becc461da78e458d113dedf21765b3 data/dynamictrees/loot_table/trees/leaves/spruce.json
 19a639dc5d4f68b89af589d18edb28c24dda7e13 data/dynamictrees/loot_table/trees/leaves/warped.json
 581b4de78db4abc16e8223663a6776e6ae92e1c5 data/dynamictrees/loot_table/trees/roots/mangrove_roots.json
+7590080f1f0c33b7e941a41640edafaa9771ae33 data/dynamictrees/loot_table/trees/roots/mossy_mangrove_roots.json
 712fe4bce6ad460d5afe59c73c228b263c92fc44 data/dynamictrees/loot_table/trees/voluntary/acacia.json
 51a7ca41824728097c9fe8be67e898188e577a34 data/dynamictrees/loot_table/trees/voluntary/apple_oak.json
 0c8922ea57401a64e07e1c1d854bd4468bc790e6 data/dynamictrees/loot_table/trees/voluntary/azalea.json

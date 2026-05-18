@@ -14,7 +14,9 @@ public class RootsItemModelGenerator extends BranchItemModelGenerator {
 
     @Override
     protected void addTextures(Family input, Map<String, Identifier> textures, Identifier primitiveLogPath, Block primitiveLog) {
-        input.addRootTextures(textures::put, primitiveLogPath);
+        if (input instanceof AerialRootsFamily rootsFamily){
+            rootsFamily.addRootTextures(textures::put, primitiveLogPath);
+        }
     }
 
     @Override

@@ -76,6 +76,7 @@ public class ModEventHandler {
     private static void registerFamilyTypes() {
         Family.REGISTRY.registerType(DynamicTrees.location("nether_fungus"), NetherFungusFamily.TYPE);
         Family.REGISTRY.registerType(DynamicTrees.location("aerial_roots"), AerialRootsFamily.TYPE);
+        Family.REGISTRY.registerType(DynamicTrees.location("mossy_aerial_roots"), MossyAerialRootsFamily.TYPE);
         Family.REGISTRY.registerType(DynamicTrees.location("palm"), PalmFamily.TYPE);
         Family.REGISTRY.registerType(DynamicTrees.location("alt_branch"), AltBranchFamily.TYPE);
         Family.REGISTRY.registerType(DynamicTrees.location("creaking_heart"), CreakingHeartFamily.TYPE);

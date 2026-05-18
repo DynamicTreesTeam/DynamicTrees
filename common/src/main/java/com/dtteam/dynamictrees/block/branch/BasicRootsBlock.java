@@ -100,10 +100,11 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         rootLootTableSupplier = new LootTableSupplier("trees/roots/", name);
     }
 
-    public boolean isFullBlock (BlockState state){
+    public static boolean isFullBlock (BlockState state){
         return state.getValue(LAYER) == Layer.COVERED;
     }
-    public AerialRootsFamily getFamily() {
+
+    public AerialRootsFamily getAerialFamily() {
         return (AerialRootsFamily) super.getFamily();
     }
 
@@ -155,7 +156,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     }
 
     protected int getMaxSignalDepth() {
-        return getFamily().getMaxSignalDepth();
+        return getAerialFamily().getMaxSignalDepth();
     }
 
     @Override
@@ -170,7 +171,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         destroyMode = DynamicTrees.DestroyMode.SET_RADIUS;
         BlockState currentState = level.getBlockState(pos);
         boolean replacingWater = currentState.getFluidState() == Fluids.WATER.getSource(false);
-        boolean replacingGround = getFamily().isAcceptableSoilForRootSystem(currentState);
+        boolean replacingGround = getAerialFamily().isAcceptableSoilForRootSystem(currentState);
         boolean setWaterlogged = replacingWater && !replacingGround;
         boolean isFullBlock = radius >= 8;
         Layer layer;
@@ -195,10 +196,10 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
 
     @Override
     protected ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
-        if (isFullBlock(state) && getFamily().getPrimitiveCoveredRoots().isPresent()){
-            return new ItemStack(getFamily().getPrimitiveCoveredRoots().get());
+        if (isFullBlock(state) && getAerialFamily().getPrimitiveCoveredRoots().isPresent()){
+            return new ItemStack(getAerialFamily().getPrimitiveCoveredRoots().get());
         }
-        return this.getFamily().getRootsItem().map(ItemStack::new).orElse(ItemStack.EMPTY);
+        return this.getAerialFamily().getRootsItem().map(ItemStack::new).orElse(ItemStack.EMPTY);
     }
 
     //////////////////////////////
@@ -207,7 +208,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
 
     @Override
     protected SoundType getSoundType(BlockState state) {
-        Optional<Block> primitive = state.getValue(LAYER).getPrimitive(getFamily());
+        Optional<Block> primitive = state.getValue(LAYER).getPrimitive(getAerialFamily());
         return primitive.map(block -> block.defaultBlockState().getSoundType())
                 .orElseGet(() -> super.getSoundType(state));
     }
@@ -266,7 +267,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     }
 
     public Optional<Block> getPrimitiveLog() {
-        return getFamily().getPrimitiveRoots();
+        return getAerialFamily().getPrimitiveRoots();
     }
 
     //////////////////////////////
@@ -280,7 +281,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
 
     @Override
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-                if (!isFullBlock(state)) {
+        if (!isFullBlock(state)) {
             Layer layer = Layer.COVERED;
             if (state.getValue(RADIUS) >= 8){
                 if (state.getValue(LAYER) == Layer.EXPOSED)
@@ -288,13 +289,12 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
                 else layer = null;
             }
             if (layer != null){
-                ItemStack handStack = player.getItemInHand(hand);
-                Block coverBlock = getFamily().getPrimitiveCoveredRoots().orElse(null);
-                if (coverBlock != null && handStack.getItem() == coverBlock.asItem()){
-                    BlockState newState = state.setValue(LAYER, layer).setValue(WATERLOGGED, false);
+                Block coverBlock = getAerialFamily().getPrimitiveCoveredRoots().orElse(null);
+                if (coverBlock != null && stack.getItem() == coverBlock.asItem()){
+                    BlockState newState = coveredRootsState(state, layer);
                     if (canPlace(player, level, pos, newState)){
                         level.setBlock(pos, newState, 3);
-                        if (!player.isCreative()) handStack.shrink(1);
+                        if (!player.isCreative()) stack.shrink(1);
                         level.playSound(null, pos, coverBlock.defaultBlockState().getSoundType().getPlaceSound(), SoundSource.BLOCKS, 1f, 0.8f);
                         return InteractionResult.SUCCESS;
                     }
@@ -304,13 +304,17 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
     }
 
+    protected BlockState coveredRootsState(BlockState state, Layer layer) {
+        return state.setValue(LAYER, layer).setValue(WATERLOGGED, false);
+    }
+
     @Override
     public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, ItemStack toolStack, boolean willHarvest, FluidState fluid) {
         if (isFullBlock(state)){
             level.setBlock(pos, state.setValue(LAYER, Layer.FILLED), level.isClientSide() ? 11 : 3);
             this.spawnDestroyParticles(level, player, pos, state);
             level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
-            Block primitive = state.getValue(LAYER).getPrimitive(getFamily()).orElse(null);
+            Block primitive = state.getValue(LAYER).getPrimitive(getAerialFamily()).orElse(null);
             if (!player.isCreative() && primitive != null) dropResources(primitive.defaultBlockState(), level, pos);
             return false;
         }
@@ -370,7 +374,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
 
         // Analyze only part of the tree beyond the break point and calculate its volume, then destroy the branches.
         final NetVolumeNode volumeSum = new NetVolumeNode();
-        final RootsDestroyerNode destroyer = new RootsDestroyerNode(getFamily());
+        final RootsDestroyerNode destroyer = new RootsDestroyerNode(getAerialFamily());
         destroyMode = DynamicTrees.DestroyMode.HARVEST;
         this.analyse(blockState, level, cutPos, wholeTree ? null : signal.localRootDir, new MapSignal(volumeSum, destroyer));
         destroyMode = DynamicTrees.DestroyMode.SLOPPY;
@@ -401,9 +405,9 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
 
     @Override
     public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
-        if (isFullBlock(state)) return getFamily().getPrimitiveCoveredRoots().orElse(Blocks.AIR).defaultDestroyTime();
+        if (isFullBlock(state)) return getAerialFamily().getPrimitiveCoveredRoots().orElse(Blocks.AIR).defaultDestroyTime();
         final int radius = this.getRadius(level.getBlockState(pos));
-        final double hardness = this.getFamily().getPrimitiveLog().orElse(Blocks.AIR).defaultBlockState()
+        final double hardness = this.getAerialFamily().getPrimitiveLog().orElse(Blocks.AIR).defaultBlockState()
                 .getDestroySpeed(level, pos) * DTConfigs.SERVER.treeHardnessMultiplier.get() * (radius * radius) / 64.0f * 8.0f;
         return (float) Math.min(hardness, DTConfigs.SERVER.maxTreeHardness.get());
     }
@@ -413,14 +417,14 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     public BlockState getStateForDecay(BlockState state, LevelAccessor level, BlockPos pos) {
         boolean waterlogged = state.hasProperty(BlockStateProperties.WATERLOGGED) && state.getValue(BlockStateProperties.WATERLOGGED);
         Layer layer = state.hasProperty(BasicRootsBlock.LAYER) ? state.getValue(BasicRootsBlock.LAYER) : Layer.EXPOSED;
-        Block primitive = (layer == Layer.COVERED && layer.getPrimitive(getFamily()).isPresent()) ? layer.getPrimitive(getFamily()).get() : Blocks.AIR;
+        Block primitive = (layer == Layer.COVERED && layer.getPrimitive(getAerialFamily()).isPresent()) ? layer.getPrimitive(getAerialFamily()).get() : Blocks.AIR;
         return waterlogged ? Blocks.WATER.defaultBlockState() : primitive.defaultBlockState();
     }
 
     //This allows for the correct tool to be used in the root covering (shovel instead of axe, for example).
     @Override
     public float getDestroyProgress(BlockState pState, Player pPlayer, BlockGetter pLevel, BlockPos pPos) {
-        Optional<Block> covered = getFamily().getPrimitiveCoveredRoots();
+        Optional<Block> covered = getAerialFamily().getPrimitiveCoveredRoots();
         if (pState.hasProperty(LAYER) && pState.getValue(LAYER) == Layer.COVERED && covered.isPresent()){
             return covered.get().defaultBlockState().getDestroyProgress(pPlayer, pLevel, pPos);
         }
@@ -485,8 +489,8 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     public VoxelShape getCollisionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
         if (isFullBlock(pState)) {
             VoxelShape fullShape = Shapes.block();
-            if (getFamily().getPrimitiveCoveredRoots().isPresent())
-                fullShape = getFamily().getPrimitiveCoveredRoots().get().defaultBlockState().getCollisionShape(pLevel, pPos, pContext);
+            if (getAerialFamily().getPrimitiveCoveredRoots().isPresent())
+                fullShape = getAerialFamily().getPrimitiveCoveredRoots().get().defaultBlockState().getCollisionShape(pLevel, pPos, pContext);
             return fullShape;
         }
         return super.getCollisionShape(pState, pLevel, pPos, pContext);
@@ -519,7 +523,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
 
     private boolean canGrowInto(Level level, BlockPos pos){
         BlockState state = level.getBlockState(pos);
-        boolean isFree = getFamily().isAcceptableSoilForRootSystem(state) || state.canBeReplaced();
+        boolean isFree = getAerialFamily().isAcceptableSoilForRootSystem(state) || state.canBeReplaced();
         return isFree || state.getBlock() instanceof BasicRootsBlock;
     }
 
@@ -540,11 +544,11 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
             return signal;
         }
         int supportExtraThickness =
-                //(getFamily().isAcceptableSoilForRootSystem(level.getBlockState(pos)) && !fromGround) ? getFamily().getSupportedRootThicknessExtra() :
+                //(getAerialFamily().isAcceptableSoilForRootSystem(level.getBlockState(pos)) && !fromGround) ? getAerialFamily().getSupportedRootThicknessExtra() :
                 0;
-        int radius = getFamily().getPrimaryRootThickness() + supportExtraThickness;
+        int radius = getAerialFamily().getPrimaryRootThickness() + supportExtraThickness;
         setRadius(level, pos, radius, null);
-        signal.radius = getFamily().getSecondaryRootThickness() + supportExtraThickness;
+        signal.radius = getAerialFamily().getSecondaryRootThickness() + supportExtraThickness;
         signal.success = true;
 
         return signal;

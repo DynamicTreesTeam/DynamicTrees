@@ -1,9 +1,10 @@
 {
-  "type": "aerial_roots",
+  "type": "mossy_aerial_roots",
   "common_leaves": "mangrove",
   "common_species": "mangrove",
   "primitive_log": "mangrove_log",
   "primitive_stripped_log": "stripped_mangrove_log",
+  "moss_carpet": "moss_carpet",
   "max_branch_radius": 8,
   "default_soil": "dynamictrees:mangrove_aerial_roots",
   "primitive_root": "mangrove_roots",

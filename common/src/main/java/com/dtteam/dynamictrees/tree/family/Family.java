@@ -956,17 +956,6 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         textureConsumer.accept("rings", rings);
     }
 
-    public void addRootTextures(BiConsumer<String, Identifier> textureConsumer, Identifier primitiveLogLocation) {
-        Identifier bark = suffix(primitiveLogLocation, "_side");
-        Identifier rings = suffix(primitiveLogLocation, "_top");
-
-        if (textureOverrides.containsKey(ROOTS_SIDE)) bark = textureOverrides.get(ROOTS_SIDE);
-        if (textureOverrides.containsKey(ROOTS_TOP)) rings = textureOverrides.get(ROOTS_TOP);
-
-        textureConsumer.accept("bark", bark);
-        textureConsumer.accept("rings", rings);
-    }
-
     public List<Identifier> topBranchTextureLocations(){
         List<Identifier> locations = new ArrayList<>();
         if (getPrimitiveLog().isPresent()){

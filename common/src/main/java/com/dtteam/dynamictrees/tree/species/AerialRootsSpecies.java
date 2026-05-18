@@ -3,7 +3,9 @@ package com.dtteam.dynamictrees.tree.species;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.api.treedata.TreePart;
 import com.dtteam.dynamictrees.block.branch.BasicRootsBlock;
+import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
+import com.dtteam.dynamictrees.block.soil.AerialRootsSoilProperties;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.block.soil.SpeciesBlockEntity;
@@ -12,8 +14,8 @@ import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKit;
 import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKitConfiguration;
 import com.dtteam.dynamictrees.systems.growthlogic.context.PositionalSpeciesContext;
 import com.dtteam.dynamictrees.tree.TreeHelper;
-import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.family.AerialRootsFamily;
+import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
 import com.dtteam.dynamictrees.worldgen.JoCode;
 import com.dtteam.dynamictrees.worldgen.JoCodeRegistry;
@@ -31,6 +33,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Optional;
 
 public class AerialRootsSpecies extends Species {
 
@@ -66,8 +69,8 @@ public class AerialRootsSpecies extends Species {
         }
     }
 
-    public AerialRootsFamily getFamily() {
-        return (AerialRootsFamily) family;
+    public AerialRootsSoilProperties getDefaultSoil(){
+        return ((AerialRootsFamily)getFamily()).getDefaultSoil();
     }
 
     //////////////////////
@@ -80,7 +83,7 @@ public class AerialRootsSpecies extends Species {
         boolean worldGenOnWater = (isWater(dirtState) && fertility == 0);
         if (!SoilHelper.isSoilRegistered(dirt) && !(dirt instanceof SoilBlock) || worldGenOnWater) {
             //soil is not valid so we place default roots
-            level.setBlock(rootPos, getFamily().getDefaultSoil().getSoilState(dirtState, fertility, this.doesRequireTileEntity(level, rootPos)), 3);
+            level.setBlock(rootPos, getDefaultSoil().getSoilState(dirtState, fertility, this.doesRequireTileEntity(level, rootPos)), 3);
 
             BlockEntity tileEntity = level.getBlockEntity(rootPos);
             if (tileEntity instanceof SpeciesBlockEntity speciesTE) {
@@ -94,10 +97,10 @@ public class AerialRootsSpecies extends Species {
 
     private boolean replaceSoilBlock (BlockState soilState, Level level, BlockPos rootPos, int fertility){
         if (soilState.getBlock() instanceof SoilBlock soilBlock
-                && !soilBlock.getSoilProperties().equals(getFamily().getDefaultSoil())){
+                && !soilBlock.getSoilProperties().equals(getDefaultSoil())){
             BlockEntity TE = level.getBlockEntity(rootPos);
-            BlockState rootCollarState = getFamily().getDefaultSoil().getSoilState(soilBlock.getPrimitiveSoilState(soilState), fertility, soilState.getValue(SoilBlock.IS_VARIANT));
-            getFamily().getDefaultSoil().getBlock().ifPresent(root -> root.updateRadius(level, rootCollarState, rootPos, 3, true));
+            BlockState rootCollarState = getDefaultSoil().getSoilState(soilBlock.getPrimitiveSoilState(soilState), fertility, soilState.getValue(SoilBlock.IS_VARIANT));
+            getDefaultSoil().getBlock().ifPresent(root -> root.updateRadius(level, rootCollarState, rootPos, 3, true));
             if (TE != null){
                 level.setBlockEntity(TE);
                 if (TE instanceof SpeciesBlockEntity speciesTE) {
@@ -198,6 +201,12 @@ public class AerialRootsSpecies extends Species {
         this.rootTapering = rootTapering;
     }
 
+    public Optional<BranchBlock> getRoots() {
+        if (getFamily() instanceof AerialRootsFamily aerialFamily)
+            return aerialFamily.getRoots();
+        return Optional.empty();
+    }
+
     @Override
     protected GrowSignal sendGrowthSignal(TreePart treeBase, Level level, BlockPos treePos, BlockPos rootPos, Direction defaultDir) {
         GrowSignal treeSignal = super.sendGrowthSignal(treeBase, level, treePos, rootPos, defaultDir);
@@ -209,7 +218,7 @@ public class AerialRootsSpecies extends Species {
                 GrowSignal rootGrowSignal = new GrowSignal(this, rootPos, getRootEnergy(level, rootPos), level.getRandom(), defaultDir.getOpposite());
                 return TreeHelper.getTreePart(belowState).growSignal(level, belowPos, rootGrowSignal);
             } else if (isAcceptableSoil(belowState)) {
-                getFamily().getRoots().ifPresent(branch -> branch.setRadius(level, belowPos, family.getPrimaryThickness(), null));
+                getRoots().ifPresent(branch -> branch.setRadius(level, belowPos, family.getPrimaryThickness(), null));
             }
         }
 

@@ -30,6 +30,8 @@ public class RootsStateGenerator implements Generator<BlockModelGenerators, Fami
 
     @Override
     public void generate(BlockModelGenerators generators, Family input, Dependencies dependencies) {
+        if (!(input instanceof AerialRootsFamily rootsInput)) return;
+
         final BranchBlock branch = dependencies.get(ROOT);
         final Block primitiveExposed = dependencies.get(PRIMITIVE_ROOT);
         final Block primitiveFilled = dependencies.get(PRIMITIVE_FILLED_ROOT);
@@ -40,12 +42,16 @@ public class RootsStateGenerator implements Generator<BlockModelGenerators, Fami
 
         final Map<String, Identifier> exposedTextures = new HashMap<>();
         final Map<String, Identifier> filledTextures = new HashMap<>();
-        input.addRootTextures(exposedTextures::put, primitiveExposedPath);
-        input.addRootTextures(filledTextures::put, primitiveFilledPath);
+        addTextures(rootsInput, exposedTextures, primitiveExposedPath);
+        addTextures(rootsInput, filledTextures, primitiveFilledPath);
 
         BasicLoaderBuilder exposedBuilder = BasicLoaderBuilder.loaderBuilders.get(input.getRootsLoader()).apply(exposedTextures, input);
         BasicLoaderBuilder filledBuilder = BasicLoaderBuilder.loaderBuilders.get(input.getRootsLoader().withSuffix("_opaque")).apply(filledTextures, input);
 
+        acceptOutput(generators, exposedBuilder, filledBuilder, primitiveCoveredPath, branch, input, dependencies);
+    }
+
+    protected void acceptOutput(BlockModelGenerators generators, BasicLoaderBuilder exposedBuilder, BasicLoaderBuilder filledBuilder, Identifier primitiveCoveredPath, BranchBlock branch, Family input, Dependencies dependencies) {
         var propertyDispatch = PropertyDispatch.initial(BasicRootsBlock.LAYER).generate(
                 layer -> switch (layer){
                     case EXPOSED -> MultiVariant.of(exposedBuilder);
@@ -55,6 +61,11 @@ public class RootsStateGenerator implements Generator<BlockModelGenerators, Fami
         );
 
         generators.blockStateOutput.accept(MultiVariantGenerator.dispatch(branch).with(propertyDispatch));
+    }
+
+
+    protected void addTextures(AerialRootsFamily rootsInput, Map<String, Identifier> exposedTextures, Identifier primitiveExposedPath) {
+        rootsInput.addRootTextures(exposedTextures::put, primitiveExposedPath);
     }
 
     @Override

@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -55,6 +56,11 @@ public class AerialRootsFamily extends Family {
         if (!(species instanceof AerialRootsSpecies)) {
             LogManager.getLogger().warn("Common species {} for Aerial Roots Family {} is not of type {}", species.getRegistryName(), getRegistryName(), AerialRootsSpecies.class);
         }
+    }
+
+    @Override
+    public boolean hasRootSystem() {
+        return true;
     }
 
     ///////////////////////////////////////////
@@ -166,9 +172,15 @@ public class AerialRootsFamily extends Family {
         return this;
     }
 
-    @Override
-    public boolean hasRootSystem() {
-        return true;
+    public void addRootTextures(BiConsumer<String, Identifier> textureConsumer, Identifier primitiveLogLocation) {
+        Identifier bark = suffix(primitiveLogLocation, "_side");
+        Identifier rings = suffix(primitiveLogLocation, "_top");
+
+        if (textureOverrides.containsKey(ROOTS_SIDE)) bark = textureOverrides.get(ROOTS_SIDE);
+        if (textureOverrides.containsKey(ROOTS_TOP)) rings = textureOverrides.get(ROOTS_TOP);
+
+        textureConsumer.accept("bark", bark);
+        textureConsumer.accept("rings", rings);
     }
 
     ///////////////////////////////////////////

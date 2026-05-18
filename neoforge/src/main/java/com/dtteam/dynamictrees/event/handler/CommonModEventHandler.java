@@ -49,6 +49,7 @@ public class CommonModEventHandler {
         if (!event.isEntryOfType(Family.class)) return;
         event.registerType(DynamicTrees.location("nether_fungus"), NetherFungusFamily.TYPE);
         event.registerType(DynamicTrees.location("aerial_roots"), AerialRootsFamily.TYPE);
+        event.registerType(DynamicTrees.location("mossy_aerial_roots"), MossyAerialRootsFamily.TYPE);
         event.registerType(DynamicTrees.location("palm"), PalmFamily.TYPE);
         event.registerType(DynamicTrees.location("alt_branch"), AltBranchFamily.TYPE);
         event.registerType(DynamicTrees.location("creaking_heart"), CreakingHeartFamily.TYPE);
