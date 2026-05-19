@@ -275,6 +275,10 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         root.performBonemeal(pLevel, pRandom, rootPos, rootState);
     }
 
+    public abstract BranchBlock setFlammability(int flammability);
+
+    public abstract BranchBlock setFireSpreadSpeed(int fireSpreadSpeed);
+
     ///////////////////////////////////////////
     // RENDERING
     ///////////////////////////////////////////

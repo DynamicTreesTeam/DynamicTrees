@@ -121,12 +121,14 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         return flammability;
     }
 
-    public BasicRootsBlock setFlammability(int flammability) {
+    @Override
+    public BranchBlock setFlammability(int flammability) {
         this.flammability = flammability;
         return this;
     }
 
-    public BasicRootsBlock setFireSpreadSpeed(int fireSpreadSpeed) {
+    @Override
+    public BranchBlock setFireSpreadSpeed(int fireSpreadSpeed) {
         this.fireSpreadSpeed = fireSpreadSpeed;
         return this;
     }

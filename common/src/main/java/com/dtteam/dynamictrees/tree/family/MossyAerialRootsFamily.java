@@ -1,13 +1,12 @@
 package com.dtteam.dynamictrees.tree.family;
 
 import com.dtteam.dynamictrees.DynamicTrees;
-import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.block.branch.BasicRootsBlock;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.branch.MossyRootsBlock;
+import com.dtteam.dynamictrees.tree.BranchEntry;
 import com.dtteam.dynamictrees.tree.TreeHelper;
-import com.dtteam.dynamictrees.utility.Optionals;
 import net.minecraft.core.BlockPos;
 import net.minecraft.data.tags.TagAppender;
 import net.minecraft.resources.Identifier;
@@ -22,6 +21,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
@@ -29,15 +29,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Supplier;
-
-import static com.dtteam.dynamictrees.utility.IdentifierUtils.suffix;
 
 public class MossyAerialRootsFamily extends AerialRootsFamily {
 
     public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(MossyAerialRootsFamily::new);
 
-    private Supplier<BranchBlock> mossyRoots;
+    protected BranchEntry mossyRoots = new BranchEntry(this);
     /**
      * Must be a block item to be placed and clicked on
      */
@@ -54,30 +51,32 @@ public class MossyAerialRootsFamily extends AerialRootsFamily {
     @Override
     public void setupBlocks() {
         super.setupBlocks();
-        this.setMossyRoots(this.createMossyRoots(this.getBranchName("mossy_")));
-        this.createRootsItem(this.getBranchName().withPrefix("mossy_"), this.mossyRoots);
+        mossyRoots.setBranchName(getRootsName("mossy_"))
+                .setCanBeStripped(false)
+                .CreateBlock(this::createMossyRoots);
     }
 
-    public Family setMossyRoots(final Supplier<BranchBlock> branchSup) {
-        this.mossyRoots = setupBranch(branchSup, false);
-        return this;
+    protected BranchBlock createMossyRoots(Identifier name, BlockBehaviour.Properties properties) {
+        return new MossyRootsBlock(name, properties);
+    }
+
+    @Override
+    protected BranchBlock createRoots(Identifier name, BlockBehaviour.Properties properties) {
+        return new BasicRootsBlock(name, properties){
+            @Override
+            protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+                if (stack.is(getMossCarpetItem())
+                        && placeMossCarpet(state, level, pos)) {
+                    stack.consume(1, player);
+                    return InteractionResult.SUCCESS;
+                }
+                return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
+            }
+        };
     }
 
     public Optional<BranchBlock> getMossyRoots() {
-        return Optionals.ofBlock(mossyRoots);
-    }
-
-    protected Supplier<BranchBlock> createMossyRoots(final Identifier id) {
-        Identifier name = suffix(id, getRootsNameSuffix());
-        return RegistryHandler.addBlock(name, () -> createMossyRootsBlock(name));
-    }
-
-    protected BranchBlock createMossyRootsBlock(Identifier name) {
-        final BasicRootsBlock branch = new MossyRootsBlock(name, this.getProperties());
-        if (this.isFireProof()) {
-            branch.setFireSpreadSpeed(0).setFlammability(0);
-        }
-        return branch;
+        return mossyRoots.getBlock();
     }
 
     public void setMossCarpet(Item mossCarpet) {
@@ -120,9 +119,7 @@ public class MossyAerialRootsFamily extends AerialRootsFamily {
     @Override
     public void setPrimitiveRoots(Block primitiveRoots) {
         super.setPrimitiveRoots(primitiveRoots);
-        if (this.mossyRoots != null) {
-            this.mossyRoots.get().setPrimitiveLogDrops(List.of(()->new ItemStack(primitiveRoots)));
-        }
+        mossyRoots.setPrimitiveBlock(primitiveRoots);
     }
 
     ///////////////////////////////////////////
@@ -131,23 +128,6 @@ public class MossyAerialRootsFamily extends AerialRootsFamily {
 
     public SoundType getMossCarpetSoundType(){
         return getMossCarpetBlock().defaultBlockState().getSoundType();
-    }
-
-    @Override
-    protected BranchBlock createRootsBlock(Identifier name) {
-        final BasicRootsBlock branch = new BasicRootsBlock(name, this.getProperties()){
-            @Override
-            protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-                if (stack.is(getMossCarpetItem())
-                        && placeMossCarpet(state, level, pos)) {
-                    stack.consume(1, player);
-                    return InteractionResult.SUCCESS;
-                }
-                return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
-            }
-        };
-        if (this.isFireProof()) branch.setFireSpreadSpeed(0).setFlammability(0);
-        return branch;
     }
 
     public boolean placeMossCarpet(BlockState state, Level level, BlockPos pos){

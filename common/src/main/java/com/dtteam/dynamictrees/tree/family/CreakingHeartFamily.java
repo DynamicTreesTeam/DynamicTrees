@@ -1,12 +1,10 @@
 package com.dtteam.dynamictrees.tree.family;
 
 import com.dtteam.dynamictrees.DynamicTrees;
-import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.block.branch.*;
+import com.dtteam.dynamictrees.tree.BranchEntry;
 import com.dtteam.dynamictrees.tree.TreeHelper;
-import com.dtteam.dynamictrees.utility.IdentifierUtils;
-import com.dtteam.dynamictrees.utility.Optionals;
 import net.minecraft.core.BlockPos;
 import net.minecraft.data.tags.TagAppender;
 import net.minecraft.resources.Identifier;
@@ -16,12 +14,12 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -32,9 +30,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
-
-import static com.dtteam.dynamictrees.utility.IdentifierUtils.suffix;
 
 public class CreakingHeartFamily extends AltBranchFamily {
 
@@ -43,8 +38,7 @@ public class CreakingHeartFamily extends AltBranchFamily {
     protected float heartHardnessMultiplier = 10;
     protected Item resinItem = Items.RESIN_CLUMP;
     protected Block resinBlock = Blocks.RESIN_CLUMP;
-    protected Supplier<BranchBlock> heartBranch;
-    protected Block primitiveHeartLog;
+    protected BranchEntry heartBranch = new BranchEntry(this);
 
     public CreakingHeartFamily(Identifier name) {
         super(name);
@@ -55,38 +49,39 @@ public class CreakingHeartFamily extends AltBranchFamily {
     ///////////////////////////////////////////
 
     @Override
+    public Family setBranchBlockProperties(BlockBehaviour.Properties properties) {
+        heartBranch.setBlockProperties(properties);
+        return super.setBranchBlockProperties(properties);
+    }
+
+    @Override
     public void setupBlocks() {
         super.setupBlocks();
 
-        this.heartBranch = setupBranch(createHeartBranch(heartBranchName()), false);
+        heartBranch.setBranchName(getHeartBranchName())
+                .setCanBeStripped(false)
+                .CreateBlock(this::createHeartBranch);
     }
 
-    protected Identifier heartBranchName(){
-        return suffix(this.getRegistryName(), "_creaking_heart");
+    protected Identifier getHeartBranchName(){
+        return this.getRegistryName().withSuffix("_creaking_heart").withSuffix(BranchBlock.NAME_SUFFIX);
     }
 
-    protected Supplier<BranchBlock> createHeartBranch(Identifier name) {
-        return RegistryHandler.addBlock(IdentifierUtils.suffix(name, this.getBranchNameSuffix()), () -> this.createHeartBranchBlock(name));
-    }
-
-    protected BranchBlock createHeartBranchBlock(Identifier name) {
-        BasicBranchBlock branch = new CreakingHeartBranchBlock(name, this.getProperties());
-        if (this.isFireProof()) branch.setFireSpreadSpeed(0).setFlammability(0);
-        return branch;
+    protected BranchBlock createHeartBranch(Identifier name, BlockBehaviour.Properties properties) {
+        return new CreakingHeartBranchBlock(name, properties);
     }
 
     public Family setPrimitiveHeartLog(Block primitiveLog) {
-        this.primitiveHeartLog = primitiveLog;
-        heartBranch.get().setPrimitiveLogDrops(List.of(()->new ItemStack(primitiveLog)));
+        heartBranch.setPrimitiveBlock(primitiveLog);
         return this;
     }
 
     public Optional<BranchBlock> getHeartBranch() {
-        return Optionals.ofBlock(heartBranch.get());
+        return heartBranch.getBlock();
     }
 
     public Optional<Block> getPrimitiveHeartLog() {
-        return Optionals.ofBlock(primitiveHeartLog);
+        return heartBranch.getPrimitiveBlock();
     }
 
     @Override
@@ -140,9 +135,10 @@ public class CreakingHeartFamily extends AltBranchFamily {
     // OTHER BRANCHES
     ///////////////////////////////////////////
 
+
     @Override
-    protected BranchBlock createBranchBlock(Identifier name) {
-        final BasicBranchBlock branch = this.isThick() ? new ThickBranchBlock(name, this.getProperties()){
+    protected BranchBlock createBranch(Identifier name, BlockBehaviour.Properties properties) {
+        return this.isThick() ? new ThickBranchBlock(name, properties){
             @Override
             public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
                 return ((CreakingHeartFamily)getFamily()).getHeartHardness(state, level, pos, super.getHardness(state, level, pos));
@@ -153,7 +149,7 @@ public class CreakingHeartFamily extends AltBranchFamily {
                 sendParticlesFromHeart(level, pos, state,(CreakingHeartFamily)getFamily());
                 super.attack(state, level, pos, player);
             }
-        } : new BasicBranchBlock(name, this.getProperties()){
+        } : new BasicBranchBlock(name, properties){
             @Override
             public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
                 return ((CreakingHeartFamily)getFamily()).getHeartHardness(state, level, pos, super.getHardness(state, level, pos));
@@ -165,10 +161,6 @@ public class CreakingHeartFamily extends AltBranchFamily {
                 super.attack(state, level, pos, player);
             }
         };
-        if (this.isFireProof()) {
-            branch.setFireSpreadSpeed(0).setFlammability(0);
-        }
-        return branch;
     }
 
     private static void sendParticlesFromHeart(Level level, BlockPos branchPos, BlockState branchState, CreakingHeartFamily family) {
@@ -187,14 +179,12 @@ public class CreakingHeartFamily extends AltBranchFamily {
     }
 
     @Override
-    protected BranchBlock createAltBranchBlock(Identifier name) {
-        final BasicBranchBlock branch = new ResinBranchBlock(name, this.getProperties());
-        if (this.isFireProof()) branch.setFireSpreadSpeed(0).setFlammability(0);
-        return branch;
+    protected BranchBlock createAltBranch(Identifier name, BlockBehaviour.Properties properties) {
+        return new ResinBranchBlock(name, properties);
     }
 
     @Override
-    protected Identifier altBranchName() {
+    protected Identifier getAltBranchName() {
         return getBranchName("resin_");
     }
 

@@ -45,7 +45,6 @@ public class ClientModEventHandler {
     // COLOR HANDLING
     ///////////////////////////////////////////
 
-
     public static void discoverWoodColors() {
 
         for (Family family : Family.REGISTRY.getAll()) {
@@ -60,7 +59,6 @@ public class ClientModEventHandler {
             }
         }
     }
-
 
     private static int getFaceColor(BlockState state, Direction face) {
         final BlockStateModel model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(state);
@@ -100,7 +98,7 @@ public class ClientModEventHandler {
     public static void registerItemColorHandlersEvent(RegisterColorHandlersEvent.ItemTintSources event){
         // Register Potion Tint Source
         event.register(DynamicTrees.location("dendro_potion"), DendroPotionItemTintSource.MAP_CODEC);
-        // Register Woodland Tint Sources
+        // Register Woodland Staff Tint Sources
         event.register(DynamicTrees.location("staff_handle"), StaffHandleItemTintSource.MAP_CODEC);
         event.register(DynamicTrees.location("staff_crystal"), StaffCrystalItemTintSource.MAP_CODEC);
     }
@@ -109,7 +107,7 @@ public class ClientModEventHandler {
     public static void registerBlockColorHandlersEvent(RegisterColorHandlersEvent.BlockTintSources event){
         BlockColors blockColors = event.getBlockColors();
 
-        // Register Rooty Tint Sources
+        // Register Rooty Soils Tint Sources
         SoilProperties.REGISTRY.getAll().stream().map(SoilProperties::getBlock).flatMap(Optional::stream)
                 .forEach(soilBlock -> {
                     SoilProperties properties = soilBlock.getSoilProperties();
@@ -138,7 +136,7 @@ public class ClientModEventHandler {
                     }
                 });
 
-        // Register Bonsai Pot Tint Sources
+        // Register Potted Sapling Tint Sources
         event.register(List.of(new PottedSaplingTintSource(blockColors)), DTRegistries.POTTED_SAPLING.get());
 
         // Register Sapling TintSources

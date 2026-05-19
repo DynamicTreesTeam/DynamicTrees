@@ -1,57 +1,62 @@
 package com.dtteam.dynamictrees.tree.family;
 
 import com.dtteam.dynamictrees.DynamicTrees;
-import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.block.branch.BasicBranchBlock;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.branch.ThickBranchBlock;
+import com.dtteam.dynamictrees.tree.BranchEntry;
 import com.dtteam.dynamictrees.utility.IdentifierUtils;
-import com.dtteam.dynamictrees.utility.Optionals;
 import net.minecraft.data.tags.TagAppender;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class AltBranchFamily extends Family {
 
     public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(AltBranchFamily::new);
 
-    protected Supplier<BranchBlock> altBranch;
-    protected Block primitiveAltLog;
+    protected BranchEntry altBranch = new BranchEntry(this);
 
     public AltBranchFamily(Identifier name) {
         super(name);
     }
 
     @Override
+    public Family setBranchBlockProperties(BlockBehaviour.Properties properties) {
+        altBranch.setBlockProperties(properties);
+        return super.setBranchBlockProperties(properties);
+    }
+
+    @Override
     public void setupBlocks() {
         super.setupBlocks();
 
-        this.altBranch = setupBranch(createAltBranch(altBranchName()), false);
+        altBranch.setBranchName(getAltBranchName())
+                .setCanBeStripped(hasStrippedBranch())
+                .CreateBlock(this::createAltBranch);
     }
 
-    protected Identifier altBranchName(){
-        return getBranchName("alt_") ;
+    protected Identifier getAltBranchName() {
+        return getBranchName("alt_");
     }
 
-    protected BranchBlock createAltBranchBlock(Identifier name) {
-        BasicBranchBlock branch = this.isThick() ? new ThickBranchBlock(name, this.getProperties()){
+    protected BranchBlock createAltBranch(Identifier name, BlockBehaviour.Properties properties) {
+        return this.isThick() ? new ThickBranchBlock(name, properties){
             @Override
             public Optional<Block> getPrimitiveLog() {
                 if (getFamily() instanceof AltBranchFamily altLogFamily)
                     return altLogFamily.getPrimitiveAltLog();
                 return super.getPrimitiveLog();
             }
-        } : new BasicBranchBlock(name, this.getProperties()){
+        } : new BasicBranchBlock(name, properties){
             @Override
             public Optional<Block> getPrimitiveLog() {
                 if (getFamily() instanceof AltBranchFamily altLogFamily)
@@ -59,29 +64,19 @@ public class AltBranchFamily extends Family {
                 return super.getPrimitiveLog();
             }
         };
-        if (this.isFireProof()) {
-            branch.setFireSpreadSpeed(0).setFlammability(0);
-        }
-
-        return branch;
-    }
-
-    protected Supplier<BranchBlock> createAltBranch(Identifier name) {
-        return RegistryHandler.addBlock(IdentifierUtils.suffix(name, this.getBranchNameSuffix()), () -> this.createAltBranchBlock(name));
     }
 
     public Family setPrimitiveAltLog(Block primitiveLog) {
-        this.primitiveAltLog = primitiveLog;
-        altBranch.get().setPrimitiveLogDrops(List.of(()->new ItemStack(primitiveLog)));
+        altBranch.setPrimitiveBlock(primitiveLog);
         return this;
     }
 
     public Optional<BranchBlock> getAltBranch() {
-        return Optionals.ofBlock(altBranch.get());
+        return altBranch.getBlock();
     }
 
     public Optional<Block> getPrimitiveAltLog() {
-        return Optionals.ofBlock(primitiveAltLog);
+        return altBranch.getPrimitiveBlock();
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.dtteam.dynamictrees.tree.family;
 
 import com.dtteam.dynamictrees.DynamicTrees;
-import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.block.branch.BasicRootsBlock;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
@@ -9,21 +8,19 @@ import com.dtteam.dynamictrees.block.soil.AerialRootsSoilProperties;
 import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.block.soil.SoilProperties;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
-import com.dtteam.dynamictrees.tree.species.Species;
+import com.dtteam.dynamictrees.tree.BranchEntry;
 import com.dtteam.dynamictrees.tree.species.AerialRootsSpecies;
+import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.Optionals;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.data.tags.TagAppender;
 import net.minecraft.resources.Identifier;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ToolMaterial;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.Nullable;
@@ -34,7 +31,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static com.dtteam.dynamictrees.utility.IdentifierUtils.suffix;
 
@@ -42,9 +38,8 @@ public class AerialRootsFamily extends Family {
 
     public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(AerialRootsFamily::new);
     private AerialRootsSoilProperties defaultSoil;
-    private Supplier<BranchBlock> roots;
-    private Supplier<Item> rootsItem;
-    private Block primitiveRoots, primitiveRootsFilled, primitiveRootsCovered;
+    protected BranchEntry roots = new BranchEntry(this);
+    private Block primitiveRootsFilled, primitiveRootsCovered;
 
     public AerialRootsFamily(Identifier name) {
         super(name);
@@ -83,46 +78,33 @@ public class AerialRootsFamily extends Family {
     ///////////////////////////////////////////
 
     @Override
+    public Family setBranchBlockProperties(BlockBehaviour.Properties properties) {
+        roots.setBlockProperties(properties);
+        return super.setBranchBlockProperties(properties);
+    }
+
+    @Override
     public void setupBlocks() {
         super.setupBlocks();
-        this.setRoots(this.createRoots(this.getBranchName()));
-        this.setRootsItem(this.createRootsItem(this.getBranchName(), this.roots));
+        roots.setBranchName(getRootsName(""))
+                .setCanBeStripped(false)
+                .CreateBlock(this::createRoots)
+                .CreateItem();
     }
 
-    protected Supplier<BranchBlock> createRoots(final Identifier id) {
-        Identifier name = suffix(id, getRootsNameSuffix());
-        return RegistryHandler.addBlock(name, () -> createRootsBlock(name));
-    }
-    protected BranchBlock createRootsBlock(Identifier name) {
-        final BasicRootsBlock branch = new BasicRootsBlock(name, this.getProperties());
-        if (this.isFireProof()) {
-            branch.setFireSpreadSpeed(0).setFlammability(0);
-        }
-        return branch;
-    }
-    public Supplier<BlockItem> createRootsItem(final Identifier registryName, final Supplier<BranchBlock> rootsSup) {
-        Identifier id = suffix(registryName, getRootsNameSuffix());
-        return RegistryHandler.addItem(id, () -> new BlockItem(rootsSup.get(), new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id))));
+    protected BranchBlock createRoots(Identifier name, BlockBehaviour.Properties properties) {
+        return new BasicRootsBlock(name, properties);
     }
 
-    protected String getRootsNameSuffix() {
-        return BasicRootsBlock.NAME_SUFFIX;
+    protected Identifier getRootsName(final String prefix) {
+        return this.getRegistryName().withPrefix(prefix).withSuffix(BasicRootsBlock.NAME_SUFFIX);
     }
 
-    public Family setRoots(final Supplier<BranchBlock> branchSup) {
-        this.roots = setupBranch(branchSup, false);
-        return this;
-    }
-    @SuppressWarnings("unchecked")
-    protected <T extends Item> Family setRootsItem(Supplier<T> branchItemSup) {
-        this.rootsItem = (Supplier<Item>) branchItemSup;
-        return this;
-    }
     public Optional<BranchBlock> getRoots() {
-        return Optionals.ofBlock(roots);
+        return roots.getBlock();
     }
     public Optional<Item> getRootsItem() {
-        return Optionals.ofItem(rootsItem);
+        return roots.getItem();
     }
 
     @Override
@@ -221,10 +203,7 @@ public class AerialRootsFamily extends Family {
     }
 
     public void setPrimitiveRoots(Block primitiveRoots) {
-        this.primitiveRoots = primitiveRoots;
-        if (this.roots != null) {
-            this.roots.get().setPrimitiveLogDrops(List.of(()->new ItemStack(primitiveRoots)));
-        }
+        roots.setPrimitiveBlock(primitiveRoots);
     }
     public void setPrimitiveRootsFilled(Block primitiveRootsFilled) {
         this.primitiveRootsFilled = primitiveRootsFilled;
@@ -234,7 +213,7 @@ public class AerialRootsFamily extends Family {
     }
 
     public Optional<Block> getPrimitiveRoots() {
-        return Optionals.ofBlock(primitiveRoots);
+        return roots.getPrimitiveBlock();
     }
     public Optional<Block> getPrimitiveFilledRoots() {
         return Optionals.ofBlock(primitiveRootsFilled);
