@@ -13,6 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,27 +25,24 @@ public class BranchEntry {
     protected final Family family;
     protected Identifier branchName;
     protected BlockBehaviour.Properties blockProperties;
-    protected boolean canBeStripped;
+    protected boolean canBeStripped = false;
     protected Block primitiveBlock = Blocks.AIR;
 
     protected Supplier<BranchBlock> branchBlock;
     protected Supplier<Item> branchItem;
 
-    public BranchEntry(Family family){
-        this(family, family.getDefaultBranchProperties());
+    public BranchEntry(Family family, Identifier name){
+        this(family, name, family.getBranchProperties());
     }
-    public BranchEntry(Family family, BlockBehaviour.Properties blockProperties){
+    public BranchEntry(Family family, Identifier name, BlockBehaviour.Properties blockProperties){
         this.family = family;
+        this.branchName = name;
         this.blockProperties = blockProperties;
     }
 
-    public BranchEntry setBranchName(Identifier branchName) {
-        this.branchName = branchName;
-        return this;
-    }
-
-    public BranchEntry setBlockProperties(BlockBehaviour.Properties blockProperties) {
-        this.blockProperties = blockProperties;
+    public BranchEntry setBlockProperties(@Nullable BlockBehaviour.Properties blockProperties) {
+        if (blockProperties != null)
+            this.blockProperties = blockProperties;
         return this;
     }
 
@@ -66,7 +64,6 @@ public class BranchEntry {
         if (family.isFireProof()) branch.setFireSpreadSpeed(0).setFlammability(0);
         branch.setFamily(family);
         branch.setCanBeStripped(canBeStripped);
-        family.addValidBranches(branch);
     }
 
     public BranchEntry CreateItem(){
@@ -78,8 +75,8 @@ public class BranchEntry {
         return this;
     }
 
-    public Optional<BranchBlock> getBlock(){
-        return Optionals.ofBlock(branchBlock);
+    public BranchBlock getBlock(){
+        return branchBlock.get();
     }
 
     public Optional<Item> getItem(){
@@ -88,7 +85,7 @@ public class BranchEntry {
 
     public BranchEntry setPrimitiveBlock(Block primitive) {
         this.primitiveBlock = primitive;
-        getBlock().ifPresent(b-> b.setPrimitiveLogDrops(List.of(()->new ItemStack(primitive))));
+        getBlock().setPrimitiveLogDrops(List.of(()->new ItemStack(primitive)));
         return this;
     }
 

@@ -7,6 +7,7 @@ import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.branch.MossyRootsBlock;
 import com.dtteam.dynamictrees.tree.BranchEntry;
 import com.dtteam.dynamictrees.tree.TreeHelper;
+import com.dtteam.dynamictrees.utility.Optionals;
 import net.minecraft.core.BlockPos;
 import net.minecraft.data.tags.TagAppender;
 import net.minecraft.resources.Identifier;
@@ -34,11 +35,11 @@ public class MossyAerialRootsFamily extends AerialRootsFamily {
 
     public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(MossyAerialRootsFamily::new);
 
-    protected BranchEntry mossyRoots = new BranchEntry(this);
     /**
      * Must be a block item to be placed and clicked on
      */
     private BlockItem mossCarpet;
+    public static final int MOSSY_ROOTS_INDEX = 3;
 
     public MossyAerialRootsFamily(Identifier name) {
         super(name);
@@ -51,9 +52,10 @@ public class MossyAerialRootsFamily extends AerialRootsFamily {
     @Override
     public void setupBlocks() {
         super.setupBlocks();
-        mossyRoots.setBranchName(getRootsName("mossy_"))
+
+        branches.add(MOSSY_ROOTS_INDEX, new BranchEntry(this, getRootsName("mossy_"))
                 .setCanBeStripped(false)
-                .CreateBlock(this::createMossyRoots);
+                .CreateBlock(this::createMossyRoots));
     }
 
     protected BranchBlock createMossyRoots(Identifier name, BlockBehaviour.Properties properties) {
@@ -76,7 +78,7 @@ public class MossyAerialRootsFamily extends AerialRootsFamily {
     }
 
     public Optional<BranchBlock> getMossyRoots() {
-        return mossyRoots.getBlock();
+        return Optionals.ofBlock(branches.get(3).getBlock());
     }
 
     public void setMossCarpet(Item mossCarpet) {
@@ -119,7 +121,7 @@ public class MossyAerialRootsFamily extends AerialRootsFamily {
     @Override
     public void setPrimitiveRoots(Block primitiveRoots) {
         super.setPrimitiveRoots(primitiveRoots);
-        mossyRoots.setPrimitiveBlock(primitiveRoots);
+        branches.get(MOSSY_ROOTS_INDEX).setPrimitiveBlock(primitiveRoots);
     }
 
     ///////////////////////////////////////////

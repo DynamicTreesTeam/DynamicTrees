@@ -7,6 +7,7 @@ import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.branch.ThickBranchBlock;
 import com.dtteam.dynamictrees.tree.BranchEntry;
 import com.dtteam.dynamictrees.utility.IdentifierUtils;
+import com.dtteam.dynamictrees.utility.Optionals;
 import net.minecraft.data.tags.TagAppender;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
@@ -23,25 +24,19 @@ public class AltBranchFamily extends Family {
 
     public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(AltBranchFamily::new);
 
-    protected BranchEntry altBranch = new BranchEntry(this);
+    public static final int ALT_BRANCH_INDEX = 2;
 
     public AltBranchFamily(Identifier name) {
         super(name);
     }
 
     @Override
-    public Family setBranchBlockProperties(BlockBehaviour.Properties properties) {
-        altBranch.setBlockProperties(properties);
-        return super.setBranchBlockProperties(properties);
-    }
-
-    @Override
     public void setupBlocks() {
         super.setupBlocks();
 
-        altBranch.setBranchName(getAltBranchName())
+        branches.add(ALT_BRANCH_INDEX, new BranchEntry(this, getAltBranchName())
                 .setCanBeStripped(hasStrippedBranch())
-                .CreateBlock(this::createAltBranch);
+                .CreateBlock(this::createAltBranch));
     }
 
     protected Identifier getAltBranchName() {
@@ -67,16 +62,16 @@ public class AltBranchFamily extends Family {
     }
 
     public Family setPrimitiveAltLog(Block primitiveLog) {
-        altBranch.setPrimitiveBlock(primitiveLog);
+        branches.get(ALT_BRANCH_INDEX).setPrimitiveBlock(primitiveLog);
         return this;
     }
 
     public Optional<BranchBlock> getAltBranch() {
-        return altBranch.getBlock();
+        return getBranchBlock(ALT_BRANCH_INDEX);
     }
 
     public Optional<Block> getPrimitiveAltLog() {
-        return altBranch.getPrimitiveBlock();
+        return getPrimitiveLog(ALT_BRANCH_INDEX);
     }
 
     @Override

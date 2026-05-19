@@ -54,6 +54,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.IntStream;
 
 import static com.dtteam.dynamictrees.utility.IdentifierUtils.suffix;
 import static com.dtteam.dynamictrees.utility.IdentifierUtils.surround;
@@ -99,11 +100,6 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         }
 
         @Override
-        public BranchBlock getValidBranchBlock(int index) {
-            return null;
-        }
-
-        @Override
         public Species getSpeciesForLocation(LevelAccessor level, BlockPos trunkPos) {
             return Species.NULL_SPECIES;
         }
@@ -118,8 +114,11 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     protected LeavesProperties commonLeaves = LeavesProperties.NULL;
 
     //Branches
-    protected BranchEntry branch = new BranchEntry(this);
-    protected BranchEntry strippedBranch = new BranchEntry(this);
+    protected List<BranchEntry> branches = new ArrayList<>();
+    public static final int BRANCH_INDEX = 0;
+    public static final int STRIPPED_BRANCH_INDEX = 0;
+
+    protected BlockBehaviour.Properties branchProperties;
 
     protected boolean hasStrippedBranch = true;
     /**
@@ -140,11 +139,6 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     protected boolean hasSurfaceRoot = false;
 
     /**
-     * A list of branches the tree accepts as its own. Used for the falling tree renderer
-     */
-    private final List<BranchBlock> validBranches = new LinkedList<>();
-
-    /**
      * The maximum radius of a {@link BranchBlock} belonging to this family. {@link Species#getMaxBranchRadius()} will be
      * clamped to this value.
      */
@@ -161,6 +155,9 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     public int woodRingColor; // For rooty blocks
 
     public int woodBarkColor; // For rooty water
+
+    private boolean branchIsLadder = true;
+    private int maxSignalDepth = 32;
 
     /**
      * A list of child species, added to when tree family is set for species.
@@ -191,22 +188,15 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return REGISTRY.getType();
     }
 
-    public Family setBranchBlockProperties(BlockBehaviour.Properties properties) {
-        branch.setBlockProperties(properties);
-        strippedBranch.setBlockProperties(properties);
-        return this;
-    }
-
     public void setupBlocks() {
-        branch.setBranchName(getBranchName(""))
-                .setCanBeStripped(hasStrippedBranch())
+        branches.add(BRANCH_INDEX, new BranchEntry(this, getBranchName(""))
+                .setCanBeStripped(hasStrippedBranch)
                 .CreateBlock(this::createBranch)
-                .CreateItem();
+                .CreateItem());
 
         if (hasStrippedBranch()) {
-            strippedBranch.setBranchName(getBranchName("stripped_"))
-                    .setCanBeStripped(false)
-                    .CreateBlock(this::createBranch);
+            branches.add(STRIPPED_BRANCH_INDEX, new BranchEntry(this, getBranchName("stripped_"))
+                    .CreateBlock(this::createBranch));
         }
 
         if (this.hasSurfaceRoot()) {
@@ -314,16 +304,23 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return true;
     }
 
+    protected Optional<BranchBlock> getBranchBlock(int index) {
+        return Optionals.ofBlock(branches.get(index).getBlock());
+    }
+    protected Optional<Item> getBranchItem(int index) {
+        return branches.get(index).getItem();
+    }
+
     public Optional<BranchBlock> getBranch() {
-        return branch.getBlock();
+        return getBranchBlock(BRANCH_INDEX);
     }
 
     public Optional<BranchBlock> getStrippedBranch() {
-        return strippedBranch.getBlock();
+        return getBranchBlock(STRIPPED_BRANCH_INDEX);
     }
 
     public Optional<Item> getBranchItem() {
-        return branch.getItem();
+        return getBranchItem(BRANCH_INDEX);
     }
 
     /**
@@ -403,12 +400,12 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      * @return {@link Family} for chaining calls
      */
     public Family setPrimitiveLog(Block primitiveLog) {
-        branch.setPrimitiveBlock(primitiveLog);
+        branches.get(BRANCH_INDEX).setPrimitiveBlock(primitiveLog);
         return this;
     }
 
     public Family setPrimitiveStrippedLog(Block primitiveStrippedLog) {
-        strippedBranch.setPrimitiveBlock(primitiveStrippedLog);
+        branches.get(STRIPPED_BRANCH_INDEX).setPrimitiveBlock(primitiveStrippedLog);
         return this;
     }
 
@@ -418,12 +415,15 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      *
      * @return Block of the primitive log.
      */
+    public Optional<Block> getPrimitiveLog(int index) {
+        return branches.get(index).getPrimitiveBlock();
+    }
     public Optional<Block> getPrimitiveLog() {
-        return branch.getPrimitiveBlock();
+        return getPrimitiveLog(BRANCH_INDEX);
     }
 
     public Optional<Block> getPrimitiveStrippedLog() {
-        return strippedBranch.getPrimitiveBlock();
+        return getPrimitiveLog(STRIPPED_BRANCH_INDEX);
     }
 
     public List<ItemStack> getLogDropsForBranch(float volume, int branch) {
@@ -471,7 +471,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return SoundType.WOOD;
     }
 
-    public BlockBehaviour.Properties getDefaultBranchProperties() {
+    public BlockBehaviour.Properties defaultBranchProperties() {
         BlockBehaviour.Properties properties = BlockBehaviour.Properties.of()
                 .sound(SoundType.WOOD)
                 .mapColor(MapColor.WOOD)
@@ -480,6 +480,15 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         if (!this.isFireProof())
             properties.ignitedByLava();
         return properties;
+    }
+
+    public void setBranchBlockProperties(BlockBehaviour.Properties properties) {
+        this.branchProperties = properties;
+    }
+
+    public BlockBehaviour.Properties getBranchProperties() {
+        if (branchProperties == null) return defaultBranchProperties();
+        return branchProperties;
     }
 
     public float getLootVolumeMultiplier() {
@@ -558,12 +567,11 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         this.reduceRadiusWhenStripping = reduceRadiusWhenStripping;
     }
 
-    public void addValidBranches(BranchBlock... branches) {
-        this.validBranches.addAll(Arrays.asList(branches));
-    }
-
     public int getBranchBlockIndex(BranchBlock block) {
-        int index = this.validBranches.indexOf(block);
+        int index = IntStream.range(0, branches.size())
+                .filter(i -> branches.get(i).getBlock() == block)
+                .findFirst()
+                .orElse(-1);
         if (index < 0) {
             DynamicTrees.LOG.warn("Block {} not valid branch for {}.", block, this);
             return 0;
@@ -573,23 +581,17 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
 
     @Nullable
     public BranchBlock getValidBranchBlock(int index) {
-        if (index < validBranches.size())
-            return this.validBranches.get(index);
+        if (index < branches.size())
+            return branches.get(index).getBlock();
         else {
-            DynamicTrees.LOG.warn("Attempted to get branch block of index {} but {} only has {} valid branches.", index, this, validBranches.size());
-            return this.validBranches.getFirst();
+            DynamicTrees.LOG.warn("Attempted to get branch block of index {} but {} only has {} valid branches.", index, this, branches.size());
+            return this.branches.getFirst().getBlock();
         }
     }
 
-    public boolean isValidBranchBlock(BranchBlock block) {
-        return this.validBranches.contains(block);
-    }
-
     public int getNumberOfValidBranchBlocks() {
-        return validBranches.size();
+        return branches.size();
     }
-
-    private boolean branchIsLadder = true;
 
     public void setBranchIsLadder(boolean branchIsLadder) {
         this.branchIsLadder = branchIsLadder;
@@ -599,7 +601,6 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return branchIsLadder;
     }
 
-    private int maxSignalDepth = 32;
 
     public int getMaxSignalDepth() {
         return maxSignalDepth;
@@ -623,7 +624,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
 
     public Supplier<SurfaceRootBlock> createSurfaceRoot() {
         Identifier id = suffix(this.getRegistryName(), "_root");
-        return RegistryHandler.addBlock(id, () -> new SurfaceRootBlock(id, this, getDefaultBranchProperties()));
+        return RegistryHandler.addBlock(id, () -> new SurfaceRootBlock(id, this, defaultBranchProperties()));
     }
 
     public Optional<SurfaceRootBlock> getSurfaceRoot() {

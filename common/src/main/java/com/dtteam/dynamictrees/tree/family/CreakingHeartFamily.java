@@ -5,6 +5,7 @@ import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.block.branch.*;
 import com.dtteam.dynamictrees.tree.BranchEntry;
 import com.dtteam.dynamictrees.tree.TreeHelper;
+import com.dtteam.dynamictrees.utility.Optionals;
 import net.minecraft.core.BlockPos;
 import net.minecraft.data.tags.TagAppender;
 import net.minecraft.resources.Identifier;
@@ -38,7 +39,7 @@ public class CreakingHeartFamily extends AltBranchFamily {
     protected float heartHardnessMultiplier = 10;
     protected Item resinItem = Items.RESIN_CLUMP;
     protected Block resinBlock = Blocks.RESIN_CLUMP;
-    protected BranchEntry heartBranch = new BranchEntry(this);
+    public static final int HEART_BRANCH_INDEX = 3;
 
     public CreakingHeartFamily(Identifier name) {
         super(name);
@@ -49,18 +50,12 @@ public class CreakingHeartFamily extends AltBranchFamily {
     ///////////////////////////////////////////
 
     @Override
-    public Family setBranchBlockProperties(BlockBehaviour.Properties properties) {
-        heartBranch.setBlockProperties(properties);
-        return super.setBranchBlockProperties(properties);
-    }
-
-    @Override
     public void setupBlocks() {
         super.setupBlocks();
 
-        heartBranch.setBranchName(getHeartBranchName())
+        branches.add(HEART_BRANCH_INDEX, new BranchEntry(this,getHeartBranchName())
                 .setCanBeStripped(false)
-                .CreateBlock(this::createHeartBranch);
+                .CreateBlock(this::createHeartBranch));
     }
 
     protected Identifier getHeartBranchName(){
@@ -72,16 +67,16 @@ public class CreakingHeartFamily extends AltBranchFamily {
     }
 
     public Family setPrimitiveHeartLog(Block primitiveLog) {
-        heartBranch.setPrimitiveBlock(primitiveLog);
+        branches.get(HEART_BRANCH_INDEX).setPrimitiveBlock(primitiveLog);
         return this;
     }
 
     public Optional<BranchBlock> getHeartBranch() {
-        return heartBranch.getBlock();
+        return getBranchBlock(HEART_BRANCH_INDEX);
     }
 
     public Optional<Block> getPrimitiveHeartLog() {
-        return heartBranch.getPrimitiveBlock();
+        return getPrimitiveLog(HEART_BRANCH_INDEX);
     }
 
     @Override

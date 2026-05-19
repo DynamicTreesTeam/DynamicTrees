@@ -38,8 +38,8 @@ public class AerialRootsFamily extends Family {
 
     public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(AerialRootsFamily::new);
     private AerialRootsSoilProperties defaultSoil;
-    protected BranchEntry roots = new BranchEntry(this);
     private Block primitiveRootsFilled, primitiveRootsCovered;
+    public static final int ROOTS_INDEX = 2;
 
     public AerialRootsFamily(Identifier name) {
         super(name);
@@ -78,18 +78,11 @@ public class AerialRootsFamily extends Family {
     ///////////////////////////////////////////
 
     @Override
-    public Family setBranchBlockProperties(BlockBehaviour.Properties properties) {
-        roots.setBlockProperties(properties);
-        return super.setBranchBlockProperties(properties);
-    }
-
-    @Override
     public void setupBlocks() {
         super.setupBlocks();
-        roots.setBranchName(getRootsName(""))
-                .setCanBeStripped(false)
+        branches.add(ROOTS_INDEX, new BranchEntry(this, getRootsName(""))
                 .CreateBlock(this::createRoots)
-                .CreateItem();
+                .CreateItem());
     }
 
     protected BranchBlock createRoots(Identifier name, BlockBehaviour.Properties properties) {
@@ -101,10 +94,10 @@ public class AerialRootsFamily extends Family {
     }
 
     public Optional<BranchBlock> getRoots() {
-        return roots.getBlock();
+        return getBranchBlock(ROOTS_INDEX);
     }
     public Optional<Item> getRootsItem() {
-        return roots.getItem();
+        return getBranchItem(ROOTS_INDEX);
     }
 
     @Override
@@ -203,7 +196,7 @@ public class AerialRootsFamily extends Family {
     }
 
     public void setPrimitiveRoots(Block primitiveRoots) {
-        roots.setPrimitiveBlock(primitiveRoots);
+        branches.get(ROOTS_INDEX).setPrimitiveBlock(primitiveRoots);
     }
     public void setPrimitiveRootsFilled(Block primitiveRootsFilled) {
         this.primitiveRootsFilled = primitiveRootsFilled;
@@ -213,7 +206,7 @@ public class AerialRootsFamily extends Family {
     }
 
     public Optional<Block> getPrimitiveRoots() {
-        return roots.getPrimitiveBlock();
+        return getPrimitiveLog(ROOTS_INDEX);
     }
     public Optional<Block> getPrimitiveFilledRoots() {
         return Optionals.ofBlock(primitiveRootsFilled);
