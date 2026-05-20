@@ -26,6 +26,7 @@ import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -214,6 +215,11 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
     public BranchBlock setFireSpreadSpeed(int fireSpreadSpeed) {
         this.fireSpreadSpeed = fireSpreadSpeed;
         return this;
+    }
+
+    @Override
+    protected SoundType getSoundType(BlockState state) {
+        return getPrimitiveLog().map(block -> block.defaultBlockState().getSoundType()).orElseGet(() -> super.getSoundType(state));
     }
 
     ///////////////////////////////////////////

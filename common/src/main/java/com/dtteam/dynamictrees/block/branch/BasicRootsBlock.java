@@ -346,7 +346,8 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         // Tries to get the face being pounded on.
         final Direction toolDir = EntityUtils.getHitDirection(entity);
         // Play and render block break sound and particles (must be done before block is broken).
-        level.levelEvent(null, 2001, cutPos, getId(state));
+        if (!level.isClientSide())
+            level.levelEvent(null, 2001, cutPos, getId(state));
 
         // Do the actual destruction.
         final BranchDestructionData destroyData = this.destroyBranchFromNode(level, cutPos, toolDir, false, entity);

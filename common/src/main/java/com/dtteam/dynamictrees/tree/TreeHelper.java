@@ -303,7 +303,8 @@ public class TreeHelper {
         if (cutBlock == null) return;
 
         // Fire event for break sound and particles
-        level.levelEvent(null, 2001, cutPos, Block.getId(level.getBlockState(cutPos)));
+        if (!level.isClientSide())
+            level.levelEvent(null, 2001, cutPos, Block.getId(level.getBlockState(cutPos)));
 
         BranchDestructionData destructionData = cutBlock.destroyBranchFromNode(level, cutPos, Direction.DOWN, false, player);
 

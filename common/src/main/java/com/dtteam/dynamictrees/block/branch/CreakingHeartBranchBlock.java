@@ -181,7 +181,10 @@ public class CreakingHeartBranchBlock extends BasicBranchBlock implements Entity
 
     @Override
     protected SoundType getSoundType(BlockState state) {
-        return getPrimitiveLog().map(block -> block.defaultBlockState().getSoundType()).orElseGet(() -> super.getSoundType(state));
+        if (state.getValue(HIDDEN) && getFamily().getBranch().isPresent()){
+            return getFamily().getBranch().map(block -> block.defaultBlockState().getSoundType()).orElseGet(() -> super.getSoundType(state));
+        }
+        return super.getSoundType(state);
     }
 
     /**
@@ -243,7 +246,9 @@ public class CreakingHeartBranchBlock extends BasicBranchBlock implements Entity
     @Override
     public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, ItemStack toolStack, boolean willHarvest, FluidState fluid) {
         if (state.getValue(HIDDEN)){
-            level.levelEvent(null, 2001, pos, getId(state));
+            if (!level.isClientSide()){
+                level.levelEvent(null, 2001, pos, getId(state));
+            }
             level.setBlock(pos, state.setValue(HIDDEN, false), 3);
             return false;
         }

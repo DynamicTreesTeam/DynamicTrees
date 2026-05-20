@@ -36,11 +36,10 @@ public class CreakingHeartFamily extends AltBranchFamily {
     public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(CreakingHeartFamily::new);
 
     protected float treeHeartHardnessMultiplier = 10;
-    protected float hiddenHeartHardnessMultiplier = 0.25f;
+    protected float hiddenHeartHardnessMultiplier = 0.4f;
     protected Item resinItem = Items.RESIN_CLUMP;
     protected Block resinBlock = Blocks.RESIN_CLUMP;
     public static final int HEART_BRANCH_INDEX = 3;
-
 
     public CreakingHeartFamily(Identifier name) {
         super(name);
