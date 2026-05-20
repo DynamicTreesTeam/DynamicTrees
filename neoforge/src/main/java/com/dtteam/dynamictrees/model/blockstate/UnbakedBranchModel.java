@@ -80,9 +80,9 @@ public record UnbakedBranchModel(Identifier barkTexture, Identifier ringsTexture
         for (int radius = 1; radius <= BranchBlock.MAX_RADIUS; radius++) {
             if (radius < BranchBlock.MAX_RADIUS) {
                 sleeves.putAllParts(radius, unbakedSleeves.bakeAllSides(baker, radius));
-                if (unbakedSleeveRings != null)
-                    sleeveRings.putAllParts(radius, unbakedSleeveRings.bakeAllSides(baker, radius));
             }
+            if (unbakedSleeveRings != null)
+                sleeveRings.putAllParts(radius, unbakedSleeveRings.bakeAllSides(baker, radius));
 
             cores.putAllParts(Direction.Axis.Y, radius, unbakedCores.bakeAllSides(baker, radius, Direction.Axis.Y)); //DOWN<->UP
             cores.putAllParts(Direction.Axis.Z, radius, unbakedCores.bakeAllSides(baker, radius, Direction.Axis.Z)); //NORTH<->SOUTH
