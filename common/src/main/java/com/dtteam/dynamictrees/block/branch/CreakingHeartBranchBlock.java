@@ -2,6 +2,7 @@ package com.dtteam.dynamictrees.block.branch;
 
 import com.dtteam.dynamictrees.api.network.MapSignal;
 import com.dtteam.dynamictrees.data.DTLootTableBuilder;
+import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.family.CreakingHeartFamily;
@@ -15,6 +16,7 @@ import net.minecraft.world.Containers;
 import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CreakingHeartBlock;
@@ -26,10 +28,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.CreakingHeartBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.CreakingHeartState;
-import net.minecraft.world.level.block.state.properties.EnumProperty;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.block.state.properties.*;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.storage.loot.LootTable;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,6 +39,7 @@ import java.util.Optional;
 public class CreakingHeartBranchBlock extends BasicBranchBlock implements EntityBlock {
 
     public static final EnumProperty<CreakingHeartState> STATE = BlockStateProperties.CREAKING_HEART_STATE;
+    public static final BooleanProperty HIDDEN = BooleanProperty.create("hidden");
 
     public CreakingHeartBranchBlock(Identifier name, Properties properties) {
         super(name, properties);
@@ -46,13 +47,13 @@ public class CreakingHeartBranchBlock extends BasicBranchBlock implements Entity
 
     @Override
     public BlockState[] createBranchStates(IntegerProperty radiusProperty, int maxRadius) {
-        registerDefaultState(defaultBlockState().setValue(STATE, CreakingHeartState.DORMANT));
+        registerDefaultState(defaultBlockState().setValue(STATE, CreakingHeartState.DORMANT).setValue(HIDDEN, true));
         return super.createBranchStates(radiusProperty, maxRadius);
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(STATE);
+        builder.add(STATE, HIDDEN);
         super.createBlockStateDefinition(builder);
     }
 
@@ -94,10 +95,13 @@ public class CreakingHeartBranchBlock extends BasicBranchBlock implements Entity
     @Override
     public BlockState getStateForRadius(int radius, BlockState previousState) {
         BlockState state = super.getStateForRadius(radius, previousState);
-        if (previousState.hasProperty(CreakingHeartBranchBlock.STATE)){
-            CreakingHeartState heartState = previousState.getValue(CreakingHeartBranchBlock.STATE);
+        if (previousState.hasProperty(STATE)){
+            CreakingHeartState heartState = previousState.getValue(STATE);
             if (heartState == CreakingHeartState.UPROOTED) heartState = CreakingHeartState.DORMANT;
-            return state.setValue(CreakingHeartBranchBlock.STATE, heartState);
+            return state.setValue(STATE, heartState);
+        }
+        if (previousState.hasProperty(HIDDEN)){
+            return state.setValue(HIDDEN, previousState.getValue(HIDDEN));
         }
         return state;
     }
@@ -128,8 +132,8 @@ public class CreakingHeartBranchBlock extends BasicBranchBlock implements Entity
 
     @Override
     public void futureBreak(BlockState state, Level level, BlockPos cutPos, LivingEntity entity) {
-        BlockEntity var6 = level.getBlockEntity(cutPos);
-        if (var6 instanceof CreakingHeartBranchBlockEntity creakingHeartBlockEntity && entity instanceof Player player) {
+        if (level.getBlockEntity(cutPos) instanceof CreakingHeartBranchBlockEntity creakingHeartBlockEntity
+                && entity instanceof Player player) {
             creakingHeartBlockEntity.removeProtector(player.damageSources().playerAttack(player));
             this.tryAwardExperience(player, level, cutPos);
         }
@@ -224,5 +228,33 @@ public class CreakingHeartBranchBlock extends BasicBranchBlock implements Entity
         if (branchBlock == null || branchBlock != family.getBranch().get()) return;
         int radius = TreeHelper.getRadius(state);
         family.getAltBranch().get().setRadius(level, pos, radius, null, 3);
+    }
+
+    @Override
+    public boolean canBeStripped(BlockState state, Level level, BlockPos pos, Player player, ItemStack heldItem) {
+        return state.getValue(HIDDEN) && this.canBeStripped && Services.INTERACTION.canToolAxeStrip(heldItem);
+    }
+
+    @Override
+    public void stripBranch(BlockState state, LevelAccessor level, BlockPos pos, int radius) {
+        level.setBlock(pos, state.setValue(HIDDEN, false), 3);
+    }
+
+    @Override
+    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, ItemStack toolStack, boolean willHarvest, FluidState fluid) {
+        if (state.getValue(HIDDEN)){
+            level.levelEvent(null, 2001, pos, getId(state));
+            level.setBlock(pos, state.setValue(HIDDEN, false), 3);
+            return false;
+        }
+        return super.onDestroyedByPlayer(state, level, pos, player, toolStack, willHarvest, fluid);
+    }
+
+    @Override
+    public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
+        float hardness = super.getHardness(state, level, pos);
+        if (state.getValue(HIDDEN) && getFamily() instanceof CreakingHeartFamily heartFamily)
+            return hardness * heartFamily.getHiddenHeartHardnessMultiplier();
+        return hardness;
     }
 }

@@ -86,7 +86,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
      */
     private Family family = Family.NULL_FAMILY;
     private List<Supplier<ItemStack>> primitiveLogDrops = new LinkedList<>();
-    private boolean canBeStripped;
+    protected boolean canBeStripped;
 
     /**
      * @param name name of branch, without a {@code _branch} suffix
@@ -211,7 +211,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         return stripRadius != 0 && stripRadius <= this.getRadius(state) && this.canBeStripped && Services.INTERACTION.canToolAxeStrip(heldItem);
     }
 
-    public void stripBranch(BlockState state, Level level, BlockPos pos, Player player, ItemStack heldItem) {
+    public void stripBranchAndDamageAxe(BlockState state, Level level, BlockPos pos, Player player, ItemStack heldItem) {
         final int radius = this.getRadius(state);
         this.damageAxe(player, heldItem, radius / 2, new NetVolumeNode.Volume((radius * radius * 64) / 2), false);
 

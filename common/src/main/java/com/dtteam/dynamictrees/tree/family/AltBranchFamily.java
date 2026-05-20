@@ -14,6 +14,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -121,6 +122,16 @@ public class AltBranchFamily extends Family {
                 }
             });
         });
+    }
+
+    @Override
+    public List<Identifier> topBranchTextureLocations(){
+        List<Identifier> locations = super.topBranchTextureLocations();
+        if (getPrimitiveAltLog().isPresent()){
+            locations.add(topBranchTextureLocation(getPrimitiveAltLog().get(), "alt_branch_top"));
+        }
+
+        return locations;
     }
 
 }

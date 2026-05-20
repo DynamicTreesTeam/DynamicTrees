@@ -47,7 +47,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.BlockHitResult;
 import org.apache.commons.lang3.tuple.Pair;
-import org.jetbrains.annotations.Debug;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -291,14 +290,12 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     }
 
     public boolean stripBranch(BlockState state, Level level, BlockPos pos, Player player, ItemStack heldItem) {
-        if (this.hasStrippedBranch()) {
-            this.getBranch().ifPresent(branch -> {
-                branch.stripBranch(state, level, pos, player, heldItem);
-                if (level.isClientSide()) {
-                    level.playSound(player, pos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1.0F, 1.0F);
-                    WailaHelper.invalidateWailaPosition();
-                }
-            });
+        if (this.hasStrippedBranch() && state.getBlock() instanceof BranchBlock branch) {
+            branch.stripBranchAndDamageAxe(state, level, pos, player, heldItem);
+            if (level.isClientSide()) {
+                level.playSound(player, pos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1.0F, 1.0F);
+                WailaHelper.invalidateWailaPosition();
+            }
             return this.getBranch().isPresent();
         } else {
             return false;

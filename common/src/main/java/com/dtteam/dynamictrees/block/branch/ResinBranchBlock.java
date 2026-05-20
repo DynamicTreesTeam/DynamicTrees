@@ -18,6 +18,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
@@ -80,6 +81,14 @@ public class ResinBranchBlock extends ThickBranchBlock {
             return InteractionResult.SUCCESS;
         }
         return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
+    }
+
+    @Override
+    public void stripBranch(BlockState state, LevelAccessor level, BlockPos pos, int radius) {
+        if (level instanceof Level l){
+            removeResin(state, l, pos, null);
+        }
+        super.stripBranch(state, level, pos, radius);
     }
 
     @Override

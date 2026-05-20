@@ -5,7 +5,6 @@ import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.block.branch.*;
 import com.dtteam.dynamictrees.tree.BranchEntry;
 import com.dtteam.dynamictrees.tree.TreeHelper;
-import com.dtteam.dynamictrees.utility.Optionals;
 import net.minecraft.core.BlockPos;
 import net.minecraft.data.tags.TagAppender;
 import net.minecraft.resources.Identifier;
@@ -36,10 +35,12 @@ public class CreakingHeartFamily extends AltBranchFamily {
 
     public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(CreakingHeartFamily::new);
 
-    protected float heartHardnessMultiplier = 10;
+    protected float treeHeartHardnessMultiplier = 10;
+    protected float hiddenHeartHardnessMultiplier = 0.25f;
     protected Item resinItem = Items.RESIN_CLUMP;
     protected Block resinBlock = Blocks.RESIN_CLUMP;
     public static final int HEART_BRANCH_INDEX = 3;
+
 
     public CreakingHeartFamily(Identifier name) {
         super(name);
@@ -54,7 +55,7 @@ public class CreakingHeartFamily extends AltBranchFamily {
         super.setupBlocks();
 
         addBranch(HEART_BRANCH_INDEX, new BranchEntry(this,getHeartBranchName())
-                .setCanBeStripped(false)
+                .setCanBeStripped(true)
                 .CreateBlock(this::createHeartBranch));
     }
 
@@ -108,8 +109,9 @@ public class CreakingHeartFamily extends AltBranchFamily {
 
             textureConsumer.accept("heart_bark", barkAwake);
             textureConsumer.accept("heart_rings", ringsAwake);
+        } else {
+            DynamicTrees.LOG.error("Attempted to load heart branch textures for family {} but the provided block {} was not it's heart branch.", getRegistryName(), primHeart);
         }
-        DynamicTrees.LOG.error("Attempted to load heart branch textures for family {} but the provided block {} was not it's heart branch.", getRegistryName(), primHeart);
     }
 
     public void addGeneratedBlockTags (Function<TagKey<Block>, TagAppender<Block, Block>> tagAppender){
@@ -126,6 +128,16 @@ public class CreakingHeartFamily extends AltBranchFamily {
         });
     }
 
+    @Override
+    public List<Identifier> topBranchTextureLocations(){
+        List<Identifier> locations = super.topBranchTextureLocations();
+        if (getPrimitiveHeartLog().isPresent()){
+            locations.add(topBranchTextureLocation(getPrimitiveHeartLog().get(), "heart_branch_top"));
+        }
+
+        return locations;
+    }
+
     ///////////////////////////////////////////
     // OTHER BRANCHES
     ///////////////////////////////////////////
@@ -136,7 +148,7 @@ public class CreakingHeartFamily extends AltBranchFamily {
         return this.isThick() ? new ThickBranchBlock(name, properties){
             @Override
             public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
-                return ((CreakingHeartFamily)getFamily()).getHeartHardness(state, level, pos, super.getHardness(state, level, pos));
+                return ((CreakingHeartFamily)getFamily()).getTreeHardness(state, level, pos, super.getHardness(state, level, pos));
             }
 
             @Override
@@ -147,7 +159,7 @@ public class CreakingHeartFamily extends AltBranchFamily {
         } : new BasicBranchBlock(name, properties){
             @Override
             public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
-                return ((CreakingHeartFamily)getFamily()).getHeartHardness(state, level, pos, super.getHardness(state, level, pos));
+                return ((CreakingHeartFamily)getFamily()).getTreeHardness(state, level, pos, super.getHardness(state, level, pos));
             }
 
             @Override
@@ -230,14 +242,22 @@ public class CreakingHeartFamily extends AltBranchFamily {
         return CreakingHeartBranchBlock.findFromBranch(state, level, pos, this.getMaxSignalDepth());
     }
 
-    public float getHeartHardness(BlockState state, BlockGetter level, BlockPos pos, float baseHardness){
+    public float getTreeHardness(BlockState state, BlockGetter level, BlockPos pos, float baseHardness){
         if (hasHeart(state, level, pos))
-            return baseHardness * heartHardnessMultiplier;
+            return baseHardness * treeHeartHardnessMultiplier;
         return baseHardness;
     }
 
-    public void setHeartHardnessMultiplier(float heartHardnessMultiplier) {
-        this.heartHardnessMultiplier = heartHardnessMultiplier;
+    public void setTreeHeartHardnessMultiplier(float treeWhenHeartHardnessMultiplier) {
+        this.treeHeartHardnessMultiplier = treeWhenHeartHardnessMultiplier;
+    }
+
+    public float getHiddenHeartHardnessMultiplier() {
+        return hiddenHeartHardnessMultiplier;
+    }
+
+    public void setHiddenHeartHardnessMultiplier(float hiddenHeartHardnessMultiplier) {
+        this.hiddenHeartHardnessMultiplier = hiddenHeartHardnessMultiplier;
     }
 
     public void setResinItem(Item resinItem) {

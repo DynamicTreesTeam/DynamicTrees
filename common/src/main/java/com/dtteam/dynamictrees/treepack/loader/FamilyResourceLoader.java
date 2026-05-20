@@ -104,7 +104,8 @@ public final class FamilyResourceLoader extends JsonRegistryResourceLoader<Famil
         this.setupAppliers
                 .register("primitive_heart", CreakingHeartFamily.class, Block.class, CreakingHeartFamily::setPrimitiveHeartLog);
         this.reloadAppliers
-                .register("heart_hardness_multiplier", CreakingHeartFamily.class, Float.class, CreakingHeartFamily::setHeartHardnessMultiplier);
+                .register("tree_heart_hardness_multiplier", CreakingHeartFamily.class, Float.class, CreakingHeartFamily::setTreeHeartHardnessMultiplier)
+                .register("hidden_heart_hardness_multiplier", CreakingHeartFamily.class, Float.class, CreakingHeartFamily::setHiddenHeartHardnessMultiplier);
 
     }
 
