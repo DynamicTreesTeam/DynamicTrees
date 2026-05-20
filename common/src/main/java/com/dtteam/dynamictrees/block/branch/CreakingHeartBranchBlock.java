@@ -1,6 +1,7 @@
 package com.dtteam.dynamictrees.block.branch;
 
 import com.dtteam.dynamictrees.api.network.MapSignal;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.data.DTLootTableBuilder;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.registry.DTRegistries;
@@ -102,6 +103,10 @@ public class CreakingHeartBranchBlock extends BasicBranchBlock implements Entity
         }
         if (previousState.hasProperty(HIDDEN)){
             return state.setValue(HIDDEN, previousState.getValue(HIDDEN));
+        } else if (!DTConfigs.SERVER.hideCreakingHeart.get()) {
+            //if the previous state doesn't have hidden it means its being placed as a new block.
+            //In that case we want to respect the config.
+            return state.setValue(HIDDEN, false);
         }
         return state;
     }
@@ -262,4 +267,5 @@ public class CreakingHeartBranchBlock extends BasicBranchBlock implements Entity
             return hardness * heartFamily.getHiddenHeartHardnessMultiplier();
         return hardness;
     }
+
 }

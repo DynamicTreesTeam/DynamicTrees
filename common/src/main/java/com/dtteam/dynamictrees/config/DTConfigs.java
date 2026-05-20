@@ -54,6 +54,7 @@ public class DTConfigs {
     public ModConfigSpec.DoubleValue rootyBlockHardnessMultiplier;
     public ModConfigSpec.EnumValue<SwampSpecies.WaterSurfaceGenerationState> swampOaksInWater;
     public ModConfigSpec.IntValue boneMealGrowthPulses;
+    public ModConfigSpec.BooleanValue hideCreakingHeart;
 
     public ModConfigSpec.BooleanValue isLeavesPassable;
     public ModConfigSpec.BooleanValue vanillaLeavesCollision;
@@ -121,6 +122,7 @@ public class DTConfigs {
         config.rootyBlockHardnessMultiplier = builder.defineInRange("rootyBlockHardnessMultiplier", 40.0, 0.0, 128.0);
         config.swampOaksInWater = builder.defineEnum("swampOaksInWater", SwampSpecies.WaterSurfaceGenerationState.ROOTED);
         config.boneMealGrowthPulses = builder.defineInRange("boneMealGrowthPulses", 1, 1, 512);
+        config.hideCreakingHeart = builder.define("hideCreakingHeart", true);
         builder.pop();
 
         builder.push("interaction");
