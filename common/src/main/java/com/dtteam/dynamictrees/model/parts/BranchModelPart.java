@@ -82,14 +82,14 @@ public record BranchModelPart(QuadCollection quads, boolean useAmbientOcclusion,
             return new CuboidModelElement(posFrom, posTo, mapFacesIn);
         }
 
-        protected static @NotNull PartMap<BranchModelPart> buildParts(PartMap<QuadCollection.Builder> builders, Material.Baked material) {
+        protected @NotNull PartMap<BranchModelPart> buildParts(PartMap<QuadCollection.Builder> builders, Material.Baked material) {
             PartMap<BranchModelPart> parts = new PartMap<>();
             for (BranchMultiPartHolder.NullableDirection dir : BranchMultiPartHolder.NullableDirection.values())
                 parts.put(dir, new BranchModelPart(builders.get(dir).build(), true, material));
             return parts;
         }
 
-        protected static @NotNull PartMap<QuadCollection.Builder> createBuilders() {
+        protected @NotNull PartMap<QuadCollection.Builder> createBuilders() {
             PartMap<QuadCollection.Builder> builders = new PartMap<>();
             for (BranchMultiPartHolder.NullableDirection dir : BranchMultiPartHolder.NullableDirection.values())
                 builders.put(dir, new QuadCollection.Builder());
@@ -475,6 +475,109 @@ public record BranchModelPart(QuadCollection quads, boolean useAmbientOcclusion,
             }
             return parts;
         }
+    }
+
+    public static class UnbakedMossCore extends UnbakedCore {
+
+        public UnbakedMossCore(Material.Baked material) {
+            super(material);
+        }
+
+        public PartMap<BranchModelPart> bakeAllSides(ModelBaker baker, int radius, Direction.Axis axis) {
+
+            QuadCollection.Builder builder = new QuadCollection.Builder();
+
+            CuboidModelElement part = generateCorePart(radius, axis, false);
+            addUnculledFaces(baker, builder, part, material, false);
+
+            PartMap<BranchModelPart> parts = new PartMap<>();
+            parts.put(Direction.UP, new BranchModelPart(builder.build(), true, material));
+            return parts;
+        }
+
+        @Override
+        protected CuboidModelElement generateCorePart(int radius, Direction.Axis axis, boolean flipNormals){
+            Vector3f posFrom = new Vector3f(8 - radius, 8 + radius + Z_FIGHTING_OFFSET, 8 - radius);
+            Vector3f posTo = new Vector3f(8 + radius, 8 + radius + 1, 8 + radius);
+
+            Map<Direction, CuboidFace> mapFacesIn = Maps.newEnumMap(Direction.class);
+
+            for (Direction face : Direction.values()) {
+                CuboidFace.UVs uv;
+                if (face.getAxis() == Direction.Axis.Y){
+                    uv = new CuboidFace.UVs(8 - radius, 8-radius, 8 + radius, 8+radius);
+                } else {
+                    uv = new CuboidFace.UVs(8 - radius, 0, 8 + radius, 1);
+                }
+                mapFacesIn.put(face, new CuboidFace(face, -1, material.toString(), uv, Quadrant.R0));
+            }
+
+            return new CuboidModelElement(posFrom, posTo, mapFacesIn);
+        }
+
+    }
+
+    public static class UnbakedMossSleeve extends UnbakedSleeve{
+
+        public UnbakedMossSleeve(Material.Baked material) {
+            super(material);
+        }
+
+        @Override
+        public PartMap<BranchModelPart> bakeAllSides(ModelBaker baker, int radius) {
+
+            PartMap<BranchModelPart> parts = new PartMap<>();
+            for (Direction dir : Direction.values()){
+                if (dir.getAxis() == Direction.Axis.Y) continue;
+                CuboidModelElement part = generateSleevePart(radius, dir, false);
+                QuadCollection.Builder builder = new QuadCollection.Builder();
+
+                addUnculledFaces(baker, builder, part, material, false);
+
+                parts.put(dir, new BranchModelPart(builder.build(), true, material));
+            }
+
+            return parts;
+        }
+
+        @Override
+        public CuboidModelElement generateSleevePart(int radius, Direction dir, boolean flipNormals){
+            //Work in double units(*2)
+            int diameter = radius * 2;
+            int halfSize = (16 - diameter) / 2;
+            int halfSizeX = dir.getStepX() != 0 ? halfSize : diameter;
+            int halfSizeZ = dir.getStepZ() != 0 ? halfSize : diameter;
+            int move = 16 - halfSize;
+            int centerX = 16 + (dir.getStepX() * move);
+            int centerY = 16;
+            int centerZ = 16 + (dir.getStepZ() * move);
+
+            Vector3f posFrom = new Vector3f((centerX - halfSizeX) / 2f, (centerY + diameter) / 2f  + Z_FIGHTING_OFFSET, (centerZ - halfSizeZ) / 2f);
+            Vector3f posTo = new Vector3f((centerX + halfSizeX) / 2f, (centerY + diameter) / 2f + 1, (centerZ + halfSizeZ) / 2f);
+
+            boolean negative = dir.getAxisDirection() == Direction.AxisDirection.NEGATIVE;
+            if (dir.getAxis() == Direction.Axis.Z) {//North/South
+                negative = !negative;
+            }
+
+            Map<Direction, CuboidFace> mapFacesIn = Maps.newEnumMap(Direction.class);
+
+            for (Direction face : Direction.values()) {
+                CuboidFace.UVs uv;
+                Quadrant q;
+                if (face.getAxis() == Direction.Axis.Y){
+                    uv = new CuboidFace.UVs(8 - radius, negative ? 16 - halfSize : 0, 8 + radius, negative ? 16 : halfSize);
+                    q = ModelHelper.getFaceQuadrant(dir.getAxis(), face);
+                } else {
+                    uv = new CuboidFace.UVs(negative ? 16 - halfSize : 0, 0, negative ? 16 : halfSize,1);
+                    q = Quadrant.R0;
+                }
+                mapFacesIn.put(face, new CuboidFace(face, -1, material.toString(), uv, q));
+            }
+
+            return new CuboidModelElement(posFrom, posTo, mapFacesIn);
+        }
+
     }
 
     private static Direction[] directionsOfAxis(Direction.Axis axis){

@@ -47,20 +47,15 @@ public record BranchBlockStateModel(
         final Direction coreRingDir = (numConnections == 1 && sourceDir != null) ? sourceDir.getOpposite() : null;
 
         if (forceRings(numConnections, forceRingDir)) {
-            parts.add(rings.getPart(forceRingDir, coreRadius));
+            addPart(parts,rings.getPart(forceRingDir, coreRadius));
         } else {
             for (Direction face : Direction.values()) {
                 gatherCoreParts(parts, face, coreRadius, connections, coreRingDir, coreDir);
                 gatherSleeveParts(parts, face, coreRadius, connections, twigRadius);
             }
         }
-        addNullCorePart(parts, coreDir, coreRadius);
-    }
-
-    private void addNullCorePart(List<BlockStateModelPart> parts, Direction.Axis coreDir, int coreRadius) {
         //The null side is usually empty, but roots have the cross.
-        BlockStateModelPart part = cores.getPart(coreDir, null, coreRadius - 1);
-        if (part != null) parts.add(part);
+        addPart(parts, cores.getPart(coreDir, null, coreRadius - 1));
     }
 
     private void gatherSleeveParts(List<BlockStateModelPart> parts, Direction face, int coreRadius, int[] connections, int twigRadius) {
@@ -74,10 +69,10 @@ public record BranchBlockStateModel(
             if (connRadius == 0) continue;
             // If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius-1 connections for leaves (which are partly transparent).
             if (connRadius <= twigRadius || face != connDir) {
-                parts.add(sleeves.getPart(connDir, connRadius));
+                addPart(parts,sleeves.getPart(connDir, connRadius));
             }
             if (face == connDir && !sleeveRings.isEmpty()){
-                parts.add(sleeveRings.getPart(connDir, connRadius));
+                addPart(parts,sleeveRings.getPart(connDir, connRadius));
             }
         }
     }
@@ -86,10 +81,15 @@ public record BranchBlockStateModel(
         if (coreRadius == connections[face.get3DDataValue()]) return;
 
         if (coreRingDir != null && coreRingDir == face) {
-            parts.add(rings.getPart(face, coreRadius));
+            addPart(parts,rings.getPart(face, coreRadius));
         } else {
-            parts.add(cores.getPart(coreDir, face, coreRadius));
+            addPart(parts,cores.getPart(coreDir, face, coreRadius));
         }
+    }
+
+    private static void addPart(List<BlockStateModelPart> parts, @Nullable BlockStateModelPart part){
+        if (part == null) return;
+        parts.add(part);
     }
 
     private static boolean forceRings(int numConnections, Direction forceRingDir) {

@@ -40,9 +40,9 @@ public record UnbakedRootsMossModel(Identifier moss) implements CustomUnbakedBlo
         Material.Baked mossMat = baker.materials().get(new Material(moss), moss::toDebugFileName);
 
         return UnbakedBranchModel.bakeBasic(baker,
-                new BranchModelPart.UnbakedCore(mossMat),
-                new BranchModelPart.UnbakedSleeve(mossMat),
-                new BranchModelPart.UnbakedCore(mossMat),
+                new BranchModelPart.UnbakedMossCore(mossMat),
+                new BranchModelPart.UnbakedMossSleeve(mossMat),
+                new BranchModelPart.UnbakedMossCore(mossMat),
                 null);
     }
 
