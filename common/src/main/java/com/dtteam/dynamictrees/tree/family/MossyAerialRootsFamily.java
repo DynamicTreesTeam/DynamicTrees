@@ -7,6 +7,7 @@ import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.branch.MossyRootsBlock;
 import com.dtteam.dynamictrees.tree.BranchEntry;
 import com.dtteam.dynamictrees.tree.TreeHelper;
+import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.Optionals;
 import net.minecraft.core.BlockPos;
 import net.minecraft.data.tags.TagAppender;
@@ -20,6 +21,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -39,8 +41,9 @@ public class MossyAerialRootsFamily extends AerialRootsFamily {
     /**
      * Must be a block item to be placed and clicked on
      */
-    private BlockItem mossCarpet;
+    protected BlockItem mossCarpet;
     public static final int MOSSY_ROOTS_INDEX = 3;
+    protected float mossyRootsChance = 0.2f;
 
     public MossyAerialRootsFamily(Identifier name) {
         super(name);
@@ -154,6 +157,19 @@ public class MossyAerialRootsFamily extends AerialRootsFamily {
             Block.popResource(level, pos, new ItemStack(getMossCarpetItem()));
         }
         level.playSound(null, pos, getMossCarpetSoundType().getBreakSound(), SoundSource.BLOCKS, 1.0F, 1.0F);
+    }
+
+    public void setMossyRootsChance(float mossyRootsChance) {
+        this.mossyRootsChance = mossyRootsChance;
+    }
+
+    @Override
+    public Optional<BranchBlock> getBranchForRootsPlacement(LevelAccessor level, Species species, BlockPos pos) {
+        if (level.getRandom().nextFloat() < mossyRootsChance
+                && !TreeHelper.isTreePart(level.getBlockState(pos.above()))){
+            return getMossyRoots();
+        }
+        return getRoots();
     }
 
 }

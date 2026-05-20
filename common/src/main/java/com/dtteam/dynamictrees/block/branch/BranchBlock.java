@@ -130,7 +130,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
     }
 
     public boolean isSameTree(BlockState state) {
-        return TreeHelper.getBranchOpt(state).map(branch -> this.getFamily() == branch.getFamily()).orElse(false);
+        return TreeHelper.getBranchOpt(state).map(this::isSameTree).orElse(false);
     }
 
     /**

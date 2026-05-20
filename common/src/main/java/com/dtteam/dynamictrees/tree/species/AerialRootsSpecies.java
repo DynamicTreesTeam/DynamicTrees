@@ -1,7 +1,9 @@
 package com.dtteam.dynamictrees.tree.species;
 
+import com.dtteam.dynamictrees.api.network.NodeInspector;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.api.treedata.TreePart;
+import com.dtteam.dynamictrees.api.voxmap.SimpleVoxmap;
 import com.dtteam.dynamictrees.block.branch.BasicRootsBlock;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
@@ -13,6 +15,7 @@ import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKit;
 import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKitConfiguration;
 import com.dtteam.dynamictrees.systems.growthlogic.context.PositionalSpeciesContext;
+import com.dtteam.dynamictrees.systems.nodemapper.InflatorNode;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.family.AerialRootsFamily;
 import com.dtteam.dynamictrees.tree.family.Family;
@@ -42,25 +45,9 @@ public class AerialRootsSpecies extends Species {
     protected GrowthLogicKitConfiguration rootLogicKit = GrowthLogicKitConfiguration.getDefault();
     private int minWorldGenHeightOffset = 2;
     private int maxWorldGenHeightOffset = 6;
-    protected float rootSignalEnergy = 16.0f;
     protected float rootTapering = 0.3f;
     protected int rootGrowthMultiplier = 15;
     protected int updateSoilOnWaterRadius = 5;
-    public void setMinWorldGenHeightOffset(int minWorldGenHeightOffset) {
-        this.minWorldGenHeightOffset = minWorldGenHeightOffset;
-    }
-
-    public void setMaxWorldGenHeightOffset(int maxWorldGenHeightOffset) {
-        this.maxWorldGenHeightOffset = maxWorldGenHeightOffset;
-    }
-
-    public void setRootGrowthMultiplier(int rootGrowthMultiplier) {
-        this.rootGrowthMultiplier = rootGrowthMultiplier;
-    }
-
-    public void setUpdateSoilOnWaterRadius(int updateSoilOnWaterRadius) {
-        this.updateSoilOnWaterRadius = updateSoilOnWaterRadius;
-    }
 
     public AerialRootsSpecies(Identifier name, Family family, LeavesProperties leavesProperties) {
         super(name, family, leavesProperties);
@@ -183,28 +170,46 @@ public class AerialRootsSpecies extends Species {
         return false;
     }
 
+    public NodeInspector getRootsNodeInflator(SimpleVoxmap leafMap, int maxRadius) {
+        return new InflatorNode(this, leafMap, maxRadius,
+                getAerialFamily().getPrimaryRootThickness(), getAerialFamily().getSecondaryRootThickness(),
+                getRootTapering() * getWorldGenTaperingFactor());
+    }
+
     //////////////////////
     // GROWTH
     //////////////////////
 
-    public float getRootSignalEnergy() {
-        return rootSignalEnergy;
-    }
-    public void setRootSignalEnergy(float rootSignalEnergy) {
-        this.rootSignalEnergy = rootSignalEnergy;
-    }
-
     public float getRootTapering() {
         return rootTapering;
     }
+
     public void setRootTapering(float rootTapering) {
         this.rootTapering = rootTapering;
     }
 
+    public void setMinWorldGenHeightOffset(int minWorldGenHeightOffset) {
+        this.minWorldGenHeightOffset = minWorldGenHeightOffset;
+    }
+
+    public void setMaxWorldGenHeightOffset(int maxWorldGenHeightOffset) {
+        this.maxWorldGenHeightOffset = maxWorldGenHeightOffset;
+    }
+
+    public void setRootGrowthMultiplier(int rootGrowthMultiplier) {
+        this.rootGrowthMultiplier = rootGrowthMultiplier;
+    }
+
+    public void setUpdateSoilOnWaterRadius(int updateSoilOnWaterRadius) {
+        this.updateSoilOnWaterRadius = updateSoilOnWaterRadius;
+    }
+
     public Optional<BranchBlock> getRoots() {
-        if (getFamily() instanceof AerialRootsFamily aerialFamily)
-            return aerialFamily.getRoots();
-        return Optional.empty();
+        return getAerialFamily().getRoots();
+    }
+
+    public AerialRootsFamily getAerialFamily(){
+        return (AerialRootsFamily) getFamily();
     }
 
     @Override

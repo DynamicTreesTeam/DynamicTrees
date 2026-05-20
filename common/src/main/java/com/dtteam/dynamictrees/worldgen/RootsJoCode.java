@@ -9,6 +9,7 @@ import com.dtteam.dynamictrees.systems.nodemapper.CoderNode;
 import com.dtteam.dynamictrees.systems.nodemapper.FindEndsNode;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.family.AerialRootsFamily;
+import com.dtteam.dynamictrees.tree.species.AerialRootsSpecies;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -44,8 +45,8 @@ public class RootsJoCode extends JoCode {
 
     @Override
     public void generate(DynamicTreeGenerationContext context) {
+        if (!(context.species() instanceof AerialRootsSpecies species)) return;
         LevelAccessor level = context.level();
-        Species species = context.species();
         int radius = context.radius();
         boolean worldGen = context.isWorldGen();
 
@@ -81,7 +82,7 @@ public class RootsJoCode extends JoCode {
         // If a branch exists then the growth was successful.
 
         final SimpleVoxmap rootsMap = new SimpleVoxmap(radius * 2 + 1, species.getWorldGenLeafMapHeight(), radius * 2 + 1).setMapAndCenter(rootsPos, new BlockPos(radius, species.getWorldGenLeafMapHeight(), radius));
-        final NodeInspector inflator = species.getNodeInflator(rootsMap, rootRadius); // This is responsible for thickening the branches.
+        final NodeInspector inflator = species.getRootsNodeInflator(rootsMap, rootRadius); // This is responsible for thickening the branches.
         final FindEndsNode endFinder = new FindEndsNode(); // This is responsible for gathering a list of branch end points.
         final MapSignal signal = new MapSignal(inflator, endFinder); // The inflator signal will "paint" a temporary voxmap of all of the leaves and branches.
         signal.destroyLoopedNodes = this.careful;

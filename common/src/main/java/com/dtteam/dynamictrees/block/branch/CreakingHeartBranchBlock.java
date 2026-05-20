@@ -119,7 +119,7 @@ public class CreakingHeartBranchBlock extends BasicBranchBlock implements Entity
     protected boolean triggerEvent(BlockState state, Level level, BlockPos pos, int b0, int b1) {
         super.triggerEvent(state, level, pos, b0, b1);
         BlockEntity blockEntity = level.getBlockEntity(pos);
-        return blockEntity == null ? false : blockEntity.triggerEvent(b0, b1);
+        return blockEntity != null && blockEntity.triggerEvent(b0, b1);
     }
 
     @SuppressWarnings("unchecked")

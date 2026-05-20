@@ -2238,9 +2238,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return 3;
     }
 
-    public NodeInspector getNodeInflator(SimpleVoxmap leafMap) {
-        return getNodeInflator(leafMap, getMaxBranchRadius());
-    }
     public NodeInspector getNodeInflator(SimpleVoxmap leafMap, int maxRadius) {
         return new InflatorNode(this, leafMap, maxRadius);
     }

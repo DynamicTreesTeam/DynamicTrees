@@ -93,7 +93,10 @@ public final class FamilyResourceLoader extends JsonRegistryResourceLoader<Famil
                 .register("moss_carpet", MossyAerialRootsFamily.class, Item.class, MossyAerialRootsFamily::setMossCarpet);
         this.reloadAppliers
                 .register("default_soil", AerialRootsFamily.class, SoilProperties.class, AerialRootsFamily::setDefaultSoil)
-                .registerArrayApplier("root_system_acceptable_soils", AerialRootsFamily.class, String.class, (Applier<AerialRootsFamily, String>) this::addAcceptableSoilForRootSystem);
+                .registerArrayApplier("root_system_acceptable_soils", AerialRootsFamily.class, String.class, (Applier<AerialRootsFamily, String>) this::addAcceptableSoilForRootSystem)
+                .register("primary_root_thickness", AerialRootsFamily.class, Integer.class, AerialRootsFamily::setPrimaryRootThickness)
+                .register("secondary_root_thickness", AerialRootsFamily.class, Integer.class, AerialRootsFamily::setSecondaryRootThickness)
+                .register("mossy_roots_chance", MossyAerialRootsFamily.class, Float.class, MossyAerialRootsFamily::setMossyRootsChance);
     }
 
     private void registerPaleOakAppliers(){

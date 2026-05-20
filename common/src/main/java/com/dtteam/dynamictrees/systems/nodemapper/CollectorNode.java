@@ -1,5 +1,6 @@
 package com.dtteam.dynamictrees.systems.nodemapper;
 
+import com.dtteam.dynamictrees.api.function.TriPredicate;
 import com.dtteam.dynamictrees.api.network.NodeInspector;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -14,14 +15,22 @@ import java.util.Set;
 public class CollectorNode implements NodeInspector {
 
     private final Set<BlockPos> nodeSet;
+    private final TriPredicate<BlockState, LevelAccessor, BlockPos> predicate;
+
+    public CollectorNode(Set<BlockPos> nodeSet, TriPredicate<BlockState, LevelAccessor, BlockPos> predicate) {
+        this.nodeSet = nodeSet;
+        this.predicate = predicate;
+    }
 
     public CollectorNode(Set<BlockPos> nodeSet) {
-        this.nodeSet = nodeSet;
+        this(nodeSet, (_,_,_)->true);
     }
 
     @Override
     public boolean run(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
-        nodeSet.add(pos);
+        if (predicate.test(state, level, pos)){
+            nodeSet.add(pos);
+        }
         return false;
     }
 

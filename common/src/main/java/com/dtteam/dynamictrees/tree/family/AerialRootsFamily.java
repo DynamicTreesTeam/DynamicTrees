@@ -186,17 +186,11 @@ public class AerialRootsFamily extends Family {
         return secondaryRootThickness;
     }
 
-    public int getSupportedRootThicknessExtra() {
-        return supportedRootThicknessExtra;
-    }
     public void setPrimaryRootThickness(int primaryRootThickness) {
         this.primaryRootThickness = primaryRootThickness;
     }
     public void setSecondaryRootThickness(int secondaryRootThickness) {
         this.secondaryRootThickness = secondaryRootThickness;
-    }
-    public void setSupportedRootThicknessExtra(int supportedRootThicknessExtra) {
-        this.supportedRootThicknessExtra = supportedRootThicknessExtra;
     }
 
     public void setPrimitiveRoots(Block primitiveRoots) {

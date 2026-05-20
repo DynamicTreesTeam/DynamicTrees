@@ -151,7 +151,6 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .register("roots_growth_logic_kit", AerialRootsSpecies.class, GrowthLogicKitConfiguration.class, AerialRootsSpecies::setRootsGrowthLogicKit)
                 .register("root_growth_multiplier", AerialRootsSpecies.class, Integer.class, AerialRootsSpecies::setRootGrowthMultiplier)
                 .register("root_tapering", AerialRootsSpecies.class, Float.class, AerialRootsSpecies::setRootTapering)
-                .register("root_signal_energy", AerialRootsSpecies.class, Float.class, AerialRootsSpecies::setRootSignalEnergy)
                 .register("update_soil_on_water_radius", AerialRootsSpecies.class, Integer.class, AerialRootsSpecies::setUpdateSoilOnWaterRadius);
     }
 

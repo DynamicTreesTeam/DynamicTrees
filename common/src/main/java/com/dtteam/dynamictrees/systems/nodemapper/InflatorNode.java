@@ -17,16 +17,24 @@ public class InflatorNode implements NodeInspector {
     private float radius;
     private BlockPos last;
     private BlockPos highestTrunkBlock;
-    private int maxRadius;
+    final private int maxRadius;
+    final private int primaryThickness;
+    final private int secondaryThickness;
+    final private float tapering;
 
     Species species;
     SimpleVoxmap leafMap;
 
-    public InflatorNode(Species species, SimpleVoxmap leafMap) {
-        this(species, leafMap, species.getMaxBranchRadius());
-    }
     public InflatorNode(Species species, SimpleVoxmap leafMap, int maxRadius) {
+        this(species, leafMap, maxRadius,
+                species.getFamily().getPrimaryThickness(), species.getFamily().getSecondaryThickness(),
+                species.getTapering() * species.getWorldGenTaperingFactor());
+    }
+    public InflatorNode(Species species, SimpleVoxmap leafMap, int maxRadius, int primaryThickness, int secondaryThickness, float tapering) {
         this.species = species;
+        this.primaryThickness = primaryThickness;
+        this.secondaryThickness = secondaryThickness;
+        this.tapering = tapering;
         this.leafMap = leafMap;
         last = BlockPos.ZERO;
         highestTrunkBlock = null;
@@ -38,7 +46,7 @@ public class InflatorNode implements NodeInspector {
         BranchBlock branch = TreeHelper.getBranch(state);
 
         if (branch != null) {
-            radius = species.getFamily().getPrimaryThickness();
+            radius = primaryThickness;
             //Store the last block to be part of the trunk
             if (highestTrunkBlock == null && !TreeHelper.isBranch(level.getBlockState(pos.above())))
                 highestTrunkBlock = pos;
@@ -85,7 +93,7 @@ public class InflatorNode implements NodeInspector {
                 }
             } else {
                 //The new branch should be the square root of all of the sums of the areas of the branches coming into it.
-                radius = (float) Math.sqrt(areaAccum) + (species.getTapering() * species.getWorldGenTaperingFactor());
+                radius = (float) Math.sqrt(areaAccum) + tapering;
 
                 //Ensure the branch is never inflated past it's species maximum
                 if (radius > maxRadius) {
@@ -102,7 +110,6 @@ public class InflatorNode implements NodeInspector {
                 }
 
                 //Ensure non-twig branches are at least radius 2
-                float secondaryThickness = species.getFamily().getSecondaryThickness();
                 if (radius < secondaryThickness) {
                     radius = secondaryThickness;
                 }

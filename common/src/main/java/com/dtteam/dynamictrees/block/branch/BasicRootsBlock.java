@@ -101,7 +101,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     }
 
     public static boolean isFullBlock (BlockState state){
-        return state.getValue(LAYER) == Layer.COVERED;
+        return state.hasProperty(LAYER) && state.getValue(LAYER) == Layer.COVERED;
     }
 
     public AerialRootsFamily getAerialFamily() {
@@ -471,7 +471,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
             for (Direction dir : Direction.values()) {// The logic here is that if this block rotted then
                 BlockPos neighPos = pos.relative(dir);// the neighbors might be rotted too.
                 BlockState neighState = level.getBlockState(neighPos);
-                if (neighState.getBlock() == this) { // Only check blocks logs that are the same as this one
+                if (isSameTree(neighState)) { // Only check blocks logs that are the same as this one
                     this.checkForRot(level, neighPos, species, fertility, getRadius(neighState), rand, 1.0f, true);
                 }
             }

@@ -1,6 +1,7 @@
 package com.dtteam.dynamictrees.block.branch;
 
 import com.dtteam.dynamictrees.tree.TreeHelper;
+import com.dtteam.dynamictrees.tree.family.AerialRootsFamily;
 import com.dtteam.dynamictrees.tree.family.MossyAerialRootsFamily;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -77,6 +78,12 @@ public class MossyRootsBlock extends BasicRootsBlock {
 
     @Override
     public int setRadius(LevelAccessor level, BlockPos pos, int radius, @Nullable Direction originDir, int flags) {
-        return super.setRadius(level, pos, radius, originDir, flags);
+        BlockState currentState = level.getBlockState(pos);
+        boolean replacingGround = getAerialFamily().isAcceptableSoilForRootSystem(currentState);
+        if (replacingGround && getFamily() instanceof AerialRootsFamily family && family.getRoots().isPresent()){
+            return family.getRoots().get().setRadius(level, pos, radius, originDir, flags);
+        } else {
+            return super.setRadius(level, pos, radius, originDir, flags);
+        }
     }
 }
