@@ -177,7 +177,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         boolean setWaterlogged = replacingWater && !replacingGround;
         boolean isFullBlock = radius >= 8;
         Layer layer;
-        if (currentState.is(this)){
+        if (currentState.hasProperty(LAYER)){
             layer = currentState.getValue(LAYER);
             if (layer == Layer.COVERED && isFullBlock){
                 layer = Layer.FILLED;
@@ -243,7 +243,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     public boolean placeLiquid(LevelAccessor pLevel, BlockPos pPos, BlockState pState, FluidState pFluidState) {
         if (canPlaceLiquid(null, pLevel, pPos, pState, pFluidState.getType())) {
             if (!pLevel.isClientSide()) {
-                pLevel.setBlock(pPos, pState.setValue(BlockStateProperties.WATERLOGGED, true).setValue(LAYER, Layer.EXPOSED), 3);
+                washRoots(pLevel, pPos, pState);
                 pLevel.scheduleTick(pPos, pFluidState.getType(), pFluidState.getType().getTickDelay(pLevel));
             }
 
@@ -251,6 +251,10 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         } else {
             return false;
         }
+    }
+
+    protected void washRoots(LevelAccessor pLevel, BlockPos pPos, BlockState pState) {
+        pLevel.setBlock(pPos, pState.setValue(BlockStateProperties.WATERLOGGED, true).setValue(LAYER, Layer.EXPOSED), 3);
     }
 
     //////////////////////////////

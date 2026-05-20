@@ -25,6 +25,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -53,7 +54,7 @@ public class MossyAerialRootsFamily extends AerialRootsFamily {
     public void setupBlocks() {
         super.setupBlocks();
 
-        branches.add(MOSSY_ROOTS_INDEX, new BranchEntry(this, getRootsName("mossy_"))
+        addBranch(MOSSY_ROOTS_INDEX, new BranchEntry(this, getRootsName("mossy_"))
                 .setCanBeStripped(false)
                 .CreateBlock(this::createMossyRoots));
     }
@@ -84,7 +85,7 @@ public class MossyAerialRootsFamily extends AerialRootsFamily {
     public void setMossCarpet(Item mossCarpet) {
         if (mossCarpet instanceof BlockItem mossCarpetItem)
             this.mossCarpet = mossCarpetItem;
-        DynamicTrees.LOG.error("Could not register mossCarpet for {}. Item {} is not of BlockItem type.", this, mossCarpet);
+        else DynamicTrees.LOG.error("Could not register mossCarpet for {}. Item {} is not of BlockItem type.", this, mossCarpet);
     }
 
     public Block getMossCarpetBlock() {
@@ -124,6 +125,10 @@ public class MossyAerialRootsFamily extends AerialRootsFamily {
         branches.get(MOSSY_ROOTS_INDEX).setPrimitiveBlock(primitiveRoots);
     }
 
+    public Identifier getRootsMossLoader(){
+        return DynamicTrees.location("roots_moss");
+    }
+
     ///////////////////////////////////////////
     // BEHAVIOR
     ///////////////////////////////////////////
@@ -141,11 +146,13 @@ public class MossyAerialRootsFamily extends AerialRootsFamily {
         return true;
     }
 
-    public void removeMossCarpet(BlockState state, Level level, BlockPos pos){
+    public void removeMossCarpet(BlockState state, Level level, BlockPos pos, @Nullable Player player){
         int currentRadius = TreeHelper.getRadius(state);
         if (currentRadius == 0) return;
         getRoots().ifPresent(roots -> roots.setRadius(level, pos, currentRadius, null, 3));
-        Block.popResource(level, pos, new ItemStack(getMossCarpetItem()));
+        if (player == null || !player.isCreative()){
+            Block.popResource(level, pos, new ItemStack(getMossCarpetItem()));
+        }
         level.playSound(null, pos, getMossCarpetSoundType().getBreakSound(), SoundSource.BLOCKS, 1.0F, 1.0F);
     }
 

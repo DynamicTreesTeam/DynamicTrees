@@ -45,8 +45,8 @@ public class RootsStateGenerator implements Generator<BlockModelGenerators, Fami
         addTextures(rootsInput, exposedTextures, primitiveExposedPath);
         addTextures(rootsInput, filledTextures, primitiveFilledPath);
 
-        BasicLoaderBuilder exposedBuilder = BasicLoaderBuilder.loaderBuilders.get(input.getRootsLoader()).apply(exposedTextures, input);
-        BasicLoaderBuilder filledBuilder = BasicLoaderBuilder.loaderBuilders.get(input.getRootsLoader().withSuffix("_opaque")).apply(filledTextures, input);
+        BasicLoaderBuilder exposedBuilder = BasicLoaderBuilder.loaderBuilders.get(rootsInput.getRootsLoader()).apply(exposedTextures, input);
+        BasicLoaderBuilder filledBuilder = BasicLoaderBuilder.loaderBuilders.get(rootsInput.getRootsLoader().withSuffix("_opaque")).apply(filledTextures, input);
 
         acceptOutput(generators, exposedBuilder, filledBuilder, primitiveCoveredPath, branch, input, dependencies);
     }

@@ -53,7 +53,7 @@ public class CreakingHeartFamily extends AltBranchFamily {
     public void setupBlocks() {
         super.setupBlocks();
 
-        branches.add(HEART_BRANCH_INDEX, new BranchEntry(this,getHeartBranchName())
+        addBranch(HEART_BRANCH_INDEX, new BranchEntry(this,getHeartBranchName())
                 .setCanBeStripped(false)
                 .CreateBlock(this::createHeartBranch));
     }
@@ -252,8 +252,8 @@ public class CreakingHeartFamily extends AltBranchFamily {
         this.resinBlock = resinBlock;
     }
 
-    public Optional<Block> getResinBlock() {
-        return Optional.ofNullable(resinBlock);
+    public Block getResinBlock() {
+        return resinBlock;
     }
 
 }

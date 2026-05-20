@@ -53,6 +53,10 @@ public final class BasicLoaderBuilder extends InvariantLoaderBuilder {
                                 textures.get("heart_rings"),
                                 textures.get("bark"),
                                 Optional.ofNullable(family))));
+        loaderBuilders.put(
+                ClientModEventHandler.ROOTS_MOSS, (textures, _)->
+                        new BasicLoaderBuilder(()-> new UnbakedRootsMossModel(
+                                textures.get("moss"))));
     }
 
     private final Supplier<CustomUnbakedBlockStateModel> unbakedSupplier;

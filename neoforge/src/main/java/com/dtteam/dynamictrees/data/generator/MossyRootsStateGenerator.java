@@ -13,8 +13,9 @@ import net.minecraft.client.data.models.model.ModelLocationUtils;
 import net.minecraft.client.renderer.block.dispatch.Variant;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -26,10 +27,12 @@ public class MossyRootsStateGenerator extends RootsStateGenerator {
 
     @Override
     protected void acceptOutput(BlockModelGenerators generators, BasicLoaderBuilder exposedBuilder, BasicLoaderBuilder filledBuilder, Identifier primitiveCoveredPath, BranchBlock branch, Family input, Dependencies dependencies) {
-        Identifier testModel = ModelLocationUtils.getModelLocation(dependencies.getOptional(MOSS_CARPET).orElse(Blocks.AIR));
+        if (!(input instanceof MossyAerialRootsFamily mossyFamily)) return;
+        final Map<String, Identifier> mossTextures = new HashMap<>();
+        addMossTextures(input, dependencies, mossTextures);
+        BasicLoaderBuilder mossBuilder = BasicLoaderBuilder.loaderBuilders.get(mossyFamily.getRootsMossLoader()).apply(mossTextures, input);
 
-        generators.blockStateOutput.accept(
-                MultiPartGenerator.multiPart(branch)
+        generators.blockStateOutput.accept(MultiPartGenerator.multiPart(branch)
                         .with(
                                 new ConditionBuilder().term(BasicRootsBlock.LAYER, BasicRootsBlock.Layer.EXPOSED),
                                 MultiVariant.of(exposedBuilder)
@@ -41,9 +44,16 @@ public class MossyRootsStateGenerator extends RootsStateGenerator {
                                 BlockModelGenerators.variant(new Variant(primitiveCoveredPath))
                         ).with(
                                 new ConditionBuilder().term(BasicRootsBlock.LAYER, BasicRootsBlock.Layer.EXPOSED, BasicRootsBlock.Layer.FILLED),
-                                BlockModelGenerators.variant(new Variant(testModel))
+                                MultiVariant.of(mossBuilder)
                         )
         );
+    }
+
+    private static void addMossTextures(Family input, Dependencies dependencies, Map<String, Identifier> mossTextures) {
+        Identifier defaultLoc = ModelLocationUtils.getModelLocation(dependencies.get(MOSS_CARPET));
+        Identifier textureLoc = input.getTexturePath("moss").orElse(
+                Identifier.fromNamespaceAndPath(defaultLoc.getNamespace(), defaultLoc.getPath().replace("_carpet", "_block")));
+        mossTextures.put("moss", textureLoc);
     }
 
     @Override

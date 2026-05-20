@@ -1,4 +1,4 @@
-// 26.1.2	2026-05-18T18:19:45.678104375	Model Definitions - dynamictrees
+// 26.1.2	2026-05-19T20:57:16.487581894	Model Definitions - dynamictrees
 aed0fb7708785b5f2b1e0eefdbc26f0044b9614c assets/dynamictrees/blockstates/acacia_branch.json
 2606791521eac27fa77ebbeeea442b8073802a51 assets/dynamictrees/blockstates/acacia_leaves.json
 28a0cd7b38e1a854acd4f0c477573a9460811d82 assets/dynamictrees/blockstates/acacia_sapling.json
@@ -35,7 +35,7 @@ ec8ab110c9a7deb973ad5c223fa05d2391f77c44 assets/dynamictrees/blockstates/mangrov
 31d65eee663350c211f1129d2be13ebe4698a3e2 assets/dynamictrees/blockstates/mega_jungle_sapling.json
 530b13d53b4adfb7b9463d6c40054223433d8f30 assets/dynamictrees/blockstates/mega_spruce_sapling.json
 f3515e36818b0b16aedab7458e2df91534ae73a2 assets/dynamictrees/blockstates/mega_warped_sapling.json
-9dcec35a4ba9180d13fe7697004a768d59248d1e assets/dynamictrees/blockstates/mossy_mangrove_roots.json
+be00b36bc633db9558000b48bc8a646dd8d398f0 assets/dynamictrees/blockstates/mossy_mangrove_roots.json
 3bd977dfae9687a8e39105cfc2e428af40915f71 assets/dynamictrees/blockstates/oak_branch.json
 9b73d2419e07259eb9681640ac018a6aeb7e7e93 assets/dynamictrees/blockstates/oak_leaves.json
 1128f60fc8e5148d030661dbf3893731dd50f56d assets/dynamictrees/blockstates/oak_sapling.json
@@ -121,7 +121,6 @@ f9ac835a541e590f163bc3641b055d228453d98d assets/dynamictrees/items/mega_crimson_
 54fa9a14a4020216b68d1927ab068c57310967ef assets/dynamictrees/items/mega_jungle_seed.json
 2e34e96e071affc48e4799da4beffe7f4d33ba7e assets/dynamictrees/items/mega_spruce_seed.json
 88351fd9d251c76456ed09c544354b8c307df308 assets/dynamictrees/items/mega_warped_seed.json
-a48e26c3ab031a0b6385760bcf3ab55fc7db8c94 assets/dynamictrees/items/mossy_mangrove_roots.json
 6327b18add925db28a1ec5ac14466eff6c034952 assets/dynamictrees/items/oak_branch.json
 398789302454457c1c43fb94663173498604baf3 assets/dynamictrees/items/oak_seed.json
 d0ff0cb9b795827952543d43604270dafb5ae767 assets/dynamictrees/items/pale_oak_branch.json

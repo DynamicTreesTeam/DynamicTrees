@@ -47,6 +47,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.BlockHitResult;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.Debug;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -116,7 +117,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     //Branches
     protected List<BranchEntry> branches = new ArrayList<>();
     public static final int BRANCH_INDEX = 0;
-    public static final int STRIPPED_BRANCH_INDEX = 0;
+    public static final int STRIPPED_BRANCH_INDEX = 1;
 
     protected BlockBehaviour.Properties branchProperties;
 
@@ -188,14 +189,22 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return REGISTRY.getType();
     }
 
+    protected void addBranch(int index, BranchEntry entry){
+        if (index < branches.size()){
+            DynamicTrees.LOG.error("Family {} already contains a branch at index {}", this.getRegistryName(), index);
+        } else {
+            branches.add(index, entry);
+        }
+    }
+
     public void setupBlocks() {
-        branches.add(BRANCH_INDEX, new BranchEntry(this, getBranchName(""))
+        addBranch(BRANCH_INDEX, new BranchEntry(this, getBranchName(""))
                 .setCanBeStripped(hasStrippedBranch)
                 .CreateBlock(this::createBranch)
                 .CreateItem());
 
         if (hasStrippedBranch()) {
-            branches.add(STRIPPED_BRANCH_INDEX, new BranchEntry(this, getBranchName("stripped_"))
+            addBranch(STRIPPED_BRANCH_INDEX, new BranchEntry(this, getBranchName("stripped_"))
                     .CreateBlock(this::createBranch));
         }
 
@@ -764,9 +773,6 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     }
     public Identifier getBranchLoader(){
         return DynamicTrees.location("branch");
-    }
-    public Identifier getRootsLoader(){
-        return DynamicTrees.location("roots");
     }
 
     public Identifier getBranchItemParentLocation() {return DynamicTrees.location("branch");}

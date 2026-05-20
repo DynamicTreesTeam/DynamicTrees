@@ -4,6 +4,7 @@ import com.dtteam.dynamictrees.data.DTLootTableBuilder;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.family.AltBranchFamily;
 import com.dtteam.dynamictrees.tree.family.CreakingHeartFamily;
+import com.dtteam.dynamictrees.tree.family.MossyAerialRootsFamily;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.Identifier;
@@ -19,6 +20,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
@@ -37,10 +39,6 @@ public class ResinBranchBlock extends ThickBranchBlock {
             return altLogFamily.getPrimitiveAltLog();
         return super.getPrimitiveLog();
     }
-    @Override
-    public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
-        return ((CreakingHeartFamily)getFamily()).getHeartHardness(state, level, pos, super.getHardness(state, level, pos));
-    }
 
     public void removeResin(BlockState state, Level level, BlockPos pos, @Nullable Player player){
         CreakingHeartFamily family = ((CreakingHeartFamily)getFamily());
@@ -49,7 +47,7 @@ public class ResinBranchBlock extends ThickBranchBlock {
         family.getBranch().get().setRadius(level, pos, currentRadius, null, 3);
 
         ItemStack resin = getResinStack(level.getRandom(), family, currentRadius);
-        if (player != null)
+        if (player != null && !player.isCreative())
             player.addItem(resin);
         else
             popResource(level, pos, resin);
@@ -85,7 +83,17 @@ public class ResinBranchBlock extends ThickBranchBlock {
     }
 
     @Override
-    protected void attack(BlockState state, Level level, BlockPos pos, Player player) {
+    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, ItemStack toolStack, boolean willHarvest, FluidState fluid) {
         removeResin(state, level, pos, player);
+        return false;
     }
+
+    @Override
+    public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
+        if (getFamily() instanceof CreakingHeartFamily heartFamily) {
+            return heartFamily.getResinBlock().defaultBlockState().getDestroySpeed(level, pos);
+        }
+        return super.getHardness(state, level, pos);
+    }
+
 }

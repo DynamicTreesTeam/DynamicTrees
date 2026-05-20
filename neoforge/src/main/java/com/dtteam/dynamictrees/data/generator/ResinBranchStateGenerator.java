@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.Block;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class ResinBranchStateGenerator extends AltBranchStateGenerator {
 
@@ -42,7 +43,7 @@ public class ResinBranchStateGenerator extends AltBranchStateGenerator {
     public Dependencies gatherDependencies(Family input) {
         if (input instanceof CreakingHeartFamily heartFamily){
             return super.gatherDependencies(input)
-                    .append(RESIN_CLUMP, heartFamily.getResinBlock());
+                    .append(RESIN_CLUMP, Optional.of(heartFamily.getResinBlock()));
         }
         return new Dependencies();
     }

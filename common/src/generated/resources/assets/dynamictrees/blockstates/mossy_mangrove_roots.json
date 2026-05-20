@@ -36,7 +36,10 @@
     },
     {
       "apply": {
-        "model": "minecraft:block/moss_carpet"
+        "type": "dynamictrees:roots_moss",
+        "textures": {
+          "moss": "minecraft:block/moss_block"
+        }
       },
       "when": {
         "layer": "exposed|filled"

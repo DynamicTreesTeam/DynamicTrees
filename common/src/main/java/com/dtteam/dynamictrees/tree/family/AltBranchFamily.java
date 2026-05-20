@@ -34,7 +34,7 @@ public class AltBranchFamily extends Family {
     public void setupBlocks() {
         super.setupBlocks();
 
-        branches.add(ALT_BRANCH_INDEX, new BranchEntry(this, getAltBranchName())
+        addBranch(ALT_BRANCH_INDEX, new BranchEntry(this, getAltBranchName())
                 .setCanBeStripped(hasStrippedBranch())
                 .CreateBlock(this::createAltBranch));
     }

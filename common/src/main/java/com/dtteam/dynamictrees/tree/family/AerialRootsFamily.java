@@ -80,7 +80,7 @@ public class AerialRootsFamily extends Family {
     @Override
     public void setupBlocks() {
         super.setupBlocks();
-        branches.add(ROOTS_INDEX, new BranchEntry(this, getRootsName(""))
+        addBranch(ROOTS_INDEX, new BranchEntry(this, getRootsName(""))
                 .CreateBlock(this::createRoots)
                 .CreateItem());
     }
@@ -103,6 +103,10 @@ public class AerialRootsFamily extends Family {
     @Override
     public Optional<BranchBlock> getBranchForRootsPlacement(LevelAccessor level, Species species, BlockPos pos) {
         return getRoots();
+    }
+
+    public Identifier getRootsLoader(){
+        return DynamicTrees.location("roots");
     }
 
     ///////////////////////////////////////////
