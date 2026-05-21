@@ -55,7 +55,7 @@ public record BranchBlockStateModel(
             }
         }
         //The null side is usually empty, but roots have the cross.
-        addPart(parts, cores.getPart(coreDir, null, coreRadius - 1));
+        addPart(parts, cores.getPart(coreDir, null, coreRadius));
     }
 
     private void gatherSleeveParts(List<BlockStateModelPart> parts, Direction face, int coreRadius, int[] connections, int twigRadius) {

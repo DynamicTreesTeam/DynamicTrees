@@ -53,9 +53,9 @@ public record UnbakedRootsModel(Identifier side, Identifier top, boolean opaque)
                     new BranchModelPart.UnbakedRootSleeveEnds(ringsMat));
         } else {
             model = UnbakedBranchModel.bakeBasic(baker,
-                    new BranchModelPart.UnbakedRootCore(barkMat),
+                    new BranchModelPart.UnbakedRootCore(barkMat, true),
                     new BranchModelPart.UnbakedRootSleeve(barkMat),
-                    new BranchModelPart.UnbakedCore(ringsMat),
+                    new BranchModelPart.UnbakedRootCore(ringsMat, false),
                     null);
         }
 

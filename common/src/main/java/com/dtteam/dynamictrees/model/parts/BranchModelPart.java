@@ -267,8 +267,10 @@ public record BranchModelPart(QuadCollection quads, boolean useAmbientOcclusion,
 
     public static class UnbakedRootCore extends UnbakedCore {
 
-        public UnbakedRootCore(Material.Baked material) {
+        private final boolean cross;
+        public UnbakedRootCore(Material.Baked material, boolean cross) {
             super(material);
+            this.cross = cross;
         }
 
         @Override
@@ -281,7 +283,7 @@ public record BranchModelPart(QuadCollection quads, boolean useAmbientOcclusion,
             addUnculledFaces(baker, builders::get, partOut, material, false);
             addUnculledFaces(baker, builders::get, partIn, material, true);
 
-            if (radius >= MIN_RADIUS_FOR_ROOTS_CROSS){
+            if (cross && radius >= MIN_RADIUS_FOR_ROOTS_CROSS){
                 for (Direction.Axis planeAxis : Direction.Axis.values()){
                     if (planeAxis == axis) continue;
                     CuboidModelElement insideCross = generateCoreAxisPlane(radius, planeAxis, axis);
