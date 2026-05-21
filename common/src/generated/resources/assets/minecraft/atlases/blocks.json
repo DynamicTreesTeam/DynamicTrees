@@ -74,6 +74,14 @@
     },
     {
       "type": "dynamictrees:thick_branch_rings",
+      "resource": "minecraft:block/pale_oak_log_top"
+    },
+    {
+      "type": "dynamictrees:thick_branch_rings",
+      "resource": "minecraft:block/creaking_heart_top"
+    },
+    {
+      "type": "dynamictrees:thick_branch_rings",
       "resource": "minecraft:block/spruce_log_top"
     },
     {

@@ -2,7 +2,7 @@ plugins {
     id 'multiloader-loader'
     id 'net.neoforged.moddev'
 }
-mod_version = "${mod_version}${neoVersionAppend}"
+//mod_version = "${mod_version}${neoVersionAppend}"
 version = mod_version
 
 neoForge {
@@ -65,6 +65,8 @@ neoForge {
         runtimeOnly "curse.maven:spark-361579:7815877"
     }
 }
+
+sourceSets.main.resources { srcDir project(':common').file('src/generated/resources') }
 
 // Implement mcgradleconventions loader attribute
 def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)

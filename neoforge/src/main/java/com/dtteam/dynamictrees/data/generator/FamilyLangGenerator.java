@@ -20,17 +20,17 @@ public class FamilyLangGenerator implements Generator<DTDataProvider.Language, F
     public void generate(DTDataProvider.Language prov, Family input, Dependencies dependencies) {
         this.provider = prov;
         input.getBranch().ifPresent(branch ->
-                treeLang(branch, input, input.getLangOverride("branch"))
+                treeLang(branch, input, "branch")
         );
         input.getBranchItem().ifPresent(branch ->
-                treeLang(branch, input.getLangOverride("branch_item"))
+                treeLang(branch, input, "branch_item")
         );
         if(input instanceof AerialRootsFamily rootsFamily){
             rootsFamily.getRoots().ifPresent(root ->
-                    treeLang(root, input, input.getLangOverride("roots"))
+                    treeLang(root, input, "roots")
             );
             rootsFamily.getRootsItem().ifPresent(root ->
-                    treeLang(root, input.getLangOverride("roots_item"))
+                    treeLang(root, input, "roots_item")
             );
         }
     }
@@ -40,17 +40,18 @@ public class FamilyLangGenerator implements Generator<DTDataProvider.Language, F
         return new Dependencies();
     }
 
-    protected void treeLang(Block entry, Family family, Optional<String> override) {
+    protected void treeLang(Block entry, Family family, String overrideKey) {
         provider.addBlock(() -> entry,
-                override.orElse(checkReplace(
+                family.getLangOverride(overrideKey).orElse(checkReplace(
                         family.getRegistryName().getPath()+ "_tree"
                 ))
         );
     }
-    protected void treeLang(Item entry, Optional<String> override) {
+    protected void treeLang(Item entry, Family family, String overrideKey) {
         provider.addItem(() -> entry,
-                override.orElse(checkReplace(
-                        BuiltInRegistries.ITEM.getKey(entry).getPath()
+                family.getLangOverride(overrideKey).orElse(checkReplace(
+                        family.getRegistryName().getPath()+ "_tree"
+//                        BuiltInRegistries.ITEM.getKey(entry).getPath()
                 ))
         );
     }
