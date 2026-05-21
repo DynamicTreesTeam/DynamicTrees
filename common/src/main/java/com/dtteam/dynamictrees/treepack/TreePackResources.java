@@ -48,7 +48,7 @@ public class TreePackResources extends PathPackResources implements com.dtteam.d
     @Override
     public void listResources(@Nullable PackType packType, String namespace, String path, ResourceOutput resourceOutput) {
         FileUtil.decomposePath(path)
-                .ifSuccess(parts -> net.minecraft.server.packs.PathPackResources.listPath(namespace, this.root.resolve(namespace).toAbsolutePath(), parts, resourceOutput))
+                .ifSuccess(parts -> PathPackResources.listPath(namespace, this.root.resolve(namespace).toAbsolutePath(), parts, resourceOutput))
                 .ifError(dataResult -> LOGGER.error("Invalid path {}: {}", path, dataResult.message()));
     }
 

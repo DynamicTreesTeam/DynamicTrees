@@ -2,16 +2,12 @@ package com.dtteam.dynamictrees.event.handler;
 
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.cell.CellKit;
-import com.dtteam.dynamictrees.api.registry.Registries;
-import com.dtteam.dynamictrees.api.registry.Registry;
-import com.dtteam.dynamictrees.api.registry.SimpleRegistry;
 import com.dtteam.dynamictrees.api.worldgen.FeatureCanceller;
 import com.dtteam.dynamictrees.block.leaves.*;
 import com.dtteam.dynamictrees.block.soil.AerialRootsSoilProperties;
 import com.dtteam.dynamictrees.block.soil.SoilProperties;
 import com.dtteam.dynamictrees.block.soil.SpreadableSoilProperties;
 import com.dtteam.dynamictrees.block.soil.WaterSoilProperties;
-import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
 import com.dtteam.dynamictrees.event.RegistryEvent;
 import com.dtteam.dynamictrees.event.TypeRegistryEvent;
 import com.dtteam.dynamictrees.systems.cell.CellKits;
@@ -21,16 +17,9 @@ import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKit;
 import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKits;
 import com.dtteam.dynamictrees.tree.family.*;
 import com.dtteam.dynamictrees.tree.species.*;
-import com.dtteam.dynamictrees.treepack.Resources;
 import com.dtteam.dynamictrees.worldgen.featurecancellation.FeatureCancellers;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.registries.NewRegistryEvent;
-import net.neoforged.neoforge.registries.RegisterEvent;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @EventBusSubscriber(modid = DynamicTrees.MOD_ID)
 public class CommonModEventHandler {
@@ -100,37 +89,4 @@ public class CommonModEventHandler {
         FeatureCancellers.register(event.getRegistry());
     }
 
-    @SubscribeEvent
-    public static void newRegistry(NewRegistryEvent event) {
-        final List<SimpleRegistry<?>> registries = Registries.REGISTRIES.stream()
-                .filter(registry -> registry instanceof SimpleRegistry)
-                .map(registry -> (SimpleRegistry<?>) registry)
-                .collect(Collectors.toList());
-
-        // Post registry events.
-        registries.forEach(SimpleRegistry::postRegistryEvent);
-
-        Resources.setupTreesResourceManager();
-
-        // Register Forge registry entry getters and add-on Json object getters.
-        JsonDeserializers.registerRegistryEntryGetters();
-        JsonDeserializers.postRegistryEvent();
-
-        // Register feature cancellers.
-        FeatureCanceller.REGISTRY.postRegistryEvent();
-        FeatureCanceller.REGISTRY.lock();
-    }
-
-    @SubscribeEvent
-    public static void loadResources(RegisterEvent event) {
-        if (event.getRegistryKey() != BuiltInRegistries.BLOCK.key()) {
-            return;
-        }
-        // Register any registry entries from JSON files.
-        Resources.MANAGER.load();
-        // Lock all the registries.
-        Registries.REGISTRIES.stream()
-                .filter(registry -> registry instanceof SimpleRegistry)
-                .forEach(Registry::lock);
-    }
 }

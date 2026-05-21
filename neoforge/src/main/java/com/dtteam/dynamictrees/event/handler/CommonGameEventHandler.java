@@ -1,13 +1,19 @@
 package com.dtteam.dynamictrees.event.handler;
 
 import com.dtteam.dynamictrees.DynamicTrees;
+import com.dtteam.dynamictrees.api.registry.Registries;
+import com.dtteam.dynamictrees.api.registry.Registry;
+import com.dtteam.dynamictrees.api.registry.SimpleRegistry;
+import com.dtteam.dynamictrees.api.worldgen.FeatureCanceller;
 import com.dtteam.dynamictrees.command.DTCommand;
+import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
 import com.dtteam.dynamictrees.recipe.DendroPotionRecipeHandler;
 import com.dtteam.dynamictrees.systems.FutureBreak;
 import com.dtteam.dynamictrees.systems.season.SeasonCompatibilityHandler;
 import com.dtteam.dynamictrees.treepack.Resources;
 import com.dtteam.dynamictrees.worldgen.BiomeDatabases;
 import com.dtteam.dynamictrees.worldgen.feature.DynamicTreeFeature;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelAccessor;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -18,6 +24,11 @@ import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
+import net.neoforged.neoforge.registries.NewRegistryEvent;
+import net.neoforged.neoforge.registries.RegisterEvent;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @EventBusSubscriber(modid = DynamicTrees.MOD_ID)
 public class CommonGameEventHandler {
@@ -141,6 +152,40 @@ public class CommonGameEventHandler {
     public static void registerBrewingRecipes(final RegisterBrewingRecipesEvent event) {
         DendroPotionRecipeHandler.getAllDendroRecipes().forEach(
                 recipe -> event.getBuilder().addRecipe(recipe));
+    }
+
+    @SubscribeEvent
+    public static void newRegistry(NewRegistryEvent event) {
+        final List<SimpleRegistry<?>> registries = Registries.REGISTRIES.stream()
+                .filter(registry -> registry instanceof SimpleRegistry)
+                .map(registry -> (SimpleRegistry<?>) registry)
+                .collect(Collectors.toList());
+
+        // Post registry events.
+        registries.forEach(SimpleRegistry::postRegistryEvent);
+
+        Resources.setupTreesResourceManager();
+
+        // Register Forge registry entry getters and add-on Json object getters.
+        JsonDeserializers.registerRegistryEntryGetters();
+        JsonDeserializers.postRegistryEvent();
+
+        // Register feature cancellers.
+        FeatureCanceller.REGISTRY.postRegistryEvent();
+        FeatureCanceller.REGISTRY.lock();
+    }
+
+    @SubscribeEvent
+    public static void loadResources(RegisterEvent event) {
+        if (event.getRegistryKey() != BuiltInRegistries.BLOCK.key()) {
+            return;
+        }
+        // Register any registry entries from JSON files.
+        Resources.MANAGER.load();
+        // Lock all the registries.
+        Registries.REGISTRIES.stream()
+                .filter(registry -> registry instanceof SimpleRegistry)
+                .forEach(Registry::lock);
     }
 
 }
