@@ -11,6 +11,7 @@ import java.nio.file.FileSystemAlreadyExistsException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
@@ -26,27 +27,29 @@ public class NeoForgeModFileContainer extends ModFileContainer {
 
     @Override
     public @NotNull Optional<Path> findResource(String subPath) {
-        Path rootPath = modFile.getContents().getPrimaryPath();
-        Path resourcePath;
-        //folder is as a plan regular directory
-        if (Files.isDirectory(rootPath)){
-            resourcePath = rootPath.resolve(subPath);
-            //folder is inside a zip file
-        } else {
-            URI jarUri = (URI.create("jar:" + rootPath.toUri()));
-            try {
+        Collection<Path> rootPaths = modFile.getContents().getContentRoots();
+        for (Path rootPath : rootPaths) {
+            Path resourcePath;
+            if (Files.isDirectory(rootPath)){
+                //folder is as a plan regular directory
+                resourcePath = rootPath.resolve(subPath);
+            } else {
+                //folder is inside a zip file
+                URI jarUri = (URI.create("jar:" + rootPath.toUri()));
                 try {
-                    resourcePath = FileSystems.newFileSystem(jarUri, Map.of()).getPath(subPath);
-                } catch (FileSystemAlreadyExistsException e){
-                    resourcePath = FileSystems.getFileSystem(jarUri).getPath(subPath);
+                    try {
+                        resourcePath = FileSystems.newFileSystem(jarUri, Map.of()).getPath(subPath);
+                    } catch (FileSystemAlreadyExistsException e){
+                        resourcePath = FileSystems.getFileSystem(jarUri).getPath(subPath);
+                    }
+                } catch (IOException e){
+                    DynamicTrees.LOG.error("{}", e.getMessage());
+                    return Optional.empty();
                 }
-            } catch (IOException e){
-                DynamicTrees.LOG.error("{}", e.getMessage());
-                return Optional.empty();
             }
-        }
-        if (Files.exists(resourcePath)) {
-            return Optional.of(resourcePath);
+            if (Files.exists(resourcePath)) {
+                return Optional.of(resourcePath);
+            }
         }
 
         return Optional.empty();
