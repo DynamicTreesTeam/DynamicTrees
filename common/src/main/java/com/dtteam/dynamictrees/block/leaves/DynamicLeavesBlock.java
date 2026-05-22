@@ -73,6 +73,11 @@ public class DynamicLeavesBlock extends TintedParticleLeavesBlock implements Tre
         this.registerDefaultState(this.stateDefinition.any().setValue(DISTANCE, LeavesProperties.maxHydro).setValue(PERSISTENT, false).setValue(WATERLOGGED, false));
     }
 
+    @Override
+    public MapCodec<? extends TintedParticleLeavesBlock> codec() {
+        return CODEC;
+    }
+
     ///////////////////////////////////////////
     // PROPERTIES
     ///////////////////////////////////////////
@@ -550,11 +555,6 @@ public class DynamicLeavesBlock extends TintedParticleLeavesBlock implements Tre
     protected static final VoxelShape SUPPORT_SHAPE = Shapes.join(Shapes.block(), box(2.0D, 14.0D, 2.0D, 14.0D, 16.0D, 14.0D), BooleanOp.ONLY_FIRST);
 
     @Override
-    public MapCodec<? extends TintedParticleLeavesBlock> codec() {
-        return CODEC;
-    }
-
-    @Override
     public VoxelShape getBlockSupportShape(BlockState pState, BlockGetter pReader, BlockPos pPos) {
         return SUPPORT_SHAPE;
     }
@@ -725,6 +725,10 @@ public class DynamicLeavesBlock extends TintedParticleLeavesBlock implements Tre
         }
     }
 
+    //////////////////////////////
+    // UTILITY
+    //////////////////////////////
+
     /**
      * Gets the exact {@link Species} for these leaves (if able to find branches nearby). Warning! Resource intensive
      * algorithm. Use only for interactions like breaking blocks.
@@ -736,31 +740,27 @@ public class DynamicLeavesBlock extends TintedParticleLeavesBlock implements Tre
      * found nearby.
      */
     Species getExactSpecies(@Nullable final Level level, final BlockPos pos, final LeavesProperties leavesProperties) {
-        if (level == null) {
-            return Species.NULL_SPECIES;
-        }
+        if (level == null) return Species.NULL_SPECIES;
 
         final List<BlockPos> branchList = new ArrayList<>();
 
-        // Find all of the branches that are nearby
+        // Find all the branches that are nearby
         for (BlockPos dPos : leavesProperties.getCellKit().getLeafCluster().getAllNonZero()) {
             dPos = pos.offset(BlockPos.ZERO.subtract(dPos));//Becomes immutable at this point
             final BlockState state = level.getBlockState(dPos);
 
-            if (!TreeHelper.isBranch(state)) {
-                continue;
-            }
+            if (!TreeHelper.isBranch(state)) continue;
 
             final BranchBlock branch = TreeHelper.getBranch(state);
+            if (branch == null) return Species.NULL_SPECIES;
 
-            if (branch.getFamily() == leavesProperties.getFamily() && branch.getRadius(state) == branch.getFamily().getPrimaryThickness()) {
+            if (branch.getFamily() == leavesProperties.getFamily()
+                    && branch.getRadius(state) == branch.getFamily().getPrimaryThickness()) {
                 branchList.add(dPos);
             }
         }
 
-        if (branchList.isEmpty()) {
-            return Species.NULL_SPECIES;
-        }
+        if (branchList.isEmpty()) return Species.NULL_SPECIES;
 
         // Find the closest one
         BlockPos closest = branchList.getFirst();
