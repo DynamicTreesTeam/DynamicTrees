@@ -1,5 +1,6 @@
 package com.dtteam.dynamictrees.model.blockstate;
 
+import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.branch.ThickBranchBlock;
 import com.dtteam.dynamictrees.model.BranchMultiPartHolder;
@@ -15,6 +16,7 @@ import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.model.block.CustomUnbakedBlockStateModel;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
@@ -59,7 +61,7 @@ public record UnbakedBranchModel(Identifier barkTexture, Identifier ringsTexture
                 null);
 
         if (family.isPresent() && family.get().isThick()){
-            Identifier thickRings = IdentifierUtils.suffix(ringsTexture, "_thick");
+            Identifier thickRings = getThickRingsTexture(ringsTexture);
             Material.Baked thickRingsMat = baker.materials().get(new Material(thickRings), thickRings::toDebugFileName);
 
             return bakeThick(baker, regular,
@@ -67,6 +69,12 @@ public record UnbakedBranchModel(Identifier barkTexture, Identifier ringsTexture
                     new BranchModelPart.UnbakedThickTrunk(thickRingsMat, true));
         }
         return regular;
+    }
+
+    private @NotNull Identifier getThickRingsTexture(Identifier ringsTexture) {
+        if (ringsTexture.equals(DynamicTrees.location("block/air")))
+            return ringsTexture;
+        return IdentifierUtils.suffix(ringsTexture, "_thick");
     }
 
     public static BranchBlockStateModel bakeBasic(

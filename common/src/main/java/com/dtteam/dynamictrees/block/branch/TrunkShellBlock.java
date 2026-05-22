@@ -160,7 +160,9 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
     }
 
     public CoordUtils.Surround getMuseDir(BlockState state, BlockPos pos) {
-        return state.getValue(CORE_DIR);
+        if (state.hasProperty(CORE_DIR))
+            return state.getValue(CORE_DIR);
+        return CoordUtils.Surround.N;
     }
 
     public boolean museDoesNotExist(BlockGetter level, BlockState state, BlockPos pos) {
