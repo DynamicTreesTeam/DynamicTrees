@@ -7,6 +7,7 @@ import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.api.worldgen.LevelContext;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.data.DTLootTableBuilder;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.loot.DTLootContextParams;
@@ -558,19 +559,13 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         this.connectAnyRadius = connectAnyRadius;
     }
 
-    @Deprecated(forRemoval = true)
-    public MapColor getDefaultMapColor() {
-        return MapColor.PLANT;
-    }
-
-    @Deprecated(forRemoval = true)
-    public BlockBehaviour.Properties getDefaultBlockProperties(final MapColor mapColor) {
-        return getDefaultBlockProperties();
+    public boolean isMovementVanilla(){
+        return DTConfigs.SERVER_CONFIG.isLoaded() && DTConfigs.SERVER.vanillaLeavesCollision.get();
     }
 
     public BlockBehaviour.Properties getDefaultBlockProperties() {
         return BlockBehaviour.Properties.of()
-                .speedFactor(0.25f)
+                .speedFactor(isMovementVanilla() ? 1.0f : 0.25f)
                 .mapColor(MapColor.PLANT)
                 .ignitedByLava()
                 .pushReaction(PushReaction.DESTROY)

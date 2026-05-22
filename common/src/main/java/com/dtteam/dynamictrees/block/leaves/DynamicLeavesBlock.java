@@ -56,6 +56,7 @@ import net.minecraft.world.phys.shapes.*;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 public class DynamicLeavesBlock extends TintedParticleLeavesBlock implements TreePart, Ageable {
 
@@ -132,18 +133,13 @@ public class DynamicLeavesBlock extends TintedParticleLeavesBlock implements Tre
     @Override
     public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource rand) {
         double growthMultiplier = DTConfigs.SERVER.treeGrowthMultiplier.get();
-        if (rand.nextFloat() > growthMultiplier) {
-            return;
-        }
+        if (rand.nextFloat() > growthMultiplier) return;
 
-        if (removeIfInvalid(state, level, pos, rand)) {
-            return;
-        }
+        if (removeIfInvalid(state, level, pos, rand)) return;
 
         //Every once in a blue moon, age the leaves
-        if (rand.nextFloat() < 0.01){
+        if (rand.nextFloat() < 0.01)
             age(level, pos, state, rand, false);
-        }
     }
 
     @Override
@@ -233,7 +229,8 @@ public class DynamicLeavesBlock extends TintedParticleLeavesBlock implements Tre
         final LeavesProperties leavesProperties = getLeavesProperties();
         final int oldHydro = state.getValue(DISTANCE);
 
-        if (!ChunkTreeHelper.canCheckSurroundings(accessor, pos, 2)) return oldHydro;
+        if (!ChunkTreeHelper.canCheckSurroundings(accessor, pos, 2)
+                || state.hasProperty(PERSISTENT) && state.getValue(PERSISTENT)) return oldHydro;
 
         // Check hydration level. Dry leaves (0) are dead leaves.
         final int newHydro = getHydrationLevelFromNeighbors(accessor, pos, leavesProperties);
@@ -372,6 +369,8 @@ public class DynamicLeavesBlock extends TintedParticleLeavesBlock implements Tre
     }
 
     public boolean removeIfInvalid(BlockState state, LevelAccessor level, BlockPos pos, RandomSource rand){
+        if (state.hasProperty(PERSISTENT) && state.getValue(PERSISTENT)) return false;
+
         if (getLeavesProperties().updateTick(level, pos, state, rand)) {
             //waterlogged leaves drown
             if (state.getValue(WATERLOGGED) && !leavesProperties.waterResistant) {
@@ -436,9 +435,7 @@ public class DynamicLeavesBlock extends TintedParticleLeavesBlock implements Tre
     @Override
     public GrowSignal growSignal(Level level, BlockPos pos, GrowSignal signal) {
         if (signal.step()) // This is always placed at the beginning of every growSignal function.
-        {
             this.branchOut(level, pos, signal); // When a growth signal hits a leaf block it attempts to become a tree branch.}
-        }
         return signal;
     }
 
@@ -563,7 +560,7 @@ public class DynamicLeavesBlock extends TintedParticleLeavesBlock implements Tre
     }
 
     protected boolean isMovementVanilla(){
-        return DTConfigs.SERVER_CONFIG.isLoaded() && DTConfigs.SERVER.vanillaLeavesCollision.get();
+        return getLeavesProperties().isMovementVanilla();
     }
 
     protected boolean isLeavesPassable() {
@@ -641,42 +638,53 @@ public class DynamicLeavesBlock extends TintedParticleLeavesBlock implements Tre
         }
     }
 
-    @Override
     protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effectApplier, boolean isPrecise) {
-        if (isMovementVanilla() || isEntityPassable(entity) || //Allow creative flying players through
-                (entity instanceof Player player && player.isCreative() && player.getAbilities().flying)) {
+        if (isMovementVanilla() || isEntityPassable(entity) || isPlayerInCreativeFlight(entity))
             super.entityInside(state, level, pos, entity, effectApplier, isPrecise);
-        } else {
-            if (entity.getDeltaMovement().y < 0.0D && (isLeavesPassable() || entity.fallDistance < 2.0f)) {
-                entity.fallDistance = 0.0f;
-                entity.setDeltaMovement(entity.getDeltaMovement().x, entity.getDeltaMovement().y * 0.5D, entity.getDeltaMovement().z); // Slowly sink into the block
-            } else if (!isLeavesPassable() && entity.getDeltaMovement().y > 0 && entity.getDeltaMovement().y < 0.25D) {
-                entity.setDeltaMovement(entity.getDeltaMovement().x, entity.getDeltaMovement().y + 0.025, entity.getDeltaMovement().z); // Allow a little climbing
-            }
 
-            entity.setSprinting(false); // One cannot sprint upon tree tops
-            entity.setDeltaMovement(entity.getDeltaMovement().x * 0.25D, entity.getDeltaMovement().y, entity.getDeltaMovement().z * 0.25D); // Make travel slow and laborious
+        if ((isLeavesPassable() || entity.fallDistance < 2.0f) && isSliding(pos, entity, y -> (y < -0.08))) {
+            entity.resetFallDistance();
+            setDeltaYMovement(entity, -0.05);
+        } else if (!isLeavesPassable() && isSliding(pos, entity, y -> (y > 0.08 && y < 0.25))){
+            setDeltaYMovement(entity, getOldDeltaY(entity.getDeltaMovement().y) + 0.02);
         }
+
+        entity.setSprinting(false);
+        super.entityInside(state, level, pos, entity, effectApplier, isPrecise);
+    }
+
+    private boolean isPlayerInCreativeFlight(Entity entity) {
+        return entity instanceof Player player && player.isCreative() && player.getAbilities().flying;
+    }
+
+    private static void setDeltaYMovement(Entity entity, double newDeltaY) {
+        Vec3 deltaMovement = entity.getDeltaMovement();
+        entity.setDeltaMovement(new Vec3(deltaMovement.x, getNewDeltaY(newDeltaY), deltaMovement.z));
+    }
+
+    //Taken from honey block
+    private boolean isSliding(BlockPos pos, Entity entity, Predicate<Double> isYMovementValid) {
+        final double epsilon = 0.0001;
+        if (entity.onGround() || entity.getY() > pos.getY() + (8/16f)
+                || !isYMovementValid.test(getOldDeltaY(entity.getDeltaMovement().y)))
+            return false;
+        double dx = Math.abs(pos.getX() + 0.5 - entity.getX());
+        double dz = Math.abs(pos.getZ() + 0.5 - entity.getZ());
+        double overlapDistance = (6/16f) + (entity.getBbWidth() / 2.0D) - epsilon;
+        return dx >= overlapDistance || dz >= overlapDistance;
+    }
+
+    private static double getOldDeltaY(double deltaY) {
+        return deltaY / 0.98 + 0.08;
+    }
+
+    private static double getNewDeltaY(double deltaY) {
+        return (deltaY - 0.08) * 0.98;
     }
 
     //////////////////////////////
     // DROPS
     //////////////////////////////
-
-//    @Override
-//    public boolean canHarvestBlock(BlockState state, BlockGetter level, BlockPos pos, Player player) {
-//        return true; // We'll handle this in #getDrops as some leave drops may not require a tool.
-//    }
-//
-//    @Override
-//    public boolean isShearable(@NotNull ItemStack item, Level level, BlockPos pos) {
-//        return this.getProperties().doRequireShears();
-//    }
-
-//    @Override
-//    public List<ItemStack> onSheared(@Nullable Player player, ItemStack item, Level level, BlockPos pos, int fortune) {
-//        return this.getDrops(player, item, level, pos, fortune);
-//    }
 
     /**
      * Gets the drops for this {@link DynamicLeavesBlock}.

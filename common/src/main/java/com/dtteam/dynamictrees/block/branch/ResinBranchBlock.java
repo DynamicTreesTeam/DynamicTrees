@@ -4,7 +4,6 @@ import com.dtteam.dynamictrees.data.DTLootTableBuilder;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.family.AltBranchFamily;
 import com.dtteam.dynamictrees.tree.family.CreakingHeartFamily;
-import com.dtteam.dynamictrees.tree.family.MossyAerialRootsFamily;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.Identifier;
@@ -48,10 +47,10 @@ public class ResinBranchBlock extends ThickBranchBlock {
         family.getBranch().get().setRadius(level, pos, currentRadius, null, 3);
 
         ItemStack resin = getResinStack(level.getRandom(), family, currentRadius);
-        if (player != null && !player.isCreative())
-            player.addItem(resin);
-        else
+        if (player == null){
             popResource(level, pos, resin);
+        } else if (!player.isCreative())
+            player.addItem(resin);
 
         level.playSound(null, pos, SoundEvents.RESIN_BREAK, SoundSource.BLOCKS, 1.0F, 1.0F);
     }
