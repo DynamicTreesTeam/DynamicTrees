@@ -644,13 +644,21 @@ public class DynamicLeavesBlock extends TintedParticleLeavesBlock implements Tre
 
         if ((isLeavesPassable() || entity.fallDistance < 2.0f) && isSliding(pos, entity, y -> (y < -0.08))) {
             entity.resetFallDistance();
-            setDeltaYMovement(entity, -0.05);
-        } else if (!isLeavesPassable() && isSliding(pos, entity, y -> (y > 0.08 && y < 0.25))){
+            setDeltaYMovement(entity, -0.08);
+        } else if (!isLeavesPassable() && isSliding(pos, entity, y -> (y > 0.08 && y < 0.25))
+                && isJumping(entity)){
             setDeltaYMovement(entity, getOldDeltaY(entity.getDeltaMovement().y) + 0.02);
         }
 
         entity.setSprinting(false);
         super.entityInside(state, level, pos, entity, effectApplier, isPrecise);
+    }
+
+    private static boolean isJumping(Entity entity) {
+        if (entity instanceof LivingEntity living){
+            return living.isJumping();
+        }
+        return false;
     }
 
     private boolean isPlayerInCreativeFlight(Entity entity) {
@@ -659,7 +667,12 @@ public class DynamicLeavesBlock extends TintedParticleLeavesBlock implements Tre
 
     private static void setDeltaYMovement(Entity entity, double newDeltaY) {
         Vec3 deltaMovement = entity.getDeltaMovement();
-        entity.setDeltaMovement(new Vec3(deltaMovement.x, getNewDeltaY(newDeltaY), deltaMovement.z));
+        if (getOldDeltaY(entity.getDeltaMovement().y) < -0.1) {
+            double horizontalFactor = 0.8;
+            entity.setDeltaMovement(new Vec3(deltaMovement.x * horizontalFactor, getNewDeltaY(newDeltaY), deltaMovement.z * horizontalFactor));
+        } else {
+            entity.setDeltaMovement(new Vec3(deltaMovement.x, getNewDeltaY(newDeltaY), deltaMovement.z));
+        }
     }
 
     //Taken from honey block
