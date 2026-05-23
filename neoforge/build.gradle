@@ -46,9 +46,17 @@ neoForge {
     }
     repositories {
         maven {
+            name "CurseForge"
             url "https://cursemaven.com"
             content {
                 includeGroup "curse.maven"
+            }
+        }
+        maven {
+            name "Modrinth"
+            url "https://api.modrinth.com/maven"
+            content {
+                includeGroup "maven.modrinth"
             }
         }
         flatDir {
@@ -58,9 +66,10 @@ neoForge {
     dependencies {
         implementation "curse.maven:jade-324717:7903350"
         implementation "curse.maven:jei-238222:7904641"
-        //implementation "curse.maven:glitchcore-955399:7873148"
-        //implementation "curse.maven:serene-seasons-291874:5753503"
-        implementation "curse.maven:ecliptic-seasons-1118306:8128745"
+
+        implementation "maven.modrinth:glitchcore:26.1.2.0.2"
+        implementation "maven.modrinth:serene-seasons:26.1.2.0.2"
+        compileOnly "curse.maven:ecliptic-seasons-1118306:8128745"
 
         //runtimeOnly "curse.maven:patchouli-306770:6164617"
         runtimeOnly "curse.maven:spark-361579:7815877"
