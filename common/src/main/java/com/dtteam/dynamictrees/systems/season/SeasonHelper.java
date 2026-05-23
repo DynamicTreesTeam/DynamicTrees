@@ -1,14 +1,9 @@
 package com.dtteam.dynamictrees.systems.season;
 
-import com.dtteam.dynamictrees.api.season.ClimateZoneType;
-import com.dtteam.dynamictrees.api.season.SeasonManager;
 import com.dtteam.dynamictrees.api.worldgen.LevelContext;
 import com.dtteam.dynamictrees.config.DTConfigs;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-
-import java.util.function.Supplier;
 
 public class SeasonHelper {
 

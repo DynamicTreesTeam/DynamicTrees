@@ -23,10 +23,12 @@ public class DynamicTrees {
     public static final Logger LOG = LoggerFactory.getLogger(MOD_NAME);
 
     public static final String MINECRAFT = "minecraft";
-    public static final String SERENE_SEASONS = "sereneseasons";
     public static final String FAST_LEAF_DECAY = "fastleafdecay";
     public static final String PASSABLE_FOLIAGE = "passablefoliage";
     public static final String DYNAMIC_TREES_PLUS = "dynamictreesplus";
+
+    public static final String SERENE_SEASONS = "sereneseasons";
+    public static final String ECLIPTIC_SEASONS = "eclipticseasons";
 
     public enum AxeDamage {
         VANILLA,

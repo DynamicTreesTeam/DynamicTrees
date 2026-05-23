@@ -9,7 +9,7 @@
 //import sereneseasons.api.season.Season;
 //import sereneseasons.init.ModConfig;
 //
-//public class SereneSeasonsSeasonProvider implements SeasonProvider {
+//public class SereneSeasonProvider implements SeasonProvider {
 //
 //    private float seasonValue = 1.0f;
 //

@@ -60,6 +60,7 @@ neoForge {
         implementation "curse.maven:jei-238222:7904641"
         //implementation "curse.maven:glitchcore-955399:7873148"
         //implementation "curse.maven:serene-seasons-291874:5753503"
+        implementation "curse.maven:ecliptic-seasons-1118306:8128745"
 
         //runtimeOnly "curse.maven:patchouli-306770:6164617"
         runtimeOnly "curse.maven:spark-361579:7815877"

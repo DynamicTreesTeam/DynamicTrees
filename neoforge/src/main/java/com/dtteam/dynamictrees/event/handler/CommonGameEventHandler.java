@@ -10,6 +10,7 @@ import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
 import com.dtteam.dynamictrees.recipe.DendroPotionRecipeHandler;
 import com.dtteam.dynamictrees.systems.FutureBreak;
 import com.dtteam.dynamictrees.systems.season.SeasonCompatibilityHandler;
+import com.dtteam.dynamictrees.systems.season.SeasonHelper;
 import com.dtteam.dynamictrees.treepack.Resources;
 import com.dtteam.dynamictrees.worldgen.BiomeDatabases;
 import com.dtteam.dynamictrees.worldgen.feature.DynamicTreeFeature;
@@ -42,7 +43,7 @@ public class CommonGameEventHandler {
         if (!event.getLevel().isClientSide()) {
             FutureBreak.process(event.getLevel());
         }
-//        SeasonHelper.updateTick(event.getLevel(), event.getLevel().getDayTime());
+        SeasonHelper.updateTick(event.getLevel(), event.getLevel().getDefaultClockTime());
     }
 
     @SubscribeEvent
