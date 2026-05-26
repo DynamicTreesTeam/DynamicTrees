@@ -264,6 +264,8 @@ public final class JsonDeserializers {
             register(BiomeDatabase.Operation.class, new EnumDeserializer<>(BiomeDatabase.Operation.class));
     public static final JsonDeserializer<ClimateZoneType> CLIMATE =
             register(ClimateZoneType.class, new EnumDeserializer<>(ClimateZoneType.class));
+    public static final JsonDeserializer<LeavesProperties.Perishability> PERISHABILITY =
+            register(LeavesProperties.Perishability.class, new EnumDeserializer<>(LeavesProperties.Perishability.class));
 
     public static final JsonDeserializer<IDTBiomeHolderSet> BIOME_LIST = register(IDTBiomeHolderSet.class, new BiomeListDeserializer());
     public static final JsonDeserializer<BiomePredicate> BIOME_PREDICATE = register(BiomePredicate.class, jsonElement ->

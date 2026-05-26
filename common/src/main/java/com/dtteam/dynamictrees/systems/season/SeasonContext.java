@@ -35,7 +35,7 @@ public class SeasonContext {
 
         if (methodTicks % updateRate == 0) {
             provider.updateTick(world, dayTime);
-            seasonValue = provider.getSeasonValue(world, BlockPos.ZERO);
+            seasonValue = provider.getLocationalSeasonValue(world, BlockPos.ZERO);
         }
 
         methodTicks++;

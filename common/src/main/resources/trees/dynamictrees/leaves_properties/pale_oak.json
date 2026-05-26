@@ -3,5 +3,6 @@
   "cell_kit": "dynamictrees:dark_oak",
   "smother": 3,
   "particle": "pale_oak_leaves",
-  "particle_chance": 0.02
+  "particle_chance": 0.02,
+  "perishability": "marcescent"
 }

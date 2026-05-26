@@ -2,5 +2,6 @@
   "primitive_leaves": "minecraft:spruce_leaves",
   "smother": 3,
   "cell_kit": "dynamictrees:conifer",
-  "particle_chance": 0
+  "particle_chance": 0,
+  "perishability": "evergreen"
 }

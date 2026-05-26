@@ -122,7 +122,7 @@ public class NormalSeasonManager implements SeasonManager {
 
     @Override
     public Float getSeasonValue(Level level, BlockPos pos) {
-        return getContext(level).getSeasonProvider().getSeasonValue(level, pos);
+        return getContext(level).getSeasonProvider().getLocationalSeasonValue(level, pos);
     }
 
     @Override

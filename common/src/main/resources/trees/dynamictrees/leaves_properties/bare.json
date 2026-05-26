@@ -1,4 +1,5 @@
 {
   "generate_block": false,
-  "cell_kit": "dynamictrees:bare"
+  "cell_kit": "dynamictrees:bare",
+  "perishability": "none"
 }

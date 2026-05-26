@@ -9,7 +9,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.NonNull;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.function.Supplier;
 
 public class CloneTintSource implements BlockTintSource {
@@ -40,11 +39,14 @@ public class CloneTintSource implements BlockTintSource {
         return source == null ? magenta : source.colorInWorld(state, level, pos);
     }
 
-    public static List<BlockTintSource> cloneAllSources(BlockColors colors, Supplier<BlockState> state, int count){
-        List<BlockTintSource> sources = new LinkedList<>();
+    public static LinkedList<BlockTintSource> cloneAllSources(BlockColors colors, Supplier<BlockState> state, int count, int padToLength){
+        LinkedList<BlockTintSource> sources = new LinkedList<>();
         for (int i=0; i<count; i++){
             final int layer = i;
             sources.add(new CloneTintSource(()->colors.getTintSource(state.get(), layer)));
+        }
+        while (sources.size() < padToLength){
+            sources.add(BlockColorMultipliers.BLANK_LAYER);
         }
         return sources;
     }

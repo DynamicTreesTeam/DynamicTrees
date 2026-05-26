@@ -3,6 +3,7 @@ package com.dtteam.dynamictrees.event.handler;
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.block.soil.SoilProperties;
+import com.dtteam.dynamictrees.client.BlockColorMultipliers;
 import com.dtteam.dynamictrees.client.TextureHelper;
 import com.dtteam.dynamictrees.client.ThickBranchRingsSource;
 import com.dtteam.dynamictrees.client.TintSources.*;
@@ -114,7 +115,7 @@ public class ClientModEventHandler {
                     List<BlockTintSource> sources = CloneTintSource.cloneAllSources(
                             blockColors,
                             ()->properties.getPrimitiveSoilState(soilBlock.defaultBlockState()),
-                            properties.getFoliageTintLayerCount());
+                            properties.getFoliageTintLayerCount(), 0);
                     sources.add(new SoilRootsTintSource(soilBlock));
                     event.register(sources, soilBlock);
                 });
@@ -123,16 +124,18 @@ public class ClientModEventHandler {
         LeavesProperties.REGISTRY.getAll().stream().map(LeavesProperties::getDynamicLeavesBlock).flatMap(Optional::stream)
                 .forEach(leaves -> {
                     LeavesProperties properties = leaves.getLeavesProperties();
+                    BlockTintSource branchSource = new SuppliedConstantTintSource(()->properties.getFamily().woodBarkColor);
                     if (properties.hasCustomColor()) {
                         Integer customColor = properties.getCustomColor();
-                        if (customColor == null) //we use null as a way to default back to "biome" index source.
-                            event.register(List.of(BlockTintSources.foliage()), leaves);
-                        else
-                            event.register(List.of(BlockTintSources.constant(customColor)), leaves);
+                        //we use null as a way to default back to "biome" index source.
+                        BlockTintSource leavesSource = customColor == null ? BlockTintSources.foliage() : BlockTintSources.constant(customColor);
+                        event.register(List.of(leavesSource, BlockColorMultipliers.BLANK_LAYER, branchSource), leaves);
                     } else {
-                        event.register(
-                                CloneTintSource.cloneAllSources(blockColors, properties::getPrimitiveLeaves, properties.getFoliageTintLayerCount()),
-                                leaves);
+                        var sources = CloneTintSource.cloneAllSources(blockColors, properties::getPrimitiveLeaves, properties.getFoliageTintLayerCount(), 3);
+                        if (properties.leavesPerishInWinter()){
+                            sources.set(2, branchSource);
+                        }
+                        event.register(sources, leaves);
                     }
                 });
 
@@ -172,6 +175,7 @@ public class ClientModEventHandler {
     public static final Identifier LARGE_PALM_FRONDS = DynamicTrees.location("large_palm_fronds");
     public static final Identifier MEDIUM_PALM_FRONDS = DynamicTrees.location("medium_palm_fronds");
     public static final Identifier SMALL_PALM_FRONDS = DynamicTrees.location("small_palm_fronds");
+    public static final Identifier WINTER_LEAVES = DynamicTrees.location("winter_leaves");
 
     @SubscribeEvent
     public static void onModelRegistryEvent(RegisterBlockStateModels event) {
@@ -186,6 +190,7 @@ public class ClientModEventHandler {
 //        event.register(LARGE_PALM_FRONDS, new PalmLeavesModelLoader(0));
 //        event.register(MEDIUM_PALM_FRONDS, new PalmLeavesModelLoader(1));
 //        event.register(SMALL_PALM_FRONDS, new PalmLeavesModelLoader(2));
+        event.registerModel(WINTER_LEAVES, WinterLeavesBlockStateModel.Unbaked.CODEC);
     }
 
     @SubscribeEvent

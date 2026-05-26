@@ -3,5 +3,6 @@
   "smother": 5,
   "light_requirement": 14,
   "particle": "cherry_leaves",
-  "particle_chance": 0.1
+  "particle_chance": 0.1,
+  "perishability": "deciduous"
 }

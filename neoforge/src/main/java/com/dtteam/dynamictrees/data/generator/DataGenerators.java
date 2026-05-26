@@ -47,6 +47,7 @@ public class DataGenerators {
 
         registerBlockModelGenerator(LeavesProperties.class, DynamicTrees.location("leaves"), LeavesStateGenerator::new);
         registerBlockModelGenerator(LeavesProperties.class, DynamicTrees.location("palm_fronds"), PalmLeavesStateGenerator::new);
+        registerBlockModelGenerator(LeavesProperties.class, DynamicTrees.location("winter_leaves"), WinterLeavesStateGenerator::new);
 
         registerBlockModelGenerator(SoilProperties.class, DynamicTrees.location("soil"), SoilStateGenerator::new);
         registerBlockModelGenerator(SoilProperties.class, DynamicTrees.location("water_root_soil"), WaterRootSoilGenerator::new);

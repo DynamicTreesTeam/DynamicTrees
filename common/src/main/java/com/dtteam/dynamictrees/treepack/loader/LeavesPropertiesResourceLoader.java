@@ -49,7 +49,8 @@ public final class LeavesPropertiesResourceLoader extends JsonRegistryResourceLo
                 .registerMapApplier("texture_overrides", Identifier.class, LeavesProperties::setTextureOverrides)
                 .registerMapApplier("model_overrides", Identifier.class, LeavesProperties::setModelOverrides)
                 .register("frond_model_loader", PalmLeavesProperties.class, Identifier.class, PalmLeavesProperties::setFrondLoader)
-                .registerMapApplier("lang_overrides", String.class, LeavesProperties::setLangOverrides);
+                .registerMapApplier("lang_overrides", String.class, LeavesProperties::setLangOverrides)
+                .register("perishability", LeavesProperties.Perishability.class, LeavesProperties::setPerishability);
 
         // Primitive leaves are needed both client and server (so cannot be done on load).
         this.setupAppliers.register("primitive_leaves", Block.class, LeavesProperties::setPrimitiveLeaves)

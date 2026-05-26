@@ -1,7 +1,9 @@
 {
   "variants": {
     "": {
-      "model": "minecraft:block/dark_oak_leaves"
+      "type": "dynamictrees:winter_leaves",
+      "model": "minecraft:block/dark_oak_leaves",
+      "winter_model": "dynamictrees:block/winter_leaves"
     }
   }
 }

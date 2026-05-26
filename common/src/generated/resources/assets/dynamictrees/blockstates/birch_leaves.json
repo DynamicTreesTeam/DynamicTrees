@@ -1,7 +1,9 @@
 {
   "variants": {
     "": {
-      "model": "minecraft:block/birch_leaves"
+      "type": "dynamictrees:winter_leaves",
+      "model": "minecraft:block/birch_leaves",
+      "winter_model": "dynamictrees:block/winter_leaves"
     }
   }
 }

@@ -3,5 +3,6 @@
   "primitive_leaves": "minecraft:flowering_azalea_leaves",
   "cell_kit": "dynamictrees:azalea",
   "sound": "azalea_leaves",
-  "particle_color": -9399763
+  "particle_color": -9399763,
+  "perishability": "deciduous"
 }

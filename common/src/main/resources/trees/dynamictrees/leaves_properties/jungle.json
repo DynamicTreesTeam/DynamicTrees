@@ -1,4 +1,5 @@
 {
   "primitive_leaves": "minecraft:jungle_leaves",
-  "light_requirement": 12
+  "light_requirement": 12,
+  "perishability": "evergreen"
 }

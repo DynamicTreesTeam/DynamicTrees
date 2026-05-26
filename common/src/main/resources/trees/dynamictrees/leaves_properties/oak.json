@@ -1,3 +1,4 @@
 {
-  "primitive_leaves": "minecraft:oak_leaves"
+  "primitive_leaves": "minecraft:oak_leaves",
+  "perishability": "marcescent"
 }

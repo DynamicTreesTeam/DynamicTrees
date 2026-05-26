@@ -15,7 +15,7 @@ public class NullSeasonProvider implements SeasonProvider {
     }
 
     @Override
-    public Float getSeasonValue(Level level, BlockPos pos) {
+    public Float getSeasonValue() {
         return null;
     }
 

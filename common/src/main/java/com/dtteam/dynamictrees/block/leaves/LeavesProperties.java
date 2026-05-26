@@ -174,6 +174,14 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     protected @Nullable ParticleType<ColorParticleOption> coloredLeavesParticle = null;
     protected @Nullable Integer forceParticleColor = null;
     protected @Nullable SimpleParticleType simpleLeavesParticle = null;
+    protected Perishability perishability = Perishability.DECIDUOUS;
+
+    public enum Perishability {
+        DECIDUOUS,
+        EVERGREEN,
+        MARCESCENT,
+        NONE
+    }
 
     private LeavesProperties() {
         this.blockLootTableSupplier = new LootTableSupplier("null/", DynamicTrees.NULL);
@@ -283,7 +291,19 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 
     @Override
     public List<Identifier> getBlockModelGenerators() {
-        return List.of(DynamicTrees.location("leaves"));
+        if (leavesPerishInWinter()){
+            return List.of(DynamicTrees.location("winter_leaves"));
+        } else {
+            return List.of(DynamicTrees.location("leaves"));
+        }
+    }
+
+    public void setPerishability(Perishability perishability) {
+        this.perishability = perishability;
+    }
+
+    public boolean leavesPerishInWinter(){
+        return perishability == Perishability.DECIDUOUS || perishability == Perishability.MARCESCENT;
     }
 
     ///////////////////////////////////////////

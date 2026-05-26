@@ -13,7 +13,10 @@ public interface SeasonProvider {
      *
      * @return season value as a Float object or null if seasons are not enabled
      */
-    Float getSeasonValue(Level level, BlockPos pos);
+    default Float getLocationalSeasonValue(Level level, BlockPos pos) {
+        return getSeasonValue();
+    }
+    Float getSeasonValue();
 
     /**
      * A simple method for updating the handler every tick.
