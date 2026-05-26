@@ -141,8 +141,13 @@ public class ClientModEventHandler {
 
         // Register Sapling TintSources
         Species.REGISTRY.getAll().stream().map(Species::getSapling).flatMap(Optional::stream)
-                .forEach(sapling ->
-                        event.register(List.of(new SaplingTintSource(blockColors, sapling.getSpecies())), sapling)
+                .forEach(sapling -> {
+                            Species species = sapling.getSpecies();
+                            event.register(List.of(
+                                    new SaplingTintSource(blockColors, species),
+                                    new SuppliedConstantTintSource(()->species.getFamily().woodBarkColor)
+                            ), sapling);
+                        }
                 );
 
     }

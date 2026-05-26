@@ -43,7 +43,7 @@ public class MossyAerialRootsFamily extends AerialRootsFamily {
      */
     protected BlockItem mossCarpet;
     public static final int MOSSY_ROOTS_INDEX = 3;
-    protected float mossyRootsChance = 0.2f;
+    protected float mossyRootsChance = 0.3f;
 
     public MossyAerialRootsFamily(Identifier name) {
         super(name);

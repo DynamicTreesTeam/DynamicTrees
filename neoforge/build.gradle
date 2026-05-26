@@ -67,7 +67,7 @@ neoForge {
         implementation "curse.maven:jade-324717:7903350"
         implementation "curse.maven:jei-238222:7904641"
 
-        implementation "maven.modrinth:glitchcore:26.1.2.0.2"
+        implementation "curse.maven:glitchcore-955399:8109770"
         implementation "maven.modrinth:serene-seasons:26.1.2.0.2"
         compileOnly "curse.maven:ecliptic-seasons-1118306:8128745"
 
