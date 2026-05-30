@@ -229,6 +229,7 @@ public class DTRegistries {
             registerDataComponentType("read_only", builder -> builder.persistent(Unit.CODEC).networkSynchronized(StreamCodec.unit(Unit.INSTANCE)));
     public static final Supplier<DataComponentType<String>> SPECIES_DATA_COMPONENT = Services.REGISTRY.getRegistryLoader().
             registerDataComponentType("species", builder -> builder.persistent(Codec.STRING).networkSynchronized(ByteBufCodecs.STRING_UTF8));
+
     public static final Supplier<DataComponentType<Integer>> DENDRO_POTION_INDEX_DATA_COMPONENT = Services.REGISTRY.getRegistryLoader().
             registerDataComponentType("potion_index", builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.INT));
 
@@ -236,6 +237,11 @@ public class DTRegistries {
             registerDataComponentType("branch_destruction_data", builder -> builder.persistent(BranchDestructionDataComponent.CODEC));//.networkSynchronized()
     public static final Supplier<DataComponentType<VoxelDataComponent>> VOXEL_DATA_COMPONENT = Services.REGISTRY.getRegistryLoader().
             registerDataComponentType("voxel_data", builder -> builder.persistent(VoxelDataComponent.CODEC));//.networkSynchronized()
+
+    public static final Supplier<DataComponentType<Boolean>> FORCE_PLANT_COMPONENT = Services.REGISTRY.getRegistryLoader().
+            registerDataComponentType("force_plant", builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
+    public static final Supplier<DataComponentType<Integer>> LIFESPAN_COMPONENT = Services.REGISTRY.getRegistryLoader().
+            registerDataComponentType("lifespan", builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.INT));
 
     ///////////////////////////////////////////
     // ENTITY DATA SERIALIZERS

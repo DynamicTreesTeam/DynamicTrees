@@ -1,28 +1,30 @@
 package com.dtteam.dynamictrees.item;
 
 import com.dtteam.dynamictrees.DynamicTrees;
-import com.dtteam.dynamictrees.api.lazyvalue.LazyValue;
+import com.dtteam.dynamictrees.api.season.ClimateZoneType;
 import com.dtteam.dynamictrees.api.worldgen.LevelContext;
 import com.dtteam.dynamictrees.block.sapling.PottedSaplingBlock;
+import com.dtteam.dynamictrees.client.Tooltips;
 import com.dtteam.dynamictrees.config.DTConfigs;
-import com.dtteam.dynamictrees.platform.*;
+import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.registry.DTRegistries;
+import com.dtteam.dynamictrees.systems.season.ClimateHelper;
+import com.dtteam.dynamictrees.systems.season.SeasonHelper;
 import com.dtteam.dynamictrees.tree.species.Species;
+import com.dtteam.dynamictrees.worldgen.BiomeDatabases;
 import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
 import com.dtteam.dynamictrees.worldgen.JoCode;
-import com.dtteam.dynamictrees.worldgen.JoCodeRegistry;
-import net.minecraft.client.Minecraft;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.stats.Stats;
-import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -39,21 +41,9 @@ import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class Seed extends Item {//implements IPlantable {
+import java.util.List;
 
-    private static final LazyValue<RandomSource> BACKUP_RANDOM = LazyValue.supplied(RandomSource::create);
-
-    /**
-     * If set to {@code true} in the item stack tag, forces the tree to be planted before despawning.
-     */
-    public static final String FORCE_PLANT_KEY = "ForcePlant";
-    public static final String LIFESPAN_KEY = "Lifespan";
-    /**
-     * If set in the item stack tag, generates the tree with the corresponding {@link JoCode} if the seed is planted.
-     * If set as an integer, selects a random code of the corresponding radius to generate the tree with if the seed is
-     * planted.
-     */
-    public static final String CODE_KEY = "Code";
+public class Seed extends Item {
 
     private final Species species;//The tree this seed creates
 
@@ -130,8 +120,8 @@ public class Seed extends Item {//implements IPlantable {
         float plantChance = (float) (getSpecies().biomeSuitability(level, pos) * DTConfigs.SERVER.seedPlantRate.get());
 
         if (DTConfigs.SERVER.seedOnlyForest.get()) {
-//            plantChance *= BiomeDatabases.getDimensionalOrDefault(level.dimension().location())
-//                    .getForestness(level.getBiome(pos));
+            plantChance *= BiomeDatabases.getDimensionalOrDefault(level.dimension().identifier())
+                    .getForestness(level.getBiome(pos));
         }
 
         float accum = 1.0f;
@@ -146,54 +136,39 @@ public class Seed extends Item {//implements IPlantable {
 
     public boolean hasForcePlant(ItemStack seedStack) {
         boolean forcePlant = false;
-//        if (seedStack.hasTag()) {
-//            CompoundTag nbtData = seedStack.getTag();
-//            assert nbtData != null;
-//            forcePlant = nbtData.getBoolean(FORCE_PLANT_KEY);
-//        }
+        if (seedStack.has(DTRegistries.FORCE_PLANT_COMPONENT.get())) {
+            Boolean value = seedStack.get(DTRegistries.FORCE_PLANT_COMPONENT.get());
+            if (value != null) forcePlant = value;
+        }
         return forcePlant;
     }
 
     public int getTimeToLive(ItemStack seedStack) {
         int lifespan = DTConfigs.SERVER.seedTimeToLive.get();
-//        if (seedStack.hasTag()) {
-//            CompoundTag nbtData = seedStack.getTag();
-//            assert nbtData != null;
-//            if (nbtData.contains(LIFESPAN_KEY)) {
-//                lifespan = nbtData.getInt(LIFESPAN_KEY);
-//            }
-//        }
+        if (seedStack.has(DTRegistries.LIFESPAN_COMPONENT.get())) {
+            Integer value = seedStack.get(DTRegistries.LIFESPAN_COMPONENT.get());
+            if (value != null) lifespan = value;
+        }
         return lifespan;
     }
 
-    public String getCode(ItemStack seedStack, RandomSource random) {
-        String joCode = "";
-//        if (seedStack.hasTag()) {
-//            CompoundTag tag = seedStack.getTag();
-//            assert tag != null;
-//            if (tag.contains(CODE_KEY)) {
-//                if (tag.getTagType(CODE_KEY) == Tag.TAG_STRING) {
-//                    joCode = tag.getString(CODE_KEY);
-//                } else if (tag.getTagType(CODE_KEY) == Tag.TAG_INT) {
-//                    final JoCode code = getJoCodeForRadius(random, tag.getInt(CODE_KEY));
-//                    if (code != null) {
-//                        joCode = code.toString();
-//                    }
-//                }
-//            }
-//        }
-        return joCode;
+    public String getCode(ItemStack itemStack, RandomSource random) {
+        String code = "";
+        if (itemStack.has(DTRegistries.JOCODE_DATA_COMPONENT.get())) {
+            String newCode = itemStack.get(DTRegistries.JOCODE_DATA_COMPONENT.get());
+            if (newCode != null) code = newCode;
+        }
+        return code;
     }
 
-    @Nullable
-    private JoCode getJoCodeForRadius(RandomSource random, int radius) {
-        return JoCodeRegistry.getRandomCode(species.getRegistryName(), Mth.clamp(radius, 2, 8), random);
-    }
+//    @Nullable
+//    private JoCode getJoCodeForRadius(RandomSource random, int radius) {
+//        return JoCodeRegistry.getRandomCode(species.getRegistryName(), Mth.clamp(radius, 2, 8), random);
+//    }
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
         // Handle planting seed on ground
-
         if (context.getLevel().getFluidState(context.getClickedPos().above()).isEmpty()
                 && onItemUsePlantSeed(context, false) == InteractionResult.SUCCESS) {
             return InteractionResult.SUCCESS;
@@ -206,7 +181,6 @@ public class Seed extends Item {//implements IPlantable {
         BlockHitResult blockhitresult = getPlayerPOVHitResult(level, player, ClipContext.Fluid.SOURCE_ONLY);
         BlockPos fluidPos = blockhitresult.getBlockPos();
         if (getSpecies().selfOrLocationOverride(level, fluidPos).isPlantableOnFluid()){
-            ItemStack itemstack = player.getItemInHand(hand);
             if (blockhitresult.getType() == HitResult.Type.BLOCK && !level.getFluidState(fluidPos).isEmpty() &&
                     level.getFluidState(fluidPos.below()).isEmpty()) {
                 if (onItemUsePlantSeed(new UseOnContext(player, hand, blockhitresult), true) == InteractionResult.SUCCESS) {
@@ -281,40 +255,40 @@ public class Seed extends Item {//implements IPlantable {
         return InteractionResult.PASS;
     }
 
-//    @Override
-//    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
-//        super.appendHoverText(stack, level, tooltip, flag);
-//
-//        if (stack.hasTag()) {
-//            final String joCode = this.getCode(stack, level == null ? BACKUP_RANDOM.get() : level.random);
-//            if (!joCode.isEmpty()) {
-//                tooltip.add(Component.translatable("tooltip.dynamictrees.jo_code", new JoCode(joCode).getTextComponent()));
-//            }
-//            if (this.hasForcePlant(stack)) {
-//                tooltip.add(Component.translatable("tooltip.dynamictrees.force_planting",
-//                        Component.translatable("tooltip.dynamictrees.enabled")
-//                                .withStyle(style -> style.withColor(ChatFormatting.DARK_AQUA)))
-//                );
-//            }
-//            final CompoundTag nbtData = stack.getTag();
-//            assert nbtData != null;
-//
-//            if (nbtData.contains(LIFESPAN_KEY)) {
-//                tooltip.add(Component.translatable("tooltip.dynamictrees.seed_life_span" +
-//                        Component.literal(String.valueOf(nbtData.getInt(LIFESPAN_KEY)))
-//                                .withStyle(style -> style.withColor(ChatFormatting.DARK_AQUA)))
-//                );
-//            }
-//        }
-//    }
+    public void appendHoverText(ItemStack stack, LevelContext levelContext, List<Component> tooltip, Player player) {
+        addSeasonTooltip(levelContext, tooltip, player);
+        addComponentTooltips(stack, levelContext, tooltip);
+    }
 
-    ///////////////////////////////////////////
-    //IPlantable Interface
-    ///////////////////////////////////////////
+    protected void addComponentTooltips(ItemStack stack, LevelContext levelContext, List<Component> tooltip) {
+        if (stack.has(DTRegistries.JOCODE_DATA_COMPONENT.get())) {
+            String joCode = this.getCode(stack, levelContext.accessor().getRandom());
+            tooltip.add(Component.translatable("tooltip.dynamictrees.jo_code", new JoCode(joCode).getTextComponent()));
+        }
 
-//    @Override
-//    public BlockState getPlant(BlockGetter level, BlockPos pos) {
-//        return getSpecies().getSapling().map(Block::defaultBlockState).orElse(Blocks.AIR.defaultBlockState());
-//    }
+        if (this.hasForcePlant(stack)) {
+            tooltip.add(Component.translatable("tooltip.dynamictrees.force_planting",
+                    Component.translatable("tooltip.dynamictrees.enabled")
+                            .withStyle(style -> style.withColor(ChatFormatting.DARK_AQUA)))
+            );
+        }
+
+        if (stack.has(DTRegistries.LIFESPAN_COMPONENT.get())) {
+            int lifeSpan = getTimeToLive(stack);
+            tooltip.add(Component.translatable("tooltip.dynamictrees.seed_life_span", Component.literal(String.valueOf(lifeSpan))
+                            .withStyle(style -> style.withColor(ChatFormatting.DARK_AQUA)))
+            );
+        }
+    }
+
+    protected void addSeasonTooltip(LevelContext levelContext, List<Component> tooltip, Player player) {
+        if (SeasonHelper.getSeasonValue(levelContext, BlockPos.ZERO) == null || !species.isValid())
+            return;
+
+        BlockPos playerPos = BlockPos.containing(player.position());
+        ClimateZoneType climate = ClimateHelper.getClimate(player.level(), playerPos);
+        int flags = species.getSeasonalTooltipFlags(levelContext, player);
+        Tooltips.applySeasonalTooltips(tooltip, flags, climate);
+    }
 
 }

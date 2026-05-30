@@ -1,18 +1,11 @@
 package com.dtteam.dynamictrees.event.handler;
 
 import com.dtteam.dynamictrees.DynamicTrees;
-import com.dtteam.dynamictrees.api.season.ClimateZoneType;
 import com.dtteam.dynamictrees.api.worldgen.LevelContext;
-import com.dtteam.dynamictrees.client.Tooltips;
 import com.dtteam.dynamictrees.item.Seed;
-import com.dtteam.dynamictrees.systems.season.ClimateHelper;
-import com.dtteam.dynamictrees.systems.season.SeasonHelper;
-import com.dtteam.dynamictrees.tree.species.Species;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.*;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
@@ -27,29 +20,13 @@ public class ClientGameEventHandler {
     @SubscribeEvent
     public static void onItemTooltipAdded(ItemTooltipEvent event) {
         ItemStack stack = event.getItemStack();
-        Item item = stack.getItem();
+        if (stack.getItem() instanceof Seed seed){
+            Player player = event.getEntity();
+            if (player == null) return;
 
-        if (!(item instanceof Seed seed)) {
-            return;
+            LevelContext levelContext = LevelContext.create(player.level());
+            seed.appendHoverText(stack, levelContext, event.getToolTip(), player);
         }
-
-        Player player = event.getEntity();
-
-        if (player == null) {
-            return;
-        }
-
-        LevelContext levelContext = LevelContext.create(player.level());
-        Species species = seed.getSpecies();
-
-        if (SeasonHelper.getSeasonValue(levelContext, BlockPos.ZERO) == null || !species.isValid()) {
-            return;
-        }
-
-        BlockPos playerPos = BlockPos.containing(player.position());
-        ClimateZoneType climate = ClimateHelper.getClimate(player.level(), playerPos);
-        int flags = seed.getSpecies().getSeasonalTooltipFlags(levelContext, player);
-        Tooltips.applySeasonalTooltips(event.getToolTip(), flags, climate);
     }
 
 }

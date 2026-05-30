@@ -113,7 +113,7 @@ public class DTConfigs {
         config.seedTimeToLive = builder.comment("Ticks before a seed in the world attempts to plant itself or despawn. 1200 = 1 minute")
                 .defineInRange("seedTimeToLive", 1200, 0, 6000);
         config.seedOnlyForest = builder.comment("If enabled then seeds will only voluntarily plant themselves in forest-like biomes.")
-                .define("seedOnlyForest", true);
+                .define("seedOnlyForest", false);
         config.seedMinForestness = builder.comment("The minimum forestness that non-forest-like biomes can have. 0 = is not at all a forest, 1 = may as well be a forest. Can be fractional.")
                 .defineInRange("seedMinForestness", 0.0, 0.0, 1.0);
         config.climateAffectsFruitsAndPods = builder.comment("If enabled, fruit and pod production will be affected by the current biome's climate.")
