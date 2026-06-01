@@ -21,7 +21,7 @@ public final class ChanceSelectorDeserializer implements JsonBiomeDatabaseDeseri
     @Override
     public Result<BiomePropertySelectors.ChanceSelector, JsonElement> deserialize(JsonElement input) {
         return JsonResult.forInput(input)
-                .mapIfType(JsonObject.class, this::readChanceSelector)
+                .mapIfType(JsonObject.class, this::readJsonChanceSelector)
                 .elseMapIfType(Float.class, this::createSimpleChanceSelector)
                 .elseMapIfType(String.class, name -> {
                     if (name.equalsIgnoreCase("standard")) {
@@ -42,31 +42,36 @@ public final class ChanceSelectorDeserializer implements JsonBiomeDatabaseDeseri
                 BiomePropertySelectors.Chance.OK : BiomePropertySelectors.Chance.CANCEL;
     }
 
+    private BiomePropertySelectors.ChanceSelector createSimpleChanceSelectorFromJson(JsonElement element, Consumer<String> warningConsumer) throws DeserializationException {
+        if (element.getAsJsonPrimitive().isString()) {
+            if (this.isDefault(element.getAsString())) {
+                return (rnd, spc, rad) -> BiomePropertySelectors.Chance.UNHANDLED;
+            }
+            warningConsumer.accept("Unrecognised named chance selector \"" + element.getAsString() + "\".");
+            throw new DeserializationException("Unrecognised named chance selector \"" + element.getAsString() + "\".");
+        } else if(element.getAsJsonPrimitive().isNumber()) {
+            return createSimpleChanceSelector(element.getAsFloat());
+        }
+        warningConsumer.accept("Unrecognised named chance selector.");
+        throw new DeserializationException("Unrecognised named chance selector.");
+    }
+
+    private BiomePropertySelectors.ChanceSelector createMathSelector(JsonElement element, Consumer<String> warningConsumer) throws DeserializationException {
+        final JsonMath jsonMath = new JsonMath(element);
+        return (rnd, spc, rad) -> rnd.nextFloat() < jsonMath.apply(rnd, spc, rad) ?
+                BiomePropertySelectors.Chance.OK : BiomePropertySelectors.Chance.CANCEL;
+    }
+
     @Nullable
-    private BiomePropertySelectors.ChanceSelector readChanceSelector(JsonObject jsonObject,
-                                                                     Consumer<String> warningConsumer)
+    private BiomePropertySelectors.ChanceSelector readJsonChanceSelector(JsonObject jsonObject,
+                                                                         Consumer<String> warningConsumer)
             throws DeserializationException {
         return JsonResult.forInput(jsonObject)
-                .mapIfContains(STATIC, JsonElement.class, input ->
-                        JsonResult.forInput(input)
-                                .mapIfType(Float.class, this::createSimpleChanceSelector)
-                                .elseMapIfType(String.class, name -> {
-                                    if (this.isDefault(name)) {
-                                        return (rnd, spc, rad) -> BiomePropertySelectors.Chance.UNHANDLED;
-                                    }
-                                    throw new DeserializationException("Unrecognised named chance selector \"" + name + "\".");
-                                }).elseTypeError()
-                ).elseMapIfContains(MATH, JsonElement.class, input ->
-                        JsonResult.forInput(input)
-                                .map(element -> {
-                                    final JsonMath jsonMath = new JsonMath(input);
-                                    return (rnd, spc, rad) -> rnd.nextFloat() < jsonMath.apply(rnd, spc, rad) ?
-                                            BiomePropertySelectors.Chance.OK : BiomePropertySelectors.Chance.CANCEL;
-                                })
-                ).map(result -> {
-                    result.getWarnings().forEach(warningConsumer);
-                    return result.orElseThrow();
-                }).orElseThrow();
+                .mapIfContains(STATIC, JsonElement.class, this::createSimpleChanceSelectorFromJson)
+                .elseMapIfContains(MATH, JsonElement.class, this::createMathSelector)
+                .elseTypeError()
+                .forEachWarning(warningConsumer)
+                .orElseThrow();
     }
 
 }
