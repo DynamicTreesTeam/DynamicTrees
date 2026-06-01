@@ -1,6 +1,7 @@
 package com.dtteam.dynamictrees.block.branch;
 
 import com.dtteam.dynamictrees.api.network.RootConnections;
+import com.dtteam.dynamictrees.api.treedata.SurfaceRootShapeState;
 import com.dtteam.dynamictrees.tree.ChunkTreeHelper;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.family.Family;
@@ -16,7 +17,6 @@ import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
-import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -24,7 +24,6 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -42,6 +41,8 @@ public class SurfaceRootBlock extends Block implements SimpleWaterloggedBlock {
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
     private final Family family;
+
+    protected static final VoxelShape[] shapeCache = new VoxelShape[SurfaceRootShapeState.TOTAL_STATES];
 
     public SurfaceRootBlock(Family family, Properties properties) {
         super(properties.strength(2.5f, 1.0F));
@@ -150,20 +151,41 @@ public class SurfaceRootBlock extends Block implements SimpleWaterloggedBlock {
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        boolean connectionMade = false;
         final int thisRadius = getRadius(state);
 
-        VoxelShape shape = Shapes.empty();
+        byte[] radii = new byte[5];
+        boolean connectionMade = false;
+
+        radii[4] = (byte)thisRadius; //last radius is the core
 
         for (Direction dir : CoordUtils.HORIZONTALS) {
             final RootConnection conn = this.getSideConnectionRadius(level, pos, dir);
-
-            if (conn == null) {
-                continue;
+            if (conn != null) {
+                radii[dir.get2DDataValue()] = (byte)Mth.clamp(conn.radius, 1, thisRadius);
+                connectionMade = true;
             }
+        }
 
-            connectionMade = true;
-            final int r = Mth.clamp(conn.radius, 1, thisRadius);
+        int index = SurfaceRootShapeState.fromArray(radii).toIndex();
+
+        VoxelShape cached = shapeCache[index];
+        if (cached != null) {
+            return cached;
+        }
+
+        VoxelShape newShape = generateNewRootShape(radii, connectionMade);
+        shapeCache[index] = newShape;
+        return newShape;
+    }
+
+    private VoxelShape generateNewRootShape(byte[] radii, boolean connectionMade) {
+        VoxelShape shape = Shapes.empty();
+        int thisRadius = radii[4];
+
+        for (Direction dir : CoordUtils.HORIZONTALS) {
+            int r = radii[dir.get2DDataValue()];
+            if (r == 0) continue;
+
             final double radius = r / 16.0;
             final double radialHeight = getRadialHeight(r) / 16.0;
             final double gap = 0.5 - radius;
