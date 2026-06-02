@@ -83,7 +83,9 @@ public class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> {
 
     //We must access the uncached noise, since accessing getBiome or getNoiseBiome calls chunks, which can hang.
     protected static Holder<Biome> getNoiseBiome(LevelContext levelContext, BlockPos pos) {
-        return levelContext.level().getUncachedNoiseBiome(pos.getX() >> 2, pos.getY() >> 2, pos.getZ() >> 2);
+        if (DTConfigs.SERVER.sampleNoiseBiome.get())
+            return levelContext.accessor().getUncachedNoiseBiome(pos.getX() >> 2, pos.getY() >> 2, pos.getZ() >> 2);
+        return levelContext.accessor().getBiome(pos);
     }
 
     public static boolean validTreePos(LevelSimulatedReader pLevel, BlockPos pPos) {
