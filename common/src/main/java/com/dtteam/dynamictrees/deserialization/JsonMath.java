@@ -8,6 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
 
@@ -41,6 +42,18 @@ public class JsonMath {
         return NULL_OPERATOR;
     }
 
+    private Species[] tryGetSpeciesList(JsonElement element) {
+        List<Species> validSpecies = new ArrayList<>();
+        for (JsonElement listElement : element.getAsJsonArray()) {
+            if (listElement.isJsonPrimitive() && listElement.getAsJsonPrimitive().isString()) {
+                if (Species.findSpeciesSloppy(listElement.getAsJsonPrimitive().getAsString()) != Species.NULL_SPECIES) {
+                    validSpecies.add(Species.findSpeciesSloppy(listElement.getAsJsonPrimitive().getAsString()));
+                }
+            }
+        }
+        return validSpecies.toArray(new Species[0]);
+    }
+
     private MathOperator processElement(String key, JsonElement value) {
 
         MathFunction op = MathFunction.getFunction(key);
@@ -50,13 +63,16 @@ public class JsonMath {
 		}
 
         ArrayList<MathOperator> paramList = new ArrayList<>();
+        Species[] speciesList = null;
         Species speciesArg = Species.NULL_SPECIES;
 
         //If the value is an array then these are the parameters for this operation
         if (value.isJsonArray()) {
             for (JsonElement parameter : value.getAsJsonArray()) {
                 MathOperator m = NULL_OPERATOR;
-                if (parameter.isJsonObject()) {
+                if (parameter.isJsonArray()) {
+                    speciesList = tryGetSpeciesList(parameter);
+                } else if (parameter.isJsonObject()) {
                     Entry<String, JsonElement> entry = parameter.getAsJsonObject().entrySet().iterator().next();
                     m = processElement(entry.getKey(), entry.getValue());
                 } else if (parameter.isJsonPrimitive()) {
@@ -93,7 +109,14 @@ public class JsonMath {
             case MAX -> new Maximum(paramArray);
             case MIN -> new Minimum(paramArray);
             case IFGT -> new IfGreaterThan(paramArray);
-            case SPECIES -> speciesArg != Species.NULL_SPECIES ? new IfSpecies(speciesArg, paramArray) : null;
+            case SPECIES -> {
+                if (speciesArg != Species.NULL_SPECIES) {
+                    yield  new IfSpecies(speciesArg, paramArray);
+                } else if (speciesList != null && speciesList.length > 0) {
+                    yield new IfSpecies(speciesList, paramArray);
+                }
+                yield null;
+            }
             case DEBUG -> new Debug(paramArray);
             default -> NULL_OPERATOR;
         };
@@ -386,10 +409,15 @@ public class JsonMath {
     public static class IfSpecies implements MathOperator {
 
         private final MathOperator[] functions;
-        private final Species species;
+        private final Species[] speciesList;
 
         public IfSpecies(Species species, MathOperator[] functionArray) {
-            this.species = species;
+            this.speciesList = new Species[] {species};
+            this.functions = functionArray;
+        }
+
+        public IfSpecies(Species[] speciesList, MathOperator[] functionArray) {
+            this.speciesList = speciesList;
             this.functions = functionArray;
         }
 
@@ -397,7 +425,12 @@ public class JsonMath {
         public float apply(MathContext mc) {
 
             if (mc instanceof MathSpeciesContext && functions.length == 2) {
-                return ((MathSpeciesContext) mc).species == species ? functions[0].apply(mc) : functions[1].apply(mc);
+                for (Species species : speciesList) {
+                    if (((MathSpeciesContext) mc).species == species) {
+                        return functions[0].apply(mc);
+                    }
+                }
+                return functions[1].apply(mc);
             }
 
             return 0.0f;
