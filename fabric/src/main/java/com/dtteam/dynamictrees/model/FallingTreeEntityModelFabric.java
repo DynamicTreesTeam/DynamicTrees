@@ -3,6 +3,7 @@ package com.dtteam.dynamictrees.model;
 import com.dtteam.dynamictrees.api.network.BranchDestructionData;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
+import com.dtteam.dynamictrees.compat.continuity.WrappedModelHandler;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.model.baked.BasicBranchBlockBakedModel;
 import com.dtteam.dynamictrees.tree.TreeHelper;
@@ -120,7 +121,8 @@ public class FallingTreeEntityModelFabric extends FallingTreeEntityModel {
     private List<BakedQuad> getBranchQuadsWithConnections(BakedModel model, BlockState state, Vec3 offset, RandomSource random, int[] connections, int coreRadius, Direction forceRingDir) {
         List<BakedQuad> allQuads = new ArrayList<>();
 
-        if (model instanceof BasicBranchBlockBakedModel branchModel) {
+        BasicBranchBlockBakedModel branchModel = WrappedModelHandler.getInstance().unwrapBranchModel(model);
+        if (branchModel != null) {
             int twigRadius = state.getBlock() instanceof BranchBlock branchBlock
                     ? branchBlock.getFamily().getPrimaryThickness()
                     : 1;

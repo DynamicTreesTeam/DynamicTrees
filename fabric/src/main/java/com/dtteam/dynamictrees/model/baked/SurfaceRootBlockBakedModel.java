@@ -226,6 +226,7 @@ public class SurfaceRootBlockBakedModel implements BakedModel, FabricBakedModel 
 
         QuadEmitter emitter = context.getEmitter();
         RenderMaterial material = getRenderMaterial();
+        if (material == null) return;
 
         bakedQuads.forEach((dir, quads) ->
                 emitQuads(dir, emitter, material, quads));
@@ -297,6 +298,7 @@ public class SurfaceRootBlockBakedModel implements BakedModel, FabricBakedModel 
 
     protected static RenderMaterial getRenderMaterial() {
         var renderer = RendererAccess.INSTANCE.getRenderer();
+        if (renderer == null) return null;
         MaterialFinder finder = renderer.materialFinder();
 
 //        finder.disableAo(0, true);

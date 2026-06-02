@@ -55,6 +55,12 @@ loom {
                 includeGroup "curse.maven"
             }
         }
+        maven {
+            url "https://api.modrinth.com/maven"
+            content {
+                includeGroup "maven.modrinth"
+            }
+        }
         flatDir {
             dir 'libs'
         }
@@ -67,6 +73,8 @@ loom {
 
         modImplementation "curse.maven:glitchcore-955399:5660741"
         modImplementation "curse.maven:serene-seasons-291874:5753502"
+
+        modCompileOnly "curse.maven:continuity-531351:5962881"
     }
 
 }
