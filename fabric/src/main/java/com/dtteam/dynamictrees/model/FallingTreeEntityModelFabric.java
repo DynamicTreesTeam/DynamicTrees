@@ -107,76 +107,26 @@ public class FallingTreeEntityModelFabric extends FallingTreeEntityModel {
         List<BakedQuad> allQuads = new ArrayList<>();
 
         if (model instanceof BasicBranchBlockBakedModel branchModel) {
-            List<BakedQuad> ringQuads = branchModel.ringsQuads[coreRadius - 1];
-            for (BakedQuad quad : ringQuads) {
+            for (BakedQuad quad : branchModel.getRingQuads(coreRadius)) {
                 if (quad.getDirection() == cutDir) {
                     allQuads.add(quad);
                 }
             }
         }
 
-        if (offset.x() != 0 || offset.y() != 0 || offset.z() != 0) {
-            List<BakedQuad> offsetQuads = new ArrayList<>();
-            for (BakedQuad quad : allQuads) {
-                offsetQuads.add(offsetQuad(quad, offset));
-            }
-            return offsetQuads;
-        }
-
-        return allQuads;
+        return offsetAllQuads(offset, allQuads);
     }
 
     private List<BakedQuad> getBranchQuadsWithConnections(BakedModel model, BlockState state, Vec3 offset, RandomSource random, int[] connections, int coreRadius, Direction forceRingDir) {
         List<BakedQuad> allQuads = new ArrayList<>();
 
         if (model instanceof BasicBranchBlockBakedModel branchModel) {
-            int twigRadius = 1;
-            if (state.getBlock() instanceof BranchBlock branchBlock) {
-                twigRadius = branchBlock.getFamily().getPrimaryThickness();
-            }
+            int twigRadius = state.getBlock() instanceof BranchBlock branchBlock
+                    ? branchBlock.getFamily().getPrimaryThickness()
+                    : 1;
 
-            int numConnections = 0;
-            for (int i : connections) {
-                numConnections += (i != 0) ? 1 : 0;
-            }
-
-            Direction sourceDir = getSourceDir(coreRadius, connections);
-            int coreDir = resolveCoreDir(sourceDir);
-            Direction coreRingDir = forceRingDir != null ? forceRingDir :
-                    ((numConnections == 1 && sourceDir != null) ? sourceDir.getOpposite() : null);
-
-            for (Direction face : Direction.values()) {
-                if (coreRadius != connections[face.get3DDataValue()]) {
-                    List<BakedQuad> quads;
-                    if (coreRingDir == null || coreRingDir != face) {
-                        quads = branchModel.coresQuads[coreDir][coreRadius - 1];
-                    } else {
-                        quads = branchModel.ringsQuads[coreRadius - 1];
-                    }
-                    for (BakedQuad quad : quads) {
-                        if (quad.getDirection() == face) {
-                            allQuads.add(quad);
-                        }
-                    }
-                }
-
-                if (coreRadius != 8) {
-                    for (Direction connDir : Direction.values()) {
-                        int idx = connDir.get3DDataValue();
-                        int connRadius = connections[idx];
-                        if (connRadius > 0 && (connRadius <= twigRadius || face != connDir)) {
-                            List<BakedQuad> sleeveQuads = branchModel.sleevesQuads[idx][connRadius - 1];
-                            if (sleeveQuads != null) {
-                                for (BakedQuad quad : sleeveQuads) {
-                                    if (quad.getDirection() == face) {
-                                        allQuads.add(quad);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            branchModel.collectQuads(coreRadius, connections, twigRadius, forceRingDir)
+                    .values().forEach(allQuads::addAll);
         } else {
             for (Direction direction : Direction.values()) {
                 allQuads.addAll(model.getQuads(state, direction, random));
@@ -184,40 +134,7 @@ public class FallingTreeEntityModelFabric extends FallingTreeEntityModel {
             allQuads.addAll(model.getQuads(state, null, random));
         }
 
-        if (offset.x() != 0 || offset.y() != 0 || offset.z() != 0) {
-            List<BakedQuad> offsetQuads = new ArrayList<>();
-            for (BakedQuad quad : allQuads) {
-                offsetQuads.add(offsetQuad(quad, offset));
-            }
-            return offsetQuads;
-        }
-
-        return allQuads;
-    }
-
-    private Direction getSourceDir(int coreRadius, int[] connections) {
-        int largestConnection = 0;
-        Direction sourceDir = null;
-
-        for (Direction dir : Direction.values()) {
-            int connRadius = connections[dir.get3DDataValue()];
-            if (connRadius > largestConnection) {
-                largestConnection = connRadius;
-                sourceDir = dir;
-            }
-        }
-
-        if (largestConnection < coreRadius) {
-            sourceDir = null;
-        }
-        return sourceDir;
-    }
-
-    private int resolveCoreDir(Direction dir) {
-        if (dir == null) {
-            return 0;
-        }
-        return dir.get3DDataValue() >> 1;
+        return offsetAllQuads(offset, allQuads);
     }
 
     private List<BakedQuad> getQuadsWithOffset(BakedModel model, BlockState state, Vec3 offset, RandomSource random) {
@@ -228,6 +145,10 @@ public class FallingTreeEntityModelFabric extends FallingTreeEntityModel {
         }
         allQuads.addAll(model.getQuads(state, null, random));
 
+        return offsetAllQuads(offset, allQuads);
+    }
+
+    private List<BakedQuad> offsetAllQuads(Vec3 offset, List<BakedQuad> allQuads) {
         if (offset.x() != 0 || offset.y() != 0 || offset.z() != 0) {
             List<BakedQuad> offsetQuads = new ArrayList<>();
             for (BakedQuad quad : allQuads) {
