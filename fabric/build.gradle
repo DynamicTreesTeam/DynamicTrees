@@ -3,7 +3,8 @@ plugins {
     id 'fabric-loom'
     id "me.modmuss50.mod-publish-plugin"
 }
-version = "${version}${fabricVersionAppend}"
+mod_version = "${mod_version}${fabricVersionAppend}"
+version = mod_version
 
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
