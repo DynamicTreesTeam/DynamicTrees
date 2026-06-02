@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public class BranchDestructionData {
     public final Species species; // The species of the tree that was harvested
     public final int[] destroyedBranchesRadiusPosition; // Encoded branch radius and relative positions
-    public final int[] destroyedBranchesConnections; // Encoded branch shapes
+    public final long[] destroyedBranchesConnections; // Encoded branch shapes
     public final int[] destroyedBranchesBlockIndex; // Encoded valid branch block index for family
     public final int[] destroyedLeaves; // Encoded leaves relative positions
     public final int[] destroyedLeavesBlockIndex; // Encoded valid leaves block index for species
@@ -42,7 +42,7 @@ public class BranchDestructionData {
 
     public BranchDestructionData() {
         this.species = Species.NULL_SPECIES;
-        this.destroyedBranchesConnections = new int[0];
+        this.destroyedBranchesConnections = new long[0];
         this.destroyedBranchesRadiusPosition = new int[0];
         this.destroyedBranchesBlockIndex = new int[0];
         this.destroyedLeaves = new int[0];
@@ -64,8 +64,8 @@ public class BranchDestructionData {
         this.species = species;
         int[][] encodedBranchData = convertBranchesToIntArrays(branches);
         this.destroyedBranchesRadiusPosition = encodedBranchData[0];
-        this.destroyedBranchesConnections = encodedBranchData[1];
-        this.destroyedBranchesBlockIndex = encodedBranchData[2];
+        this.destroyedBranchesConnections = convertBranchConnectionsToLongArray(branches);
+        this.destroyedBranchesBlockIndex = encodedBranchData[1];
         int[][] encodedLeavesData = convertLeavesToIntArray(leaves, species);
         this.destroyedLeaves = encodedLeavesData[0];
         this.destroyedLeavesBlockIndex = encodedLeavesData[1];
@@ -122,7 +122,7 @@ public class BranchDestructionData {
     public BranchDestructionData(CompoundTag nbt) {
         this.species = TreeRegistry.findSpecies(new ResourceLocation(nbt.getString("species")));
         this.destroyedBranchesRadiusPosition = nbt.getIntArray("branchpos");
-        this.destroyedBranchesConnections = nbt.getIntArray("branchcon");
+        this.destroyedBranchesConnections = nbt.getLongArray("branchcon");
         this.destroyedBranchesBlockIndex = nbt.getIntArray("branchblock");
         this.destroyedLeaves = nbt.getIntArray("leavespos");
         this.destroyedLeavesBlockIndex = nbt.getIntArray("leavesblock");
@@ -139,7 +139,7 @@ public class BranchDestructionData {
     public CompoundTag writeToNBT(CompoundTag tag) {
         tag.putString("species", species.getRegistryName().toString());
         tag.putIntArray("branchpos", destroyedBranchesRadiusPosition);
-        tag.putIntArray("branchcon", destroyedBranchesConnections);
+        tag.putLongArray("branchcon", destroyedBranchesConnections);
         tag.putIntArray("branchblock", destroyedBranchesBlockIndex);
         tag.putIntArray("leavespos", destroyedLeaves);
         tag.putIntArray("leavesblock", destroyedLeavesBlockIndex);
@@ -163,7 +163,6 @@ public class BranchDestructionData {
 
     private int[][] convertBranchesToIntArrays(Map<BlockPos, BranchConnectionData> branchList) {
         int[] radPosData = new int[branchList.size()];
-        int[] connectionData = new int[branchList.size()];
         int[] blockIndexData = new int[branchList.size()];
         int index = 0;
 
@@ -172,11 +171,9 @@ public class BranchDestructionData {
         if (origConnData != null) {
             BlockState origState = origConnData.getBlockState();
             radPosData[index] = encodeBranchesRadiusPos(BlockPos.ZERO, (BranchBlock) origState.getBlock(), origState);
-            connectionData[index] = encodeBranchesConnections(origConnData.getConnections());
             blockIndexData[index++] = encodeBranchBlocks((BranchBlock) origState.getBlock());
         }
 
-        //Encode the remaining blocks
         for (Entry<BlockPos, BranchConnectionData> set : branchList.entrySet()) {
             if (set.getKey().equals(BlockPos.ZERO)) continue;
             BlockPos relPos = set.getKey();
@@ -184,63 +181,61 @@ public class BranchDestructionData {
             BlockState state = connData.getBlockState();
             Block block = state.getBlock();
 
-            if (block instanceof BranchBlock && bounds.inBounds(relPos)) { //Place comfortable limits on the system
+            if (block instanceof BranchBlock && bounds.inBounds(relPos)) {
                 radPosData[index] = encodeBranchesRadiusPos(relPos, (BranchBlock) block, state);
-                connectionData[index] = encodeBranchesConnections(connData.getConnections());
                 blockIndexData[index++] = encodeBranchBlocks((BranchBlock) block);
             }
         }
 
-        //Shrink down the arrays
         radPosData = Arrays.copyOf(radPosData, index);
-        connectionData = Arrays.copyOf(connectionData, index);
         blockIndexData = Arrays.copyOf(blockIndexData, index);
 
-        return new int[][]{radPosData, connectionData, blockIndexData};
+        return new int[][]{radPosData, blockIndexData};
+    }
+
+    private long[] convertBranchConnectionsToLongArray(Map<BlockPos, BranchConnectionData> branchList) {
+        long[] connectionData = new long[branchList.size()];
+        int index = 0;
+
+        //Ensure the origin block is at the first index
+        BranchConnectionData origConnData = branchList.get(BlockPos.ZERO);
+        if (origConnData != null) {
+            connectionData[index++] = encodeBranchesConnections(origConnData.getConnections());
+        }
+
+        for (Entry<BlockPos, BranchConnectionData> set : branchList.entrySet()) {
+            if (set.getKey().equals(BlockPos.ZERO)) continue;
+            BlockPos relPos = set.getKey();
+            BranchConnectionData connData = set.getValue();
+            BlockState state = connData.getBlockState();
+            Block block = state.getBlock();
+
+            if (block instanceof BranchBlock && bounds.inBounds(relPos)) {
+                connectionData[index++] = encodeBranchesConnections(connData.getConnections());
+            }
+        }
+
+        return Arrays.copyOf(connectionData, index);
     }
 
     private int encodeBranchesRadiusPos(BlockPos relPos, BranchBlock branchBlock, BlockState state) {
-        return ((branchBlock.getRadius(state) & 0x1F) << 24) | //Radius 0 - 31
+        return ((branchBlock.getRadius(state) & 0xFF) << 24) | // Radius 0 - 255
                 encodeRelBlockPos(relPos);
     }
 
-    private int encodeBranchesConnections(Connections exState) {
-        int result = 0;
+    private long encodeBranchesConnections(Connections exState) {
+        long result = 0;
         int[] radii = exState.getAllRadii();
         for (Direction face : Direction.values()) {
             int faceIndex = face.get3DDataValue();
             int rad = radii[faceIndex];
-            result |= (rad & 0x1F) << (faceIndex * 5);//5 bits per face * 6 faces = 30bits
+            result |= ((long)(rad & 0xFF)) << (faceIndex * 8); // 8 bits per face * 6 faces = 48 bits
         }
         return result;
     }
 
-    private int encodeBranchBlocks(BranchBlock branch) {
-        return branch.getFamily().getBranchBlockIndex(branch);
-    }
-
-    public int getNumBranches() {
-        return destroyedBranchesRadiusPosition.length;
-    }
-
-    public BlockPos getBranchRelPos(int index) {
-        BlockPos pos = decodeRelPos(destroyedBranchesRadiusPosition[index]);
-        if (basePos != cutPos){ //When a root system is involved, the relative positions are moved down
-            return pos.offset(getRelativeCutPos());
-        }
-        return pos;
-    }
-
-    public BlockPos getRelativeCutPos(){
-        return cutPos.subtract(basePos);
-    }
-
-    public int getBranchRadius(int index) {
-        return decodeBranchRadius(destroyedBranchesRadiusPosition[index]);
-    }
-
     private int decodeBranchRadius(int encoded) {
-        return (encoded >> 24) & 0x1F;
+        return (encoded >> 24) & 0xFF;
     }
 
     @Nullable
@@ -256,12 +251,32 @@ public class BranchDestructionData {
     }
 
     public void getConnections(int index, int[] connections) {
-        int encodedConnections = destroyedBranchesConnections[index];
+        long encodedConnections = destroyedBranchesConnections[index];
 
         for (Direction face : Direction.values()) {
-            int rad = (encodedConnections >> (face.get3DDataValue() * 5) & 0x1F);
+            int rad = (int)((encodedConnections >> (face.get3DDataValue() * 8)) & 0xFF);
             connections[face.get3DDataValue()] = Math.max(0, rad);
         }
+    }
+
+    private int encodeBranchBlocks(BranchBlock branch) {
+        return branch.getFamily().getBranchBlockIndex(branch);
+    }
+
+    public int getNumBranches() {
+        return destroyedBranchesRadiusPosition.length;
+    }
+
+    public BlockPos getBranchRelPos(int index) {
+        BlockPos pos = decodeRelPos(destroyedBranchesRadiusPosition[index]);
+        if (basePos != cutPos) { // When a root system is involved, the relative positions are moved down
+            return pos.offset(getRelativeCutPos());
+        }
+        return pos;
+    }
+
+    public int getBranchRadius(int index) {
+        return decodeBranchRadius(destroyedBranchesRadiusPosition[index]);
     }
 
     public static class BlockStateWithConnections {
@@ -457,6 +472,10 @@ public class BranchDestructionData {
                 (((encoded >> 8) & 0xFF) - 64),
                 (((encoded) & 0xFF) - 64)
         );
+    }
+
+    public BlockPos getRelativeCutPos() {
+        return cutPos.subtract(basePos);
     }
 
 }
