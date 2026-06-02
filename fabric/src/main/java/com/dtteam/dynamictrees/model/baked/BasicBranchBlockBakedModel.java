@@ -1,6 +1,7 @@
 package com.dtteam.dynamictrees.model.baked;
 
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
+import com.dtteam.dynamictrees.block.branch.ThickBranchBlock;
 import com.google.common.collect.Maps;
 import net.fabricmc.fabric.api.renderer.v1.mesh.*;
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
@@ -29,10 +30,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 
 @SuppressWarnings("unchecked")
@@ -169,42 +167,58 @@ public class BasicBranchBlockBakedModel implements BakedModel, FabricBakedModel 
 
     @Override
     public void emitBlockQuads(BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext context) {
-        if (state == null) return;
+        EnumMap<Direction, List<BakedQuad>> bakedQuads = collectQuads(blockView, state, pos);
+        if (bakedQuads == null) return;
+
+        QuadEmitter emitter = context.getEmitter();
+        RenderMaterial material = getRenderMaterial();
+        if (material == null) return;
+
+        bakedQuads.forEach((dir, quads) ->
+                emitQuads(dir, emitter, material, quads));
+    }
+
+    protected @Nullable EnumMap<Direction, List<BakedQuad>> collectQuads(BlockAndTintGetter getter, BlockState state, BlockPos pos) {
+        if (state == null) return null;
 
         final int coreRadius = getRadius(state);
-        if (coreRadius <= 0 || coreRadius > 8) return;
+        if (coreRadius <= 0 || coreRadius > maxBranchRadius()) return null;
 
         int[] connections = new int[]{0, 0, 0, 0, 0, 0};
         int twigRadius = 1;
 
         if (state.getBlock() instanceof BranchBlock branchBlock) {
-            connections = branchBlock.getConnectionData(blockView, pos, state).getAllRadii();
+            connections = branchBlock.getConnectionData(getter, pos, state).getAllRadii();
             twigRadius = branchBlock.getFamily().getPrimaryThickness();
         }
 
+        return collectQuads(coreRadius, connections, twigRadius, null);
+    }
+
+    protected int maxBranchRadius() {
+        return ThickBranchBlock.MAX_RADIUS;
+    }
+
+    public EnumMap<Direction, List<BakedQuad>> collectQuads(int coreRadius, int[] connections, int twigRadius, Direction forceRingDir) {
         int numConnections = 0;
         for (int i : connections) {
             numConnections += (i != 0) ? 1 : 0;
         }
 
-        QuadEmitter emitter = context.getEmitter();
-
         Direction sourceDir = getSourceDir(coreRadius, connections);
         int coreDir = resolveCoreDir(sourceDir);
-        Direction coreRingDir = (numConnections == 1 && sourceDir != null) ? sourceDir.getOpposite() : null;
+        Direction coreRingDir = forceRingDir != null ? forceRingDir :
+                ((numConnections == 1 && sourceDir != null) ? sourceDir.getOpposite() : null);
+
+        EnumMap<Direction, List<BakedQuad>> bakedQuads = new EnumMap<>(Direction.class);
 
         for (Direction face : Direction.values()) {
+            List<BakedQuad> quads = bakedQuads.computeIfAbsent(face, dir->new ArrayList<>());
             if (coreRadius != connections[face.get3DDataValue()]) {
-                List<BakedQuad> quads;
                 if (coreRingDir == null || coreRingDir != face) {
-                    quads = coresQuads[coreDir][coreRadius - 1];
+                    quads.addAll(coresQuads[coreDir][coreRadius - 1]);
                 } else {
-                    quads = ringsQuads[coreRadius - 1];
-                }
-                for (BakedQuad quad : quads) {
-                    if (quad.getDirection() == face) {
-                        emitQuad(emitter, quad, face, context);
-                    }
+                    quads.addAll(ringsQuads[coreRadius - 1]);
                 }
             }
 
@@ -213,32 +227,36 @@ public class BasicBranchBlockBakedModel implements BakedModel, FabricBakedModel 
                     int idx = connDir.get3DDataValue();
                     int connRadius = connections[idx];
                     if (connRadius > 0 && connRadius < 8 && (connRadius <= twigRadius || face != connDir)) {
-                        List<BakedQuad> sleeveQuads = sleevesQuads[idx][connRadius - 1];
-                        if (sleeveQuads != null) {
-                            for (BakedQuad quad : sleeveQuads) {
-                                if (quad.getDirection() == face) {
-                                    emitQuad(emitter, quad, face, context);
-                                }
-                            }
-                        }
+                        quads.addAll(sleevesQuads[idx][connRadius - 1]);
                     }
                 }
             }
         }
+        return bakedQuads;
     }
 
-    protected void emitQuad(QuadEmitter emitter, BakedQuad quad, Direction cullFace, RenderContext context) {
+    public List<BakedQuad> getRingQuads(int radius){
+        return ringsQuads[radius - 1];
+    }
+
+    protected static RenderMaterial getRenderMaterial() {
         var renderer = RendererAccess.INSTANCE.getRenderer();
-
+        if (renderer == null) return null;
         MaterialFinder finder = renderer.materialFinder();
+//        finder.disableAo(0, true);
+//        finder.disableDiffuse(0, true);
 
-        finder.disableAo(0, true);
-        finder.disableDiffuse(0, true);
+        return finder.find();
+    }
 
-        RenderMaterial material = finder.find();
-
-        emitter.fromVanilla(quad, material, cullFace);
-        emitter.emit();
+    protected void emitQuads(Direction face, QuadEmitter emitter, RenderMaterial material, List<BakedQuad> quads) {
+        if (quads == null) return;
+        for (BakedQuad quad : quads) {
+            if (quad.getDirection() == face) {
+                emitter.fromVanilla(quad, material, face);
+                emitter.emit();
+            }
+        }
     }
 
     @Override

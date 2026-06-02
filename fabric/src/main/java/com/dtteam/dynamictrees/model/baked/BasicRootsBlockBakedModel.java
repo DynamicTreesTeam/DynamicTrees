@@ -3,6 +3,7 @@ package com.dtteam.dynamictrees.model.baked;
 import com.dtteam.dynamictrees.block.branch.BasicRootsBlock;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.google.common.collect.Maps;
+import net.fabricmc.fabric.api.renderer.v1.material.RenderMaterial;
 import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -17,9 +18,11 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -85,51 +88,27 @@ public class BasicRootsBlockBakedModel extends BasicBranchBlockBakedModel {
         return super.getRadius(blockState);
     }
 
-    protected void emitQuad(QuadEmitter emitter, BakedQuad quad, Direction cullFace) {
-        emitter.fromVanilla(quad, null, null);
-        emitter.emit();
-    }
-
     @Override
-    public void emitBlockQuads(BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext context) {
-        if (state == null) return;
-
-        final int coreRadius = getRadius(state);
-        if (coreRadius <= 0 || coreRadius > 8) return;
-
-        int[] connections = new int[]{0, 0, 0, 0, 0, 0};
-        int twigRadius = 1;
-
-        if (state.getBlock() instanceof BranchBlock branchBlock) {
-            connections = branchBlock.getConnectionData(blockView, pos, state).getAllRadii();
-            twigRadius = branchBlock.getFamily().getPrimaryThickness();
-        }
-
+    public EnumMap<Direction, List<BakedQuad>> collectQuads(int coreRadius, int[] connections, int twigRadius, Direction forceRingDir) {
         int numConnections = 0;
         for (int i : connections) {
             numConnections += (i != 0) ? 1 : 0;
         }
 
-        var emitter = context.getEmitter();
-
         Direction sourceDir = getSourceDir(coreRadius, connections);
         int coreDir = resolveCoreDir(sourceDir);
         Direction coreRingDir = (numConnections == 1 && sourceDir != null) ? sourceDir.getOpposite() : null;
 
-        for (Direction face : Direction.values()) {
-            int connectionOnFace = connections[face.get3DDataValue()];
+        EnumMap<Direction, List<BakedQuad>> bakedQuads = new EnumMap<>(Direction.class);
 
+        for (Direction face : Direction.values()) {
+            List<BakedQuad> quads = bakedQuads.computeIfAbsent(face, dir->new ArrayList<>());
+            int connectionOnFace = connections[face.get3DDataValue()];
             if (coreRadius != connectionOnFace) {
-                List<BakedQuad> quads;
                 if (coreRingDir == null || coreRingDir != face) {
-                    quads = coresQuads[coreDir][coreRadius - 1];
+                    quads.addAll(coresQuads[coreDir][coreRadius - 1]);
                 } else {
-                    quads = ringsQuads[coreRadius - 1];
-                }
-                for (BakedQuad quad : quads) {
-                    if (quad.getDirection() == face) {
-                        emitQuad(emitter, quad, face);
-                    }
+                    quads.addAll(ringsQuads[coreRadius - 1]);
                 }
             }
 
@@ -138,28 +117,16 @@ public class BasicRootsBlockBakedModel extends BasicBranchBlockBakedModel {
                     int idx = connDir.get3DDataValue();
                     int connRadius = connections[idx];
                     if (connRadius > 0 && connRadius < 8 && (connRadius <= twigRadius || face != connDir)) {
-                        List<BakedQuad> sleeveQuads = sleevesQuads[idx][connRadius - 1];
-                        if (sleeveQuads != null) {
-                            for (BakedQuad quad : sleeveQuads) {
-                                if (quad.getDirection() == face) {
-                                    emitQuad(emitter, quad, face);
-                                }
-                            }
-                        }
+                        quads.addAll(sleevesQuads[idx][connRadius - 1]);
                     }
                 }
             }
 
             if (connectionOnFace > 0 && connectionOnFace <= coreRadius) {
-                List<BakedQuad> endFaceQuads = sleeveEndFaces[face.get3DDataValue()][connectionOnFace - 1];
-                if (endFaceQuads != null) {
-                    for (BakedQuad quad : endFaceQuads) {
-                        if (quad.getDirection() == face) {
-                            emitQuad(emitter, quad, face);
-                        }
-                    }
-                }
+                quads.addAll(sleeveEndFaces[face.get3DDataValue()][connectionOnFace - 1]);
             }
         }
+
+        return bakedQuads;
     }
 }

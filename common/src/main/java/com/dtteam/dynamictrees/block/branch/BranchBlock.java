@@ -314,7 +314,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         radii[6] = (byte)radius; //last radius is the core
 
         for (Direction dir : Direction.values()) {
-            radii[dir.ordinal()] = (byte)Math.min(getSideConnectionRadius(level, pos, radius, dir), radius);
+            radii[dir.get3DDataValue()] = (byte)Math.min(getSideConnectionRadius(level, pos, radius, dir), radius);
         }
         int shapeStateIndex = BranchShapeState.fromArray(radii).toIndex();
 
@@ -332,7 +332,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         double radius = radii[6] / 16.0;
         VoxelShape shape = Shapes.create(makeCube(radius));
         for (Direction dir : Direction.values()) {
-            double sideRadius = radii[dir.ordinal()] / 16.0f;
+            double sideRadius = radii[dir.get3DDataValue()] / 16.0f;
             if (sideRadius > 0.0f) {
                 double gap = 0.5f - sideRadius;
                 AABB aabb = makeCube(sideRadius);

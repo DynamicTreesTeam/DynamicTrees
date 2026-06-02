@@ -3,7 +3,8 @@ plugins {
     id 'net.neoforged.moddev'
     id "me.modmuss50.mod-publish-plugin"
 }
-version = "${version}${neoVersionAppend}"
+mod_version = "${mod_version}${neoVersionAppend}"
+version = mod_version
 
 neoForge {
     version = neoforge_version
