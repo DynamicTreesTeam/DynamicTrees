@@ -15,6 +15,8 @@ import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
+import com.ferreusveritas.dynamictrees.block.branch.ThickBranchBlock;
+import com.ferreusveritas.dynamictrees.util.CoordUtils.ShellDirection;
 import com.google.common.collect.Iterables;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -237,12 +239,16 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
     protected void cleanupShellBlocks(BranchDestructionData destroyData) {
         BlockPos cutPos = destroyData.cutPos;
         for (int i = 0; i < destroyData.getNumBranches(); i++) {
-            if (destroyData.getBranchRadius(i) > 8) {
+            int radius = destroyData.getBranchRadius(i);
+            if (radius > ThickBranchBlock.RADIUS_TO_INNER_SHELL) {
                 BlockPos pos = destroyData.getBranchRelPos(i).offset(cutPos);
-                for (Surround dir : Surround.values()) {
-                    BlockPos dPos = pos.offset(dir.getOffset());
-                    if (level().getBlockState(dPos).getBlock() instanceof TrunkShellBlock) {
-                        level().removeBlock(dPos, false);
+                for (ShellDirection dir : ShellDirection.values()) {
+                    // Only check shells that this radius actually needs
+                    if (dir.getShellLevel() == 1 || dir.getShellLevel() == 2 && radius > ThickBranchBlock.RADIUS_TO_OUTER_SHELL || dir.getShellLevel() == 3 && radius > ThickBranchBlock.RADIUS_TO_OUTERMOST_SHELL) {
+                        BlockPos dPos = pos.offset(dir.getOffset());
+                        if (level().getBlockState(dPos).getBlock() instanceof TrunkShellBlock) {
+                            level().removeBlock(dPos, false);
+                        }
                     }
                 }
             }
