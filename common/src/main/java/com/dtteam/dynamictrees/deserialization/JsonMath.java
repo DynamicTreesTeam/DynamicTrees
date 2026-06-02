@@ -4,6 +4,9 @@ import com.dtteam.dynamictrees.tree.species.Species;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.levelgen.WorldgenRandom;
+import net.minecraft.world.level.levelgen.synth.PerlinNoise;
+import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,6 +16,7 @@ import java.util.Map.Entry;
 
 public class JsonMath {
 
+    private static final long BASE_SEED = 96L;
     public MathOperator rootOp;
 
     public JsonMath(JsonElement mathElement) {
@@ -83,7 +87,11 @@ public class JsonMath {
         MathOperator[] paramArray = paramList.toArray(new MathOperator[0]);
 
         return switch (op) {
+            case X -> new ValX();
+            case Z -> new ValZ();
             case NOISE -> new Noise();
+            case PERLIN -> new Perlin(paramArray);
+            case SIMPLEX -> new Simplex(paramArray);
             case RAND -> new Rand();
             case RADIUS -> new Radius();
             case ADD -> new Adder(paramArray);
@@ -100,22 +108,31 @@ public class JsonMath {
 
     }
 
-    public float apply(RandomSource random, float noise) {
-        MathContext mc = new MathContext(noise, random);
+    public double apply(RandomSource random, int x, int z, float noise) {
+        MathContext mc = new MathContext(noise, x, z, random);
         return rootOp.apply(mc);
     }
 
-    public float apply(RandomSource random, Species species, float radius) {
-        MathContext mc = new MathSpeciesContext(random, species, radius);
+    public double apply(RandomSource random, Species species, int x, int z, float radius) {
+        MathContext mc = new MathSpeciesContext(random, species, x, z, radius);
         return rootOp.apply(mc);
     }
 
     public static class MathContext {
-        public float noise;
+        public double noise;
+        public double x;
+        public double z;
         public RandomSource rand;
 
-        public MathContext(float noise, RandomSource random) {
+        public MathContext(
+            double noise,
+            double x,
+            double z,
+            RandomSource random
+        ) {
             this.noise = noise;
+            this.x = x;
+            this.z = z;
             this.rand = random;
         }
     }
@@ -124,8 +141,14 @@ public class JsonMath {
         public float radius;
         public Species species;
 
-        public MathSpeciesContext(RandomSource random, Species species, float radius) {
-            super(0.0f, random);
+        public MathSpeciesContext(
+            RandomSource random,
+            Species species,
+            double x,
+            double z,
+            float radius
+        ) {
+            super(0.0f, x, z, random);
             this.radius = radius;
             this.species = species;
         }
@@ -133,7 +156,7 @@ public class JsonMath {
     }
 
     public interface MathOperator {
-        float apply(MathContext mc);
+        double apply(MathContext mc);
     }
 
     public static class Const implements MathOperator {
@@ -144,24 +167,101 @@ public class JsonMath {
         }
 
         @Override
-        public float apply(MathContext mc) {
+        public double apply(MathContext mc) {
             return value;
         }
     }
 
+    public static class ValX implements MathOperator {
+        @Override
+        public double apply(MathContext mc) {
+            return mc.x;
+        }
+    }
+    
+    public static class ValZ implements MathOperator {
+        @Override
+        public double apply(MathContext mc) {
+            return mc.z;
+        }
+    }
+    
     public static class Noise implements MathOperator {
 
         @Override
-        public float apply(MathContext mc) {
+        public double apply(MathContext mc) {
             return mc.noise;
         }
 
     }
 
+    public static class Perlin implements MathOperator {
+        
+        private final MathOperator[] functions;
+        private final PerlinNoise noise;
+        
+        public Perlin(MathOperator[] functionArray) {
+            this.functions = functionArray;
+            
+            WorldgenRandom random = new WorldgenRandom(WorldgenRandom.Algorithm.LEGACY.newInstance(BASE_SEED));
+            MathContext mc = new MathContext(0, 0, 0, random);
+            
+            if(functionArray.length > 2) {
+                long seed = (long) (functionArray[2].apply(mc) * Long.MAX_VALUE);
+                random = new WorldgenRandom(WorldgenRandom.Algorithm.LEGACY.newInstance(seed));
+            }
+
+            java.util.List<Integer> octaves = new ArrayList<>();
+            for (int i = 3; i < functionArray.length; i++) {
+                octaves.add((int) functionArray[i].apply(mc));
+            }
+
+            this.noise = PerlinNoise.create(random, octaves);
+        }
+        
+        @Override
+        public double apply(MathContext mc) {
+            double x = functions.length > 0 ? functions[0].apply(mc) : mc.x;
+            double z = functions.length > 1 ? functions[1].apply(mc) : mc.z;
+            
+            return (noise.getValue(x, 0.0D, z) + 1.0D) / 2.0D;
+        }
+        
+    }
+    
+    public static class Simplex implements MathOperator {
+        
+        private final MathOperator[] functions;
+        private final SimplexNoise noise;
+        
+        public Simplex(MathOperator[] functionArray) {
+            this.functions = functionArray;
+            
+            WorldgenRandom random = new WorldgenRandom(WorldgenRandom.Algorithm.LEGACY.newInstance(BASE_SEED));
+            MathContext mc = new MathContext(0, 0, 0, random);
+            
+            if(functionArray.length > 2) {
+                long seed = (long) (functionArray[2].apply(mc) * Long.MAX_VALUE);
+                random = new WorldgenRandom(WorldgenRandom.Algorithm.LEGACY.newInstance(seed));
+            }
+            
+            this.noise = new SimplexNoise(random);
+        }
+        
+        @Override
+        public double apply(MathContext mc) {
+            double x = functions.length > 0 ? functions[0].apply(mc) : mc.x;
+            double z = functions.length > 1 ? functions[1].apply(mc) : mc.z;
+            
+            return (noise.getValue(x, 0.0D, z) + 1.0D) / 2.0D;
+        }
+        
+    }
+    
     public static class Rand implements MathOperator {
 
         @Override
-        public float apply(MathContext mc) {
+        public double apply(MathContext mc) {
             return mc.rand.nextFloat();
         }
 
@@ -170,7 +270,7 @@ public class JsonMath {
     public static class Radius implements MathOperator {
 
         @Override
-        public float apply(MathContext mc) {
+        public double apply(MathContext mc) {
             if (mc instanceof MathSpeciesContext) {
                 return ((MathSpeciesContext) mc).radius;
             }
@@ -192,13 +292,13 @@ public class JsonMath {
         }
 
         @Override
-        public float apply(MathContext mc) {
+        public double apply(MathContext mc) {
 
             if (dual) {
                 return functions[0].apply(mc) + functions[1].apply(mc);
             }
 
-            float r = 0;
+            double r = 0;
             for (MathOperator f : functions) {
                 r += f.apply(mc);
             }
@@ -218,19 +318,19 @@ public class JsonMath {
         }
 
         @Override
-        public float apply(MathContext mc) {
+        public double apply(MathContext mc) {
 
             if (dual) {
                 return functions[0].apply(mc) - functions[1].apply(mc);
             }
 
-            Float r = null;
+            Double r = null;
             for (MathOperator f : functions) {
-                float v = f.apply(mc);
+                double v = f.apply(mc);
                 r = r == null ? v : r - v;
             }
 
-            return r == null ? 0.0f : r;
+            return r == null ? 0.0 : r;
         }
     }
 
@@ -245,13 +345,13 @@ public class JsonMath {
         }
 
         @Override
-        public float apply(MathContext mc) {
+        public double apply(MathContext mc) {
 
             if (dual) {
                 return functions[0].apply(mc) * functions[1].apply(mc);
             }
 
-            float r = 1.0f;
+            double r = 1.0f;
             for (MathOperator f : functions) {
                 r *= f.apply(mc);
             }
@@ -271,19 +371,19 @@ public class JsonMath {
         }
 
         @Override
-        public float apply(MathContext mc) {
+        public double apply(MathContext mc) {
 
             if (dual) {
                 return functions[0].apply(mc) / functions[1].apply(mc);
             }
 
-            Float r = null;
+            Double r = null;
             for (MathOperator f : functions) {
-                float v = f.apply(mc);
+                double v = f.apply(mc);
                 r = r == null ? v : r / v;
             }
 
-            return r == null ? 0.0f : r;
+            return r == null ? 0.0 : r;
         }
     }
 
@@ -298,13 +398,13 @@ public class JsonMath {
         }
 
         @Override
-        public float apply(MathContext mc) {
+        public double apply(MathContext mc) {
 
             if (dual) {
                 return functions[0].apply(mc) % functions[1].apply(mc);
             }
 
-            return 0.0f;
+            return 0.0;
         }
     }
 
@@ -320,19 +420,19 @@ public class JsonMath {
         }
 
         @Override
-        public float apply(MathContext mc) {
+        public double apply(MathContext mc) {
 
             if (dual) {
                 return Math.max(functions[0].apply(mc), functions[1].apply(mc));
             }
 
-            Float r = null;
+            Double r = null;
             for (MathOperator f : functions) {
-                float v = f.apply(mc);
+                double v = f.apply(mc);
                 r = r == null ? v : Math.max(r, v);
             }
 
-            return r == null ? 0.0f : r;
+            return r == null ? 0.0 : r;
         }
     }
 
@@ -347,19 +447,19 @@ public class JsonMath {
         }
 
         @Override
-        public float apply(MathContext mc) {
+        public double apply(MathContext mc) {
 
             if (dual) {
                 return Math.min(functions[0].apply(mc), functions[1].apply(mc));
             }
 
-            Float r = null;
+            Double r = null;
             for (MathOperator f : functions) {
-                float v = f.apply(mc);
+                double v = f.apply(mc);
                 r = r == null ? v : Math.min(r, v);
             }
 
-            return r == null ? 0.0f : r;
+            return r == null ? 0.0 : r;
         }
     }
 
@@ -372,13 +472,13 @@ public class JsonMath {
         }
 
         @Override
-        public float apply(MathContext mc) {
+        public double apply(MathContext mc) {
 
             if (functions.length == 4) {
                 return functions[0].apply(mc) > functions[1].apply(mc) ? functions[2].apply(mc) : functions[3].apply(mc);
             }
 
-            return 0.0f;
+            return 0.0;
         }
 
     }
@@ -394,13 +494,13 @@ public class JsonMath {
         }
 
         @Override
-        public float apply(MathContext mc) {
+        public double apply(MathContext mc) {
 
             if (mc instanceof MathSpeciesContext && functions.length == 2) {
                 return ((MathSpeciesContext) mc).species == species ? functions[0].apply(mc) : functions[1].apply(mc);
             }
 
-            return 0.0f;
+            return 0.0;
         }
 
     }
@@ -414,9 +514,9 @@ public class JsonMath {
         }
 
         @Override
-        public float apply(MathContext mc) {
+        public double apply(MathContext mc) {
             if (functions.length >= 1) {
-                float val = functions[0].apply(mc);
+                double val = functions[0].apply(mc);
                 LogManager.getLogger().debug("Json Debug Value: " + val);
                 return val;
             }
@@ -429,14 +529,18 @@ public class JsonMath {
 
     private static class Null implements MathOperator {
         @Override
-        public float apply(MathContext mc) {
-            return 0f;
+        public double apply(MathContext mc) {
+            return 0;
         }
     }
 
     public enum MathFunction {
         CONST,
+        X,
+        Z,
         NOISE,
+        PERLIN,
+        SIMPLEX,
         RAND,
         RADIUS,
         ADD,

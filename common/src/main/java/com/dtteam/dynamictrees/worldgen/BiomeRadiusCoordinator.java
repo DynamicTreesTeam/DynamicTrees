@@ -39,7 +39,7 @@ public class BiomeRadiusCoordinator implements RadiusCoordinator {
 
         final double noiseDensity = (this.noiseGenerator.getValue(x / scale, z / scale, false) + 1D) / 2.0D; // Gives 0.0 to 1.0
         final double density = BiomeDatabases.getDimensionalOrDefault(this.dimensionName)
-                .getDensitySelector(biome).getDensity(this.level.getRandom(), noiseDensity);
+                .getDensitySelector(biome).getDensity(this.level.getRandom(), x, z, noiseDensity);
         final double size = ((1.0 - density) * 9); // Size is the inverse of density (gives 0 to 9)
 
         // Oh Joy. RandomSource can potentially start with the same number for each chunk. Let's just

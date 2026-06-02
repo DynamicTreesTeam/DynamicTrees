@@ -103,8 +103,8 @@ public class BiomeDatabase {
         private final BiomeDatabase database;
         @Nullable
         private final ResourceKey<Biome> biomeKey;
-        ChanceSelector chanceSelector = (rnd, spc, rad) -> Chance.UNHANDLED;
-        DensitySelector densitySelector = (rnd, nd) -> -1;
+        ChanceSelector chanceSelector = (rnd, spc, x, y, rad) -> Chance.UNHANDLED;
+        DensitySelector densitySelector = (rnd, x, z, nd) -> -1;
         SpeciesSelector speciesSelector = (pos, dirt, rnd) -> new SpeciesSelection();
         FeatureCancellation featureCancellation = NoFeatureCancellation.INSTANCE;
         Boolean blacklisted = false;
@@ -151,13 +151,13 @@ public class BiomeDatabase {
             ChanceSelector existing = chanceSelector;
             switch (op) {
                 case REPLACE -> chanceSelector = selector;
-                case SPLICE_BEFORE -> chanceSelector = (rnd, spc, rad) -> {
-                    Chance c = selector.getChance(rnd, spc, rad);
-                    return c != Chance.UNHANDLED ? c : existing.getChance(rnd, spc, rad);
+                case SPLICE_BEFORE -> chanceSelector = (rnd, spc, x, z, rad) -> {
+                    Chance c = selector.getChance(rnd, spc, x, z, rad);
+                    return c != Chance.UNHANDLED ? c : existing.getChance(rnd, spc, x, z, rad);
                 };
-                case SPLICE_AFTER -> chanceSelector = (rnd, spc, rad) -> {
-                    Chance c = existing.getChance(rnd, spc, rad);
-                    return c != Chance.UNHANDLED ? c : selector.getChance(rnd, spc, rad);
+                case SPLICE_AFTER -> chanceSelector = (rnd, spc, x, z, rad) -> {
+                    Chance c = existing.getChance(rnd, spc, x, z, rad);
+                    return c != Chance.UNHANDLED ? c : selector.getChance(rnd, spc, x, z, rad);
                 };
             }
         }
@@ -170,13 +170,13 @@ public class BiomeDatabase {
             DensitySelector existing = densitySelector;
             switch (op) {
                 case REPLACE -> densitySelector = selector;
-                case SPLICE_BEFORE -> densitySelector = (rnd, nd) -> {
-                    double d = selector.getDensity(rnd, nd);
-                    return d >= 0 ? d : existing.getDensity(rnd, nd);
+                case SPLICE_BEFORE -> densitySelector = (rnd, x, z,nd) -> {
+                    double d = selector.getDensity(rnd, x, z, nd);
+                    return d >= 0 ? d : existing.getDensity(rnd, x, z, nd);
                 };
-                case SPLICE_AFTER -> densitySelector = (rnd, nd) -> {
-                    double d = existing.getDensity(rnd, nd);
-                    return d >= 0 ? d : selector.getDensity(rnd, nd);
+                case SPLICE_AFTER -> densitySelector = (rnd, x, z, nd) -> {
+                    double d = existing.getDensity(rnd, x, z, nd);
+                    return d >= 0 ? d : selector.getDensity(rnd, x, z, nd);
                 };
             }
         }
@@ -295,8 +295,8 @@ public class BiomeDatabase {
 
         public void reset() {
             this.speciesSelector = (pos, dirt, rnd) -> new BiomePropertySelectors.SpeciesSelection();
-            this.densitySelector = (rnd, nd) -> -1;
-            this.chanceSelector = (rnd, spc, rad) -> BiomePropertySelectors.Chance.UNHANDLED;
+            this.densitySelector = (rnd, x, z, nd) -> -1;
+            this.chanceSelector = (rnd, spc, x, z, rad) -> BiomePropertySelectors.Chance.UNHANDLED;
             this.forestness = 0.0F;
             this.heightmap = "WORLD_SURFACE_WG";
             this.blacklisted = false;
@@ -342,7 +342,7 @@ public class BiomeDatabase {
     public static class CaveRootedData {
 
         SpeciesSelector speciesSelector = (pos, dirt, rnd) -> new SpeciesSelection();
-        ChanceSelector chanceSelector = (rnd, spc, rad) -> Chance.UNHANDLED;
+        ChanceSelector chanceSelector = (rnd, spc, x, z, rad) -> Chance.UNHANDLED;
 
         /**
          * If {@code true}, the tree will always be generated on the surface. Otherwise, it will be
@@ -399,13 +399,13 @@ public class BiomeDatabase {
             ChanceSelector existing = chanceSelector;
             switch (op) {
                 case REPLACE -> chanceSelector = selector;
-                case SPLICE_BEFORE -> chanceSelector = (rnd, spc, rad) -> {
-                    Chance c = selector.getChance(rnd, spc, rad);
-                    return c != Chance.UNHANDLED ? c : existing.getChance(rnd, spc, rad);
+                case SPLICE_BEFORE -> chanceSelector = (rnd, spc, x, z, rad) -> {
+                    Chance c = selector.getChance(rnd, spc, x, z, rad);
+                    return c != Chance.UNHANDLED ? c : existing.getChance(rnd, spc, x, z, rad);
                 };
-                case SPLICE_AFTER -> chanceSelector = (rnd, spc, rad) -> {
-                    Chance c = existing.getChance(rnd, spc, rad);
-                    return c != Chance.UNHANDLED ? c : selector.getChance(rnd, spc, rad);
+                case SPLICE_AFTER -> chanceSelector = (rnd, spc, x, z, rad) -> {
+                    Chance c = existing.getChance(rnd, spc, x, z, rad);
+                    return c != Chance.UNHANDLED ? c : selector.getChance(rnd, spc, x, z, rad);
                 };
             }
         }

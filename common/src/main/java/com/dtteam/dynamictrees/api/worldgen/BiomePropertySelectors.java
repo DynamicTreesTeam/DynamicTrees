@@ -24,12 +24,12 @@ public class BiomePropertySelectors {
 
     @FunctionalInterface
     public interface ChanceSelector {
-        Chance getChance(RandomSource random, @NotNull Species species, int radius);
+        Chance getChance(RandomSource random, @NotNull Species species, int x, int z, int radius);
     }
 
     @FunctionalInterface
     public interface DensitySelector {
-        double getDensity(RandomSource random, double noiseDensity);
+        double getDensity(RandomSource random, int x, int z, double noiseDensity);
     }
 
     @FunctionalInterface

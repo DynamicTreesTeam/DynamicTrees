@@ -32,7 +32,7 @@ public final class DensitySelectorDeserializer implements JsonBiomeDatabaseDeser
     }
 
     private BiomePropertySelectors.DensitySelector createStaticDensitySelector(float density) {
-        return (rnd, n) -> density;
+        return (rnd, x, z, n) -> density;
     }
 
     private BiomePropertySelectors.DensitySelector createScaleDensitySelector(JsonArray jsonArray,
@@ -48,11 +48,11 @@ public final class DensitySelectorDeserializer implements JsonBiomeDatabaseDeser
         }
 
         return switch (parameters.size()) {
-            case 0 -> (rnd, n) -> n;
-            case 1 -> (rnd, n) -> n * parameters.getFirst();
-            case 2 -> (rnd, n) -> (n * parameters.getFirst()) + parameters.get(1);
-            case 3 -> (rnd, n) -> ((n * parameters.getFirst()) + parameters.get(1)) * parameters.get(2);
-            default -> (rnd, n) -> 0.0f;
+            case 0 -> (rnd, x, z, n) -> n;
+            case 1 -> (rnd, x, z, n) -> n * parameters.getFirst();
+            case 2 -> (rnd, x, z, n) -> (n * parameters.getFirst()) + parameters.get(1);
+            case 3 -> (rnd, x, z, n) -> ((n * parameters.getFirst()) + parameters.get(1)) * parameters.get(2);
+            default -> (rnd, x, z, n) -> 0.0f;
         };
     }
 
@@ -66,7 +66,7 @@ public final class DensitySelectorDeserializer implements JsonBiomeDatabaseDeser
                 .elseMapIfContains(STATIC, Float.class, this::createStaticDensitySelector)
                 .elseMapIfContains(MATH, JsonElement.class, input -> {
                     final JsonMath jsonMath = new JsonMath(input);
-                    return (rnd, n) -> jsonMath.apply(rnd, (float) n);
+                    return (rnd, x, z, n) -> jsonMath.apply(rnd, x, z, (float) n);
                 }).elseTypeError()
                 .forEachWarning(warningConsumer)
                 .orElseThrow();
