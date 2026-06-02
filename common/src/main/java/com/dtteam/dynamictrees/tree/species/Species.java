@@ -307,6 +307,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     private final Set<Pod> pods = new HashSet<>();
 
+    private boolean overrideSaplingReplacementWhenCrouching = false;
+
     /**
      * Blank constructor for {@link #NULL_SPECIES}.
      */
@@ -785,6 +787,14 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     public Set<SeedSaplingRecipe> getPrimitiveSaplingRecipes() {
         return new HashSet<>(this.primitiveSaplingRecipe);
+    }
+
+    public void setOverrideSaplingReplacementWhenCrouching(boolean overrideSaplingReplacementWhenCrouching) {
+        this.overrideSaplingReplacementWhenCrouching = overrideSaplingReplacementWhenCrouching;
+    }
+
+    public boolean overrideSaplingReplacementWhenCrouching() {
+        return overrideSaplingReplacementWhenCrouching;
     }
 
     public Species addPrimitiveSaplingItem(final Item primitiveSaplingItem) {

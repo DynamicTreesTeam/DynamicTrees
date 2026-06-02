@@ -50,10 +50,12 @@ public class VanillaSaplingEventHandler {
         Species targetSpecies = DynamicSaplingBlock.SAPLING_REPLACERS.get(block);
         Species species = targetSpecies.selfOrLocationOverride(level, placePos);
 
-        if (species.plantSapling(level, placePos, targetSpecies != species)) {
-            if (!player.isCreative()) {
-                stack.shrink(1);
-            }
+        if (species.overrideSaplingReplacementWhenCrouching() && player.isCrouching()){
+            return InteractionResult.PASS;
+        }
+
+        if (!species.plantSapling(level, placePos, targetSpecies != species)) {
+            if (!player.isCreative()) stack.grow(1);
             return InteractionResult.SUCCESS;
         }
 
