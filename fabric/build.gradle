@@ -75,6 +75,8 @@ loom {
         modImplementation "curse.maven:serene-seasons-291874:5753502"
 
         modCompileOnly "curse.maven:continuity-531351:5962881"
+
+        modRuntimeOnly "maven.modrinth:sodium:u1OEbNKx"
     }
 
 }
