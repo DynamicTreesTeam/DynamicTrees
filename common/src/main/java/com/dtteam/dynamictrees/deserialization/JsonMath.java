@@ -1,6 +1,7 @@
 package com.dtteam.dynamictrees.deserialization;
 
 import com.dtteam.dynamictrees.tree.species.Species;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.util.RandomSource;
@@ -42,9 +43,15 @@ public class JsonMath {
         return NULL_OPERATOR;
     }
 
-    private Species[] tryGetSpeciesList(JsonElement element) {
+    /**
+     * Attempt to parse each entry in a JsonArray, assuming each is intended to be a Species.
+     * Because a species entry is assumed to be a String, non-string entries are skipped.
+     * @param speciesArray JsonArray containing string entries to parse into Species instances.
+     * @return An array of valid Species, or an empty array if none are valid.
+     */
+    private Species[] tryGetSpeciesList(JsonArray speciesArray) {
         List<Species> validSpecies = new ArrayList<>();
-        for (JsonElement listElement : element.getAsJsonArray()) {
+        for (JsonElement listElement : speciesArray) {
             if (listElement.isJsonPrimitive() && listElement.getAsJsonPrimitive().isString()) {
                 if (Species.findSpeciesSloppy(listElement.getAsJsonPrimitive().getAsString()) != Species.NULL_SPECIES) {
                     validSpecies.add(Species.findSpeciesSloppy(listElement.getAsJsonPrimitive().getAsString()));
@@ -71,7 +78,7 @@ public class JsonMath {
             for (JsonElement parameter : value.getAsJsonArray()) {
                 MathOperator m = NULL_OPERATOR;
                 if (parameter.isJsonArray()) {
-                    speciesList = tryGetSpeciesList(parameter);
+                    speciesList = tryGetSpeciesList(parameter.getAsJsonArray());
                 } else if (parameter.isJsonObject()) {
                     Entry<String, JsonElement> entry = parameter.getAsJsonObject().entrySet().iterator().next();
                     m = processElement(entry.getKey(), entry.getValue());
