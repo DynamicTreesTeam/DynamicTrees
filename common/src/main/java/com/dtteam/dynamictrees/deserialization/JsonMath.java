@@ -111,11 +111,11 @@ public class JsonMath {
             case IFGT -> new IfGreaterThan(paramArray);
             case SPECIES -> {
                 if (speciesArg != Species.NULL_SPECIES) {
-                    yield  new IfSpecies(speciesArg, paramArray);
+                    yield new IfSpecies(speciesArg, paramArray);
                 } else if (speciesList != null && speciesList.length > 0) {
                     yield new IfSpecies(speciesList, paramArray);
                 }
-                yield null;
+                yield NULL_OPERATOR;
             }
             case DEBUG -> new Debug(paramArray);
             default -> NULL_OPERATOR;
