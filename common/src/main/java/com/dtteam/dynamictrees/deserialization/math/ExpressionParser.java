@@ -12,7 +12,20 @@ import java.util.Locale;
 public final class ExpressionParser {
     
     private static final HashMap<String, MathOperator> CACHE = new HashMap<>();
-    
+
+    public static final HashMap<String, MathOperatorBuilder> FUNCTIONS = new HashMap<>();
+    static {
+        FUNCTIONS.put("perlin", args->Noise.build(NoiseType.PERLIN, args));
+        FUNCTIONS.put("simplex", args->Noise.build(NoiseType.SIMPLEX, args));
+        FUNCTIONS.put("noise", args->Noise.build(NoiseType.LEGACY, args));
+        FUNCTIONS.put("rand", args->mc -> mc.rand().nextDouble());
+        FUNCTIONS.put("min", MinOperator::new);
+        FUNCTIONS.put("max", MaxOperator::new);
+        FUNCTIONS.put("if", IfOperator::new);
+        FUNCTIONS.put("lerp", LerpOperator::new);
+        FUNCTIONS.put("debug", Debug::new);
+    }
+
     private final String expression;
     private int cursor;
     
@@ -164,19 +177,12 @@ public final class ExpressionParser {
         }
         
         final MathOperator[] argumentArray = arguments.toArray(new MathOperator[0]);
-        
-        return switch (name) {
-            case "perlin" -> Noise.build(NoiseType.PERLIN, argumentArray);
-            case "simplex" -> Noise.build(NoiseType.SIMPLEX, argumentArray);
-            case "noise" -> Noise.build(NoiseType.LEGACY, argumentArray);
-            case "rand" -> mc -> mc.rand().nextDouble();
-            case "min" -> new MinOperator(argumentArray);
-            case "max" -> new MaxOperator(argumentArray);
-            case "if" -> new IfOperator(argumentArray);
-            case "lerp" -> new LerpOperator(argumentArray);
-            case "debug" -> new Debug(argumentArray);
-            default -> throw error("Invalid function \"" + name + "\".");
-        };
+
+        if (FUNCTIONS.containsKey(name)){
+            return FUNCTIONS.get(name).build(argumentArray);
+        } else {
+            throw error("Invalid function \"" + name + "\".");
+        }
     }
     
     private MathOperator parseIsSpeciesFunction() {
