@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.deserialization.deserializer.worldgen;
 
 import com.dtteam.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.dtteam.dynamictrees.deserialization.DeserializationException;
-import com.dtteam.dynamictrees.deserialization.math.MathOperator;
+import com.dtteam.dynamictrees.deserialization.math.operator.MathOperator;
 import com.dtteam.dynamictrees.deserialization.math.ExpressionParser;
 import com.dtteam.dynamictrees.deserialization.JsonMath;
 import com.dtteam.dynamictrees.deserialization.result.JsonResult;

@@ -1,4 +1,6 @@
-package com.dtteam.dynamictrees.deserialization.math;
+package com.dtteam.dynamictrees.deserialization.math.operator;
+
+import com.dtteam.dynamictrees.deserialization.math.MathContext;
 
 public class MaxOperator implements MathOperator {
 	

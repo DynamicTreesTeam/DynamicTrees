@@ -1,6 +1,7 @@
-package com.dtteam.dynamictrees.deserialization.math;
+package com.dtteam.dynamictrees.deserialization.math.operator;
 
-import org.apache.logging.log4j.LogManager;
+import com.dtteam.dynamictrees.DynamicTrees;
+import com.dtteam.dynamictrees.deserialization.math.MathContext;
 
 public class Debug implements MathOperator {
 	
@@ -14,7 +15,7 @@ public class Debug implements MathOperator {
 	public double apply(MathContext mc) {
 		if (functions.length >= 1) {
 			double val = functions[0].apply(mc);
-			LogManager.getLogger().debug("Json Debug Value: " + val);
+            DynamicTrees.LOG.info("Json Debug Value: {}", val);
 			return val;
 		}
 		return 0;

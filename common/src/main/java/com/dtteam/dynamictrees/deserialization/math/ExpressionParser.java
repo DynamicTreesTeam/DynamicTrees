@@ -1,6 +1,7 @@
 package com.dtteam.dynamictrees.deserialization.math;
 
 import com.dtteam.dynamictrees.deserialization.math.noise.NoiseType;
+import com.dtteam.dynamictrees.deserialization.math.operator.*;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.google.gson.JsonParseException;
 
@@ -15,15 +16,40 @@ public final class ExpressionParser {
 
     public static final HashMap<String, MathOperatorBuilder> FUNCTIONS = new HashMap<>();
     static {
+        //Basic
+        FUNCTIONS.put("min", MinOperator::new);
+        FUNCTIONS.put("max", MaxOperator::new);
+        FUNCTIONS.put("avg", AverageOperator::new);
+        FUNCTIONS.put("sqrt", args -> new FunctionOperator(Math::sqrt, args));
+        FUNCTIONS.put("pow", args -> new BiFunctionOperator(Math::pow, args));
+        FUNCTIONS.put("lerp", LerpOperator::new);
+        FUNCTIONS.put("map", MapOperator::new);
+        //Logic
+        FUNCTIONS.put("if", IfOperator::new);
+        //Noise
         FUNCTIONS.put("perlin", args->Noise.build(NoiseType.PERLIN, args));
         FUNCTIONS.put("simplex", args->Noise.build(NoiseType.SIMPLEX, args));
         FUNCTIONS.put("noise", args->Noise.build(NoiseType.LEGACY, args));
         FUNCTIONS.put("rand", args->mc -> mc.rand().nextDouble());
-        FUNCTIONS.put("min", MinOperator::new);
-        FUNCTIONS.put("max", MaxOperator::new);
-        FUNCTIONS.put("if", IfOperator::new);
-        FUNCTIONS.put("lerp", LerpOperator::new);
+        //Trig
+        FUNCTIONS.put("sin", args -> new FunctionOperator(Math::sin, args));
+        FUNCTIONS.put("arcsin", args -> new FunctionOperator(Math::asin, args));
+        FUNCTIONS.put("cos", args -> new FunctionOperator(Math::cos, args));
+        FUNCTIONS.put("arccos", args -> new FunctionOperator(Math::acos, args));
+        FUNCTIONS.put("tan", args -> new FunctionOperator(Math::tan, args));
+        FUNCTIONS.put("arctan", args -> new FunctionOperator(Math::atan, args));
+        FUNCTIONS.put("arctan2", args -> new BiFunctionOperator(Math::atan2, args));
+        //Misc
         FUNCTIONS.put("debug", Debug::new);
+    }
+
+    public static final HashMap<String, MathOperator> VARIABLES = new HashMap<>();
+    static {
+        VARIABLES.put("x", mc -> mc.pos().getX());
+        VARIABLES.put("y", mc -> mc.pos().getY());
+        VARIABLES.put("z", mc -> mc.pos().getZ());
+        VARIABLES.put("radius", MathContext::radius);
+        VARIABLES.put("pi", mc -> Math.PI);
     }
 
     private final String expression;
@@ -45,14 +71,29 @@ public final class ExpressionParser {
     }
     
     private MathOperator parse() {
-        final MathOperator operator = parseComparison();
+        final MathOperator operator = parseBoolean();
         skipWhitespace();
         if (!isAtEnd()) {
             throw error("Unexpected token \"" + peek() + "\".");
         }
         return operator;
     }
-    
+
+    private MathOperator parseBoolean() {
+        MathOperator left = parseComparison();
+
+        while (true) {
+            skipWhitespace();
+            if (consume("&&")) {
+                left = new BooleanLogicOperator(left, parseComparison(), BooleanType.AND);
+            } else if (consume("||")) {
+                left = new BooleanLogicOperator(left, parseComparison(), BooleanType.OR);
+            } else {
+                return left;
+            }
+        }
+    }
+
     private MathOperator parseComparison() {
         MathOperator left = parseAdditive();
         
@@ -115,6 +156,9 @@ public final class ExpressionParser {
         }
         if (consume("-")) {
             return new ArithmeticOperator(new Const(0), parseUnary(), ArithmeticType.SUB);
+        }
+        if (consume("!")) {
+            return new BooleanLogicOperator(new Const(0), parseUnary(), BooleanType.NOT);
         }
         return parsePrimary();
     }
@@ -219,13 +263,11 @@ public final class ExpressionParser {
     }
     
     private MathOperator parseVariable(String name) {
-        return switch (name) {
-            case "x" -> mc -> mc.pos().getX();
-            case "y" -> mc -> mc.pos().getY();
-            case "z" -> mc -> mc.pos().getZ();
-            case "radius" -> MathContext::radius;
-            default -> throw error("Unknown variable \"" + name + "\".");
-        };
+        if (VARIABLES.containsKey(name)){
+            return VARIABLES.get(name);
+        } else {
+            throw error("Unknown variable \"" + name + "\".");
+        }
     }
     
     private String parseIdentifier() {

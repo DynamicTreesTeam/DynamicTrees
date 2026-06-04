@@ -12,7 +12,7 @@ public record MathContext(
 ) {
 
 	public MathContext(RandomSource rand) {
-		this(Vec3i.ZERO, rand, Species.NULL_SPECIES, 0);
+		this(Vec3i.ZERO, rand);
 	}
 
 	public MathContext(Vec3i pos, RandomSource rand) {

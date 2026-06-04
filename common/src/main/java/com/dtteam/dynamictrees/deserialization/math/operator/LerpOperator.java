@@ -1,5 +1,6 @@
-package com.dtteam.dynamictrees.deserialization.math;
+package com.dtteam.dynamictrees.deserialization.math.operator;
 
+import com.dtteam.dynamictrees.deserialization.math.MathContext;
 import net.minecraft.util.Mth;
 
 public class LerpOperator implements MathOperator {
