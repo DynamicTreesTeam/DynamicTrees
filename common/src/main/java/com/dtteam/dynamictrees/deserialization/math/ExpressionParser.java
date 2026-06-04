@@ -76,7 +76,6 @@ public final class ExpressionParser {
     
     private MathOperator parse() {
         final MathOperator operator = parseBoolean();
-        skipWhitespace();
         if (!isAtEnd()) {
             throw error("Unexpected token \"" + peek() + "\".");
         }
@@ -87,7 +86,6 @@ public final class ExpressionParser {
         MathOperator left = parseComparison();
 
         while (true) {
-            skipWhitespace();
             if (consume("&&")) {
                 left = new BooleanLogicOperator(left, parseComparison(), BooleanType.AND);
             } else if (consume("||")) {
@@ -104,7 +102,6 @@ public final class ExpressionParser {
         MathOperator left = parseAdditive();
         
         while (true) {
-            skipWhitespace();
             if (consume(">=")) {
                 left = new ComparisonOperator(left, parseAdditive(), ComparisonType.GREATER_THAN_OR_EQUAL);
             } else if (consume("<=")) {
@@ -127,7 +124,6 @@ public final class ExpressionParser {
         MathOperator left = parseMultiplicative();
         
         while (true) {
-            skipWhitespace();
             if (consume("+")) {
                 left = new ArithmeticOperator(left, parseMultiplicative(), ArithmeticType.ADD);
             } else if (consume("-")) {
@@ -142,7 +138,6 @@ public final class ExpressionParser {
         MathOperator left = parseUnary();
         
         while (true) {
-            skipWhitespace();
             if (consume("*")) {
                 left = new ArithmeticOperator(left, parseUnary(), ArithmeticType.MUL);
             } else if (consume("/")) {
@@ -156,7 +151,6 @@ public final class ExpressionParser {
     }
     
     private MathOperator parseUnary() {
-        skipWhitespace();
         if (consume("+")) {
             return parseUnary();
         }
@@ -170,7 +164,6 @@ public final class ExpressionParser {
     }
     
     private MathOperator parsePrimary() {
-        skipWhitespace();
         if (consume("(")) {
             final MathOperator operator = parseComparison();
             expect(")", "Expected closing parenthesis.");
@@ -181,7 +174,6 @@ public final class ExpressionParser {
         }
         if (isIdentifierStart(peek())) {
             final String identifier = parseIdentifier().toLowerCase(Locale.ENGLISH);
-            skipWhitespace();
             if (consume("(")) {
                 return parseFunction(identifier);
             }
@@ -217,11 +209,9 @@ public final class ExpressionParser {
         }
         
         final ArrayList<MathOperator> arguments = new ArrayList<>();
-        skipWhitespace();
         if (!consume(")")) {
             do {
                 arguments.add(parseComparison());
-                skipWhitespace();
             } while (consume(","));
             expect(")", "Expected closing parenthesis after function arguments.");
         }
@@ -237,7 +227,6 @@ public final class ExpressionParser {
     
     private MathOperator parseIsSpeciesFunction() {
         final List<Species> speciesList = new ArrayList<>();
-        skipWhitespace();
 
         if (!consume(")")) {
             do {
@@ -246,7 +235,6 @@ public final class ExpressionParser {
                 if (species != Species.NULL_SPECIES) {
                     speciesList.add(species);
                 }
-                skipWhitespace();
             } while (consume(","));
 
             expect(")", "Expected closing parenthesis after species function arguments.");
@@ -256,7 +244,6 @@ public final class ExpressionParser {
     }
 
     private String parseSpeciesName() {
-        skipWhitespace();
         if (peek() != '\'') {
             throw error("Expected single-quoted species name.");
         }
@@ -315,20 +302,13 @@ public final class ExpressionParser {
     }
     
     private boolean consume(String token) {
-        skipWhitespace();
         if (expression.startsWith(token, cursor)) {
             cursor += token.length();
             return true;
         }
         return false;
     }
-    
-    private void skipWhitespace() {
-        while (!isAtEnd() && Character.isWhitespace(peek())) {
-            cursor++;
-        }
-    }
-    
+
     private boolean isNumberStart() {
         return Character.isDigit(peek()) || (peek() == '.' && cursor + 1 < expression.length() &&
             Character.isDigit(expression.charAt(cursor + 1)));
