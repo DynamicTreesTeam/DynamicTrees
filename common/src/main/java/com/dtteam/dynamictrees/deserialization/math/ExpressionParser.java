@@ -164,7 +164,7 @@ public final class ExpressionParser {
             return new ArithmeticOperator(new Const(0), parseUnary(), ArithmeticType.SUB);
         }
         if (consume("!")) {
-            return new BooleanLogicOperator(new Const(0), parseUnary(), BooleanType.NOT);
+            return new BooleanLogicOperator(parseUnary(), new Const(0), BooleanType.NOT);
         }
         return parsePrimary();
     }

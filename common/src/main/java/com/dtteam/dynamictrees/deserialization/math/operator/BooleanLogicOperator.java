@@ -19,7 +19,7 @@ public class BooleanLogicOperator implements MathOperator {
 	public double apply(MathContext mc) {
 		final boolean leftValue = isTrue(left.apply(mc));
 		return switch (operator) {
-			case NOT -> !isTrue(right.apply(mc));
+			case NOT -> !leftValue;
 			case AND -> leftValue && isTrue(right.apply(mc));
 			case OR -> leftValue || isTrue(right.apply(mc));
 			case XOR -> leftValue ^ isTrue(right.apply(mc));
