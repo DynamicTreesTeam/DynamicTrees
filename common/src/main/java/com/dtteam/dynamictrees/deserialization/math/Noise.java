@@ -13,28 +13,20 @@ public class Noise implements MathOperator {
 	private final MathOperator xFunc;
 	private final MathOperator yFunc;
 	private final MathOperator zFunc;
-	private final double scale;
 	private final NoiseModel noise;
 	
-	private Noise(
-		MathOperator xFunc,
-		MathOperator yFunc,
-		MathOperator zFunc,
-		double scale,
-		NoiseModel noise
-	) {
+	private Noise(MathOperator xFunc, MathOperator yFunc, MathOperator zFunc, NoiseModel noise) {
 		this.xFunc = xFunc;
 		this.yFunc = yFunc;
 		this.zFunc = zFunc;
-		this.scale = scale;
 		this.noise = noise;
 	}
 	
 	@Override
 	public double apply(MathContext mc) {
-		double x = xFunc.apply(mc) * scale;
-		double y = yFunc.apply(mc) * scale;
-		double z = zFunc.apply(mc) * scale;
+		double x = xFunc.apply(mc);
+		double y = yFunc.apply(mc);
+		double z = zFunc.apply(mc);
 		return normalize(noise.sample(x, y, z));
 	}
 	
@@ -42,29 +34,16 @@ public class Noise implements MathOperator {
 		return (val + 1.0) / 2.0;
 	}
 	
-	public static Noise build(
-		NoiseType noiseType
-	) {
-		return build(noiseType, new MathOperator[]{}, DEFAULT_SCALE);
+	public static Noise build(NoiseType noiseType) {
+		return build(noiseType, new MathOperator[]{});
 	}
 	
-	public static Noise build(
-		NoiseType noiseType,
-		MathOperator[] functions
-	) {
-		return build(noiseType, functions, DEFAULT_SCALE);
-	}
-	
-	public static Noise build(
-		NoiseType noiseType,
-		MathOperator[] functions,
-		double scale
-	) {
+	public static Noise build(NoiseType noiseType, MathOperator[] functions) {
 		int numArgs = functions.length;
 		
-		MathOperator xFunc = numArgs > 0 ? functions[0] : mc -> mc.pos().getX();
-		MathOperator yFunc = numArgs > 1 ? functions[1] : mc -> mc.pos().getY();
-		MathOperator zFunc = numArgs > 2 ? functions[2] : mc -> mc.pos().getZ();
+		MathOperator xFunc = numArgs > 0 ? functions[0] : mc -> mc.pos().getX() * DEFAULT_SCALE;
+		MathOperator yFunc = numArgs > 1 ? functions[1] : mc -> mc.pos().getY() * DEFAULT_SCALE;
+		MathOperator zFunc = numArgs > 2 ? functions[2] : mc -> mc.pos().getZ() * DEFAULT_SCALE;
 		
 		WorldgenRandom random = new WorldgenRandom(WorldgenRandom.Algorithm.LEGACY.newInstance(BASE_SEED));
 		MathContext mc = new MathContext(random);
@@ -91,7 +70,7 @@ public class Noise implements MathOperator {
 			case LEGACY -> new PerlinSimplexNoiseModel(new WorldgenRandom(WorldgenRandom.Algorithm.LEGACY.newInstance(BASE_SEED)), octaves);
 		};
 		
-		return new Noise(xFunc, yFunc, zFunc, scale, model);
+		return new Noise(xFunc, yFunc, zFunc, model);
 	}
 	
 }
