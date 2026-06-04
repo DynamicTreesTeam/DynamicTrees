@@ -17,6 +17,7 @@ public final class ExpressionParser {
     private int cursor;
     
     public static MathOperator parse(String expression) {
+        expression = expression.replaceAll("\\s", "");
         if (CACHE.containsKey(expression)) {
             return CACHE.get(expression);
         }
