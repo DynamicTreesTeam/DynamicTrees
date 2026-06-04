@@ -59,7 +59,7 @@ public final class ExpressionParser {
     private final String expression;
     private int cursor;
     
-    public static MathOperator parse(String expression) {
+    public static MathOperator parse(String expression) throws JsonParseException {
         expression = expression.replaceAll("\\s", "");
         if (CACHE.containsKey(expression)) {
             return CACHE.get(expression);
@@ -218,10 +218,14 @@ public final class ExpressionParser {
         
         final MathOperator[] argumentArray = arguments.toArray(new MathOperator[0]);
 
-        if (FUNCTIONS.containsKey(name)){
-            return FUNCTIONS.get(name).build(argumentArray);
-        } else {
-            throw error("Invalid function \"" + name + "\".");
+        try {
+            if (FUNCTIONS.containsKey(name)){
+                return FUNCTIONS.get(name).build(argumentArray);
+            } else {
+                throw error("Invalid function: \"" + name + "\" does not exist.");
+            }
+        } catch (IllegalArgumentException e){
+            throw error("Invalid function \"" + name + "\": "+e.getMessage()+".");
         }
     }
     

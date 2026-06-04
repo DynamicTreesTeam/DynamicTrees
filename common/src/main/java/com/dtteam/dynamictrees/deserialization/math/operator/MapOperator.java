@@ -12,12 +12,12 @@ public class MapOperator implements MathOperator {
 	private final MathOperator toEnd;
 
 	public MapOperator(MathOperator[] functionArray) {
-		int numArgs = functionArray.length;
-		this.delta = numArgs > 0 ? functionArray[0] : NullOperator.NULL;
-		this.fromStart = numArgs > 1 ? functionArray[1] : NullOperator.NULL;
-		this.fromEnd = numArgs > 2 ? functionArray[2] : NullOperator.NULL;
-		this.toStart = numArgs > 3 ? functionArray[3] : NullOperator.NULL;
-		this.toEnd = numArgs > 4 ? functionArray[4] : NullOperator.NULL;
+		throwIfInvalidParameterLength(functionArray.length, 5);
+		this.delta = functionArray[0];
+		this.fromStart = functionArray[1];
+		this.fromEnd = functionArray[2];
+		this.toStart = functionArray[3];
+		this.toEnd = functionArray[4];
 	}
 
 	@Override

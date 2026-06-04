@@ -7,6 +7,7 @@ public class MinOperator implements MathOperator {
 	private final MathOperator[] functions;
 	
 	public MinOperator(MathOperator[] functionArray) {
+		throwIfInvalidParameterLengthMin(functionArray.length, 1);
 		this.functions = functionArray;
 	}
 	

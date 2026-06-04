@@ -10,10 +10,10 @@ public class LerpOperator implements MathOperator {
 	private final MathOperator end;
 
 	public LerpOperator(MathOperator[] functionArray) {
-		int numArgs = functionArray.length;
-		this.delta = numArgs > 0 ? functionArray[0] : NullOperator.NULL;
-		this.start = numArgs > 1 ? functionArray[1] : NullOperator.NULL;
-		this.end = numArgs > 2 ? functionArray[2] : NullOperator.NULL;
+		throwIfInvalidParameterLength(functionArray.length, 3);
+		this.delta = functionArray[0];
+		this.start = functionArray[1];
+		this.end = functionArray[2];
 	}
 
 	@Override

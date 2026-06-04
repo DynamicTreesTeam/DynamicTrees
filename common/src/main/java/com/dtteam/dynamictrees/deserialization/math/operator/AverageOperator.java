@@ -7,6 +7,7 @@ public class AverageOperator implements MathOperator {
 	private final MathOperator[] functions;
 
 	public AverageOperator(MathOperator[] functionArray) {
+		throwIfInvalidParameterLengthMin(functionArray.length, 1);
 		this.functions = functionArray;
 	}
 	

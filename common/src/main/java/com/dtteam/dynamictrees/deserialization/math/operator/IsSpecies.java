@@ -10,6 +10,7 @@ public class IsSpecies implements MathOperator {
 	private final List<Species> species;
 	
 	public IsSpecies(List<Species> species) {
+		throwIfInvalidParameterLengthMin(species.size(), 1);
 		this.species = species;
 	}
 	

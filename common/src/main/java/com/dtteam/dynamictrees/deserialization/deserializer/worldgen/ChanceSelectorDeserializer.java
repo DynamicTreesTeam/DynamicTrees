@@ -9,6 +9,7 @@ import com.dtteam.dynamictrees.deserialization.result.JsonResult;
 import com.dtteam.dynamictrees.deserialization.result.Result;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
@@ -71,8 +72,7 @@ public final class ChanceSelectorDeserializer implements JsonBiomeDatabaseDeseri
             : BiomePropertySelectors.Chance.CANCEL;
     }
     
-    private BiomePropertySelectors.ChanceSelector readExpressionSelector(String string, Consumer<String> warningConsumer
-    ) {
+    private BiomePropertySelectors.ChanceSelector readExpressionSelector(String string, Consumer<String> warningConsumer) {
         
         if ("standard".equalsIgnoreCase(string)) {
             return mc -> mc.rand().nextFloat() < (mc.radius() > 3 ? 2.0f / mc.radius() : 1.0f) ?
@@ -82,7 +82,7 @@ public final class ChanceSelectorDeserializer implements JsonBiomeDatabaseDeseri
         try {
             MathOperator expression =  ExpressionParser.parse(string);
             return mc -> mc.rand().nextDouble() < expression.apply(mc) ? BiomePropertySelectors.Chance.OK : BiomePropertySelectors.Chance.CANCEL;
-        } catch (Exception e) {
+        } catch (JsonParseException e) {
             warningConsumer.accept("Failed to parse expression: \"" + string + "\", error: " + e.getMessage());
             return mc -> BiomePropertySelectors.Chance.CANCEL;
         }

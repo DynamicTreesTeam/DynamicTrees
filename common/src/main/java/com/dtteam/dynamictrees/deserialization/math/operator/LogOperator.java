@@ -12,9 +12,9 @@ public class LogOperator implements MathOperator {
 	private final MathOperator value;
 
 	public LogOperator(MathOperator[] functionArray) {
-		int numArgs = functionArray.length;
-		this.value = numArgs > 0 ? functionArray[0] : NullOperator.NULL;
-		this.base = numArgs > 1 ? functionArray[1] : mc -> Math.E;
+		throwIfInvalidParameterLengthRange(functionArray.length, 1, 2);
+		this.value = functionArray[0];
+		this.base = functionArray.length >= 2 ? functionArray[1] : mc -> Math.E;
 	}
 
 	@Override

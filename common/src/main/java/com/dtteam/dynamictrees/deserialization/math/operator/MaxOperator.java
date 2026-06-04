@@ -7,6 +7,7 @@ public class MaxOperator implements MathOperator {
 	private final MathOperator[] functions;
 	
 	public MaxOperator(MathOperator[] functionArray) {
+		throwIfInvalidParameterLengthMin(functionArray.length, 1);
 		this.functions = functionArray;
 	}
 	

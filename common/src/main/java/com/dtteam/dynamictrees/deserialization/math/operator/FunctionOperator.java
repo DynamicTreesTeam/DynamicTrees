@@ -10,8 +10,8 @@ public class FunctionOperator implements MathOperator {
 	private final Function<Double, Double> function;
 
 	public FunctionOperator(Function<Double, Double> function, MathOperator[] functionArray) {
-		int numArgs = functionArray.length;
-		this.value = numArgs > 0 ? functionArray[0] : NullOperator.NULL;
+		throwIfInvalidParameterLength(functionArray.length, 1);
+		this.value = functionArray[0];
 		this.function = function;
 	}
 

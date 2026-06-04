@@ -10,6 +10,7 @@ import com.dtteam.dynamictrees.deserialization.result.Result;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -38,10 +39,7 @@ public final class DensitySelectorDeserializer implements JsonBiomeDatabaseDeser
     }
 
     @Deprecated
-    private BiomePropertySelectors.DensitySelector createScaleDensitySelector(
-        JsonArray jsonArray,
-        Consumer<String> warningConsumer
-    ) {
+    private BiomePropertySelectors.DensitySelector createScaleDensitySelector(JsonArray jsonArray, Consumer<String> warningConsumer) {
         final List<Double> parameters = new ArrayList<>();
 
         for (final JsonElement element : jsonArray) {
@@ -57,10 +55,7 @@ public final class DensitySelectorDeserializer implements JsonBiomeDatabaseDeser
 
     @Nullable
     @Deprecated
-    private BiomePropertySelectors.DensitySelector readDensitySelector(
-        JsonObject jsonObject,
-        Consumer<String> warningConsumer
-    ) throws DeserializationException {
+    private BiomePropertySelectors.DensitySelector readDensitySelector(JsonObject jsonObject, Consumer<String> warningConsumer) throws DeserializationException {
         return JsonResult.forInput(jsonObject)
                 .mapIfContains(SCALE, JsonArray.class, this::createScaleDensitySelector)
                 .elseMapIfContains(STATIC, Double.class, this::createStaticDensitySelector)
@@ -72,14 +67,11 @@ public final class DensitySelectorDeserializer implements JsonBiomeDatabaseDeser
                 .orElseThrow();
     }
     
-    private BiomePropertySelectors.DensitySelector readExpressionSelector(
-        String string,
-        Consumer<String> warningConsumer
-    ) {
+    private BiomePropertySelectors.DensitySelector readExpressionSelector(String string, Consumer<String> warningConsumer) {
         try {
             MathOperator expression = ExpressionParser.parse(string);
             return expression::apply;
-        } catch (Exception e) {
+        } catch (JsonParseException e) {
             warningConsumer.accept("Failed to parse expression: \"" + string + "\", error: " + e.getMessage());
             return mc -> 0.0f;
         }
