@@ -16,14 +16,18 @@ public final class ExpressionParser {
 
     public static final HashMap<String, MathOperatorBuilder> FUNCTIONS = new HashMap<>();
     static {
-        //Basic
+        //Basic Math
         FUNCTIONS.put("min", MinOperator::new);
         FUNCTIONS.put("max", MaxOperator::new);
         FUNCTIONS.put("avg", AverageOperator::new);
         FUNCTIONS.put("sqrt", args -> new FunctionOperator(Math::sqrt, args));
         FUNCTIONS.put("pow", args -> new BiFunctionOperator(Math::pow, args));
+        FUNCTIONS.put("exp", args -> new FunctionOperator(Math::exp, args));
         FUNCTIONS.put("lerp", LerpOperator::new);
         FUNCTIONS.put("map", MapOperator::new);
+        FUNCTIONS.put("clamp", ClampOperator::new);
+        FUNCTIONS.put("abs", args -> new FunctionOperator(Math::abs, args));
+        FUNCTIONS.put("log", LogOperator::new);
         //Logic
         FUNCTIONS.put("if", IfOperator::new);
         //Noise
@@ -88,6 +92,8 @@ public final class ExpressionParser {
                 left = new BooleanLogicOperator(left, parseComparison(), BooleanType.AND);
             } else if (consume("||")) {
                 left = new BooleanLogicOperator(left, parseComparison(), BooleanType.OR);
+            } else if (consume("^")) {
+                left = new BooleanLogicOperator(left, parseComparison(), BooleanType.XOR);
             } else {
                 return left;
             }

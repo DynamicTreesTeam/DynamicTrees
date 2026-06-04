@@ -17,12 +17,17 @@ public class BooleanLogicOperator implements MathOperator {
 	
 	@Override
 	public double apply(MathContext mc) {
-		final boolean leftValue = left.apply(mc) > 0.5;
-		final boolean rightValue = right.apply(mc) > 0.5;
+		final boolean leftValue = isTrue(left.apply(mc));
+		final boolean rightValue = isTrue(right.apply(mc));
 		return switch (operator) {
 			case NOT -> !rightValue;
 			case AND -> leftValue && rightValue;
 			case OR -> leftValue || rightValue;
+			case XOR -> leftValue ^ rightValue;
 		} ? 1.0 : 0.0;
+	}
+
+	public static boolean isTrue(double value){
+		return value >= 0.5;
 	}
 }
