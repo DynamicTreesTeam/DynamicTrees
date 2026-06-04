@@ -1,9 +1,10 @@
 package com.dtteam.dynamictrees.deserialization.deserializer.worldgen;
 
 import com.dtteam.dynamictrees.api.worldgen.BiomePropertySelectors;
-import com.dtteam.dynamictrees.deserialization.DeserializationException;
-import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
-import com.dtteam.dynamictrees.deserialization.JsonMath;
+import com.dtteam.dynamictrees.deserialization.*;
+import com.dtteam.dynamictrees.deserialization.math.ExpressionParser;
+import com.dtteam.dynamictrees.deserialization.math.MathOperator;
+import com.dtteam.dynamictrees.deserialization.math.Scale;
 import com.dtteam.dynamictrees.deserialization.result.JsonResult;
 import com.dtteam.dynamictrees.deserialization.result.Result;
 import com.google.gson.JsonArray;
@@ -25,51 +26,63 @@ public final class DensitySelectorDeserializer implements JsonBiomeDatabaseDeser
     @Override
     public Result<BiomePropertySelectors.DensitySelector, JsonElement> deserialize(JsonElement input) {
         return JsonResult.forInput(input)
-                .mapIfType(JsonObject.class, this::readDensitySelector)
-                .elseMapIfType(JsonArray.class, this::createScaleDensitySelector)
-                .elseMapIfType(Float.class, this::createStaticDensitySelector)
+                .mapIfType(JsonObject.class, this::readDensitySelector) // Deprecated
+                .elseMapIfType(JsonArray.class, this::createScaleDensitySelector) // Deprecated
+                .elseMapIfType(Double.class, this::createStaticDensitySelector)
+                .elseMapIfType(String.class, this::readExpressionSelector)
                 .elseTypeError();
     }
 
-    private BiomePropertySelectors.DensitySelector createStaticDensitySelector(float density) {
-        return (rnd, x, z, n) -> density;
+    private BiomePropertySelectors.DensitySelector createStaticDensitySelector(double density) {
+        return mc -> density;
     }
 
-    private BiomePropertySelectors.DensitySelector createScaleDensitySelector(JsonArray jsonArray,
-                                                                              Consumer<String> warningConsumer) {
-        final List<Float> parameters = new ArrayList<>();
+    @Deprecated
+    private BiomePropertySelectors.DensitySelector createScaleDensitySelector(
+        JsonArray jsonArray,
+        Consumer<String> warningConsumer
+    ) {
+        final List<Double> parameters = new ArrayList<>();
 
         for (final JsonElement element : jsonArray) {
-            JsonDeserializers.FLOAT.deserialize(element).ifSuccessOrElse(
+            JsonDeserializers.DOUBLE.deserialize(element).ifSuccessOrElse(
                     parameters::add,
                     warningConsumer,
                     warningConsumer
             );
         }
-
-        return switch (parameters.size()) {
-            case 0 -> (rnd, x, z, n) -> n;
-            case 1 -> (rnd, x, z, n) -> n * parameters.getFirst();
-            case 2 -> (rnd, x, z, n) -> (n * parameters.getFirst()) + parameters.get(1);
-            case 3 -> (rnd, x, z, n) -> ((n * parameters.getFirst()) + parameters.get(1)) * parameters.get(2);
-            default -> (rnd, x, z, n) -> 0.0f;
-        };
+        MathOperator mathOperator = new Scale(parameters);
+        return mathOperator::apply;
     }
 
     @Nullable
-    private BiomePropertySelectors.DensitySelector readDensitySelector(JsonObject jsonObject,
-                                                                       Consumer<String> warningConsumer)
-            throws DeserializationException {
-
+    @Deprecated
+    private BiomePropertySelectors.DensitySelector readDensitySelector(
+        JsonObject jsonObject,
+        Consumer<String> warningConsumer
+    ) throws DeserializationException {
         return JsonResult.forInput(jsonObject)
                 .mapIfContains(SCALE, JsonArray.class, this::createScaleDensitySelector)
-                .elseMapIfContains(STATIC, Float.class, this::createStaticDensitySelector)
+                .elseMapIfContains(STATIC, Double.class, this::createStaticDensitySelector)
                 .elseMapIfContains(MATH, JsonElement.class, input -> {
                     final JsonMath jsonMath = new JsonMath(input);
-                    return (rnd, x, z, n) -> jsonMath.apply(rnd, x, z, (float) n);
+                    return jsonMath::apply;
                 }).elseTypeError()
                 .forEachWarning(warningConsumer)
                 .orElseThrow();
     }
-
+    
+    private BiomePropertySelectors.DensitySelector readExpressionSelector(
+        String string,
+        Consumer<String> warningConsumer
+    ) {
+        try {
+            MathOperator expression = ExpressionParser.parse(string);
+            return expression::apply;
+        } catch (Exception e) {
+            warningConsumer.accept("Failed to parse expression: \"" + string + "\", error: " + e.getMessage());
+            return mc -> 0.0f;
+        }
+    }
+    
 }

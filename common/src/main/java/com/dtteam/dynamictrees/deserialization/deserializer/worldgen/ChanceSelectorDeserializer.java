@@ -2,6 +2,8 @@ package com.dtteam.dynamictrees.deserialization.deserializer.worldgen;
 
 import com.dtteam.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.dtteam.dynamictrees.deserialization.DeserializationException;
+import com.dtteam.dynamictrees.deserialization.math.MathOperator;
+import com.dtteam.dynamictrees.deserialization.math.ExpressionParser;
 import com.dtteam.dynamictrees.deserialization.JsonMath;
 import com.dtteam.dynamictrees.deserialization.result.JsonResult;
 import com.dtteam.dynamictrees.deserialization.result.Result;
@@ -21,28 +23,25 @@ public final class ChanceSelectorDeserializer implements JsonBiomeDatabaseDeseri
     @Override
     public Result<BiomePropertySelectors.ChanceSelector, JsonElement> deserialize(JsonElement input) {
         return JsonResult.forInput(input)
-                .mapIfType(JsonObject.class, this::readJsonChanceSelector)
+                .mapIfType(JsonObject.class, this::readJsonChanceSelector) // Deprecated
                 .elseMapIfType(Double.class, this::createSimpleChanceSelector)
-                .elseMapIfType(String.class, name -> {
-                    if (name.equalsIgnoreCase("standard")) {
-                        return (rnd, spc, x, z, rad) -> rnd.nextFloat() < (rad > 3 ? 2.0f / rad : 1.0f) ?
-                                BiomePropertySelectors.Chance.OK : BiomePropertySelectors.Chance.CANCEL;
-                    }
-                    throw new DeserializationException("Unrecognised named chance selector \"" + name + "\".");
-                }).elseTypeError();
+                .elseMapIfType(String.class, this::readExpressionSelector)
+                .elseTypeError();
     }
 
     private BiomePropertySelectors.ChanceSelector createSimpleChanceSelector(double value) {
         if (value <= 0) {
-            return (rnd, spc, x, z, rad) -> BiomePropertySelectors.Chance.CANCEL;
-        } else if (value >= 1) {
-            return (rnd, spc, x, z, rad) -> BiomePropertySelectors.Chance.OK;
+            return mc -> BiomePropertySelectors.Chance.CANCEL;
+        } 
+        if (value >= 1) {
+            return mc -> BiomePropertySelectors.Chance.OK;
         }
-        return (rnd, spc, x, z, rad) -> rnd.nextDouble() < value ?
+        return mc -> mc.rand().nextDouble() < value ?
                 BiomePropertySelectors.Chance.OK : BiomePropertySelectors.Chance.CANCEL;
     }
 
     @Nullable
+    @Deprecated
     private BiomePropertySelectors.ChanceSelector readJsonChanceSelector(JsonObject jsonObject, Consumer<String> warningConsumer)
             throws DeserializationException {
         return JsonResult.forInput(jsonObject)
@@ -52,23 +51,43 @@ public final class ChanceSelectorDeserializer implements JsonBiomeDatabaseDeseri
                 .orElseThrow();
     }
 
+    @Deprecated
     private BiomePropertySelectors.ChanceSelector createSimpleChanceSelectorFromJson(JsonElement element, Consumer<String> warningConsumer)
             throws DeserializationException {
         if (element.getAsJsonPrimitive().isNumber()) {
             return createSimpleChanceSelector(element.getAsFloat());
         }
-        if (element.getAsJsonPrimitive().isString()) {
-            if (this.isDefault(element.getAsString())) {
-                return (rnd, spc, x, z,rad) -> BiomePropertySelectors.Chance.UNHANDLED;
-            }
+        if (element.getAsJsonPrimitive().isString() && isDefault(element.getAsString())) {
+            return mc -> BiomePropertySelectors.Chance.UNHANDLED;
         }
         throw new DeserializationException("Unrecognised named chance selector \"" + element.getAsString() + "\".");
     }
 
+    @Deprecated
     private BiomePropertySelectors.ChanceSelector createMathSelector(JsonElement element, Consumer<String> warningConsumer) {
         final JsonMath jsonMath = new JsonMath(element);
-        return (rnd, spc, x, z, rad) -> rnd.nextDouble() < jsonMath.apply(rnd, spc, x, z, rad) ?
-                BiomePropertySelectors.Chance.OK : BiomePropertySelectors.Chance.CANCEL;
+        return mc -> mc.rand().nextDouble() < jsonMath.apply(mc)
+            ? BiomePropertySelectors.Chance.OK
+            : BiomePropertySelectors.Chance.CANCEL;
     }
-
+    
+    private BiomePropertySelectors.ChanceSelector readExpressionSelector(
+        String string,
+        Consumer<String> warningConsumer
+    ) {
+        
+        if ("standard".equalsIgnoreCase(string)) {
+            return mc -> mc.rand().nextFloat() < (mc.radius() > 3 ? 2.0f / mc.radius() : 1.0f) ?
+                BiomePropertySelectors.Chance.OK : BiomePropertySelectors.Chance.CANCEL;
+        }
+        
+        try {
+            MathOperator expression =  ExpressionParser.parse(string);
+            return mc -> mc.rand().nextDouble() < expression.apply(mc) ? BiomePropertySelectors.Chance.OK : BiomePropertySelectors.Chance.CANCEL;
+        } catch (Exception e) {
+            warningConsumer.accept("Failed to parse expression: \"" + string + "\", error: " + e.getMessage());
+            return mc -> BiomePropertySelectors.Chance.CANCEL;
+        }
+    }
+    
 }
