@@ -18,12 +18,11 @@ public class BooleanLogicOperator implements MathOperator {
 	@Override
 	public double apply(MathContext mc) {
 		final boolean leftValue = isTrue(left.apply(mc));
-		final boolean rightValue = isTrue(right.apply(mc));
 		return switch (operator) {
-			case NOT -> !rightValue;
-			case AND -> leftValue && rightValue;
-			case OR -> leftValue || rightValue;
-			case XOR -> leftValue ^ rightValue;
+			case NOT -> !isTrue(right.apply(mc));
+			case AND -> leftValue && isTrue(right.apply(mc));
+			case OR -> leftValue || isTrue(right.apply(mc));
+			case XOR -> leftValue ^ isTrue(right.apply(mc));
 		} ? 1.0 : 0.0;
 	}
 
