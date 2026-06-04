@@ -71,9 +71,7 @@ public final class ChanceSelectorDeserializer implements JsonBiomeDatabaseDeseri
             : BiomePropertySelectors.Chance.CANCEL;
     }
     
-    private BiomePropertySelectors.ChanceSelector readExpressionSelector(
-        String string,
-        Consumer<String> warningConsumer
+    private BiomePropertySelectors.ChanceSelector readExpressionSelector(String string, Consumer<String> warningConsumer
     ) {
         
         if ("standard".equalsIgnoreCase(string)) {

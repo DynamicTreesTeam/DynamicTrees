@@ -7,9 +7,7 @@ public class SimplexNoiseModel implements NoiseModel {
 	
 	private final SimplexNoise noise;
 	
-	public SimplexNoiseModel(
-		RandomSource randomSource
-	) {
+	public SimplexNoiseModel(RandomSource randomSource) {
 		this.noise = new SimplexNoise(randomSource);
 	}
 	

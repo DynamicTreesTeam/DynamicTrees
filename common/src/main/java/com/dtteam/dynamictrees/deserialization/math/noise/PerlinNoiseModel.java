@@ -9,10 +9,7 @@ public class PerlinNoiseModel implements NoiseModel {
 	
 	private final PerlinNoise noise;
 	
-	public PerlinNoiseModel(
-		RandomSource randomSource,
-		List<Integer> octaves
-	) {
+	public PerlinNoiseModel(RandomSource randomSource, List<Integer> octaves) {
 		this.noise = PerlinNoise.create(randomSource, octaves);
 	}
 	

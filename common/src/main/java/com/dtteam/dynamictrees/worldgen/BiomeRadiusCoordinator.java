@@ -49,7 +49,7 @@ public class BiomeRadiusCoordinator implements RadiusCoordinator {
     private int calcRadius(int x, int z, double density) {
         final double size = ((1.0 - density) * 9); // Size is the inverse of density (gives 0 to 9)
         
-        // Oh Joy. RandomSource can potentially start with the same number for each chunk. Let's just
+        // Oh, Joy. RandomSource can potentially start with the same number for each chunk. Let's just
         // throw this large prime xor hack in there to get it to at least look like it's random.
         int kindaRandom = ((x * 674365771) ^ (z * 254326997)) >> 4;
         int shakelow = (kindaRandom & 0x3) % 3; // Produces 0,0,1 or 2

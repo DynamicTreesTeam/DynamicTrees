@@ -1,12 +1,13 @@
 package com.dtteam.dynamictrees.deserialization.math;
 
 import com.dtteam.dynamictrees.deserialization.math.noise.*;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
 
 import java.util.ArrayList;
 
 public class Noise implements MathOperator {
-	
+
 	private static final long BASE_SEED = 96L; // Classic noise seed. Completely arbitrary.
 	private static final double DEFAULT_SCALE = 1.0 / 128.0; // Classic noise scale.
 	
@@ -47,7 +48,7 @@ public class Noise implements MathOperator {
 		
 		WorldgenRandom random = new WorldgenRandom(WorldgenRandom.Algorithm.LEGACY.newInstance(BASE_SEED));
 		MathContext mc = new MathContext(random);
-		
+
 		if (numArgs > 3) {
 			long seed = (long) functions[3].apply(mc);
 			random = new WorldgenRandom(WorldgenRandom.Algorithm.LEGACY.newInstance(seed));
@@ -63,14 +64,14 @@ public class Noise implements MathOperator {
 			int singleVal = noiseType == NoiseType.LEGACY ? 1 : 0;
 			octaves.add(singleVal); // Default to 1 octave for classic noise for backwards compatibility
 		}
-		
+
 		NoiseModel model = switch (noiseType) {
-			case PERLIN -> new PerlinNoiseModel(new WorldgenRandom(WorldgenRandom.Algorithm.LEGACY.newInstance(BASE_SEED)), octaves);
-			case SIMPLEX -> new SimplexNoiseModel(new WorldgenRandom(WorldgenRandom.Algorithm.LEGACY.newInstance(BASE_SEED)));
-			case LEGACY -> new PerlinSimplexNoiseModel(new WorldgenRandom(WorldgenRandom.Algorithm.LEGACY.newInstance(BASE_SEED)), octaves);
+			case PERLIN -> new PerlinNoiseModel(random, octaves);
+			case SIMPLEX -> new SimplexNoiseModel(random);
+			case LEGACY -> new PerlinSimplexNoiseModel(random, octaves);
 		};
 		
 		return new Noise(xFunc, yFunc, zFunc, model);
 	}
-	
+
 }
