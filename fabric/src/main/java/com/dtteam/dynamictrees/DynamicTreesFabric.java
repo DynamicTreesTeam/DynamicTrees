@@ -16,8 +16,12 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.neoforged.fml.config.*;
 
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
 public class DynamicTreesFabric implements ModInitializer {
-    
+
     @Override
     public void onInitialize() {
 
@@ -29,13 +33,8 @@ public class DynamicTreesFabric implements ModInitializer {
 
         CommonEventHandler.RegisterEvents();
 
-        for (EntrypointContainer<DynamicTreesAddonEntrypoint> container : FabricLoader.getInstance().getEntrypointContainers("dynamictrees", DynamicTreesAddonEntrypoint.class)) {
-            try {
-                container.getEntrypoint().onDynamicTreesPreSetup();
-            } catch (Throwable e) {
-                DynamicTrees.LOG.error("Failed to invoke Dynamic Trees addon entrypoint for mod: {}", container.getProvider().getMetadata().getId(), e);
-            }
-        }
+        runOnEntryPoints(container ->
+                container.getEntrypoint().onDynamicTreesPreSetup(), "PreSetup");
 
         ModEventHandler.RegisterEvents();
         VanillaSaplingEventHandler.register();
@@ -57,7 +56,20 @@ public class DynamicTreesFabric implements ModInitializer {
             FabricMiscHelper.currentServer = null;
         });
 
+    }
 
+    public static List<EntrypointContainer<DynamicTreesAddonEntrypoint>> getEntryPointContainers(){
+        return FabricLoader.getInstance().getEntrypointContainers(DynamicTrees.MOD_ID, DynamicTreesAddonEntrypoint.class);
+    }
+
+    public static void runOnEntryPoints (Consumer<EntrypointContainer<DynamicTreesAddonEntrypoint>> run, String errorMessage){
+        for (EntrypointContainer<DynamicTreesAddonEntrypoint> container : DynamicTreesFabric.getEntryPointContainers()) {
+            try {
+                run.accept(container);
+            } catch (Throwable e) {
+                DynamicTrees.LOG.error("Failed to invoke {} Entry Point for mod {}: {}", errorMessage, container.getProvider().getMetadata().getId(), e.getMessage());
+            }
+        }
     }
 
 }

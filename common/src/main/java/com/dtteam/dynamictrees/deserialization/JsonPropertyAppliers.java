@@ -202,4 +202,8 @@ public final class JsonPropertyAppliers<O> implements PropertyAppliers<O, JsonEl
         return objectType;
     }
 
+    @Override
+    public Class<JsonElement> getInputType() {
+        return JsonElement.class;
+    }
 }

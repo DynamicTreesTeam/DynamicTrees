@@ -1,6 +1,7 @@
 package com.dtteam.dynamictrees.platform;
 
 import com.dtteam.dynamictrees.DynamicTrees;
+import com.dtteam.dynamictrees.DynamicTreesFabric;
 import com.dtteam.dynamictrees.api.DynamicTreesAddonEntrypoint;
 import com.dtteam.dynamictrees.api.registry.AbstractRegistry;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
@@ -35,13 +36,8 @@ public class FabricEventHelper implements IEventHelper {
 
     @Override
     public void postAddResourceLoadersEventPre(TreeResourceManager resourceManager) {
-        for (EntrypointContainer<DynamicTreesAddonEntrypoint> container : FabricLoader.getInstance().getEntrypointContainers("dynamictrees", DynamicTreesAddonEntrypoint.class)) {
-            try {
-                container.getEntrypoint().onAddResourceLoaders(resourceManager);
-            } catch (Throwable e) {
-                DynamicTrees.LOG.error("Failed to invoke Dynamic Trees addon resource loader for mod: {}", container.getProvider().getMetadata().getId(), e);
-            }
-        }
+        DynamicTreesFabric.runOnEntryPoints(container ->
+                container.getEntrypoint().onAddResourceLoaders(resourceManager), "AddResourceLoader");
     }
 
     @Override
@@ -54,6 +50,8 @@ public class FabricEventHelper implements IEventHelper {
 
     @Override
     public <O, I> void postApplierEvent(StagedApplierResourceLoader.ApplierStage stage, PropertyAppliers<O, I> appliers, String identifier) {
+        DynamicTreesFabric.runOnEntryPoints(container ->
+                container.getEntrypoint().onRegisterStagedApplier(stage, appliers, identifier), "RegisterApplier");
     }
 
     @Override

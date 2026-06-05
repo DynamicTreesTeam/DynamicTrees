@@ -65,6 +65,8 @@ public interface PropertyAppliers<O, I> {
 
     Class<O> getObjectType();
 
+    Class<I> getInputType();
+
     final class ResultList extends LinkedList<PropertyApplierResult> {
 
         public ResultList forEachError(final Consumer<String> errorConsumer) {

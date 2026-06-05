@@ -1,7 +1,8 @@
 package com.dtteam.dynamictrees.api;
 
 import com.dtteam.dynamictrees.api.resource.TreeResourceManager;
-import com.dtteam.dynamictrees.registry.FabricRegistryHandler;
+import com.dtteam.dynamictrees.api.resource.loading.StagedApplierResourceLoader;
+import com.dtteam.dynamictrees.deserialization.PropertyAppliers;
 
 public interface DynamicTreesAddonEntrypoint {
     void onDynamicTreesPreSetup();
@@ -9,8 +10,7 @@ public interface DynamicTreesAddonEntrypoint {
     default void onAddResourceLoaders(TreeResourceManager resourceManager) {
     }
 
-    static void setupAddon(String modId) {
-        FabricRegistryHandler.setup(modId);
+    default <O, I> void onRegisterStagedApplier(StagedApplierResourceLoader.ApplierStage stage, PropertyAppliers<O, I> appliers, String identifier) {
     }
 }
 
