@@ -3,7 +3,7 @@
     "_comment1": "Rivers and oceans have no trees but we set a default density and chance for addons to use.",
     "_comment2": "When adding trees to these biomes in an addon/treepack, always keep density at [1] and chance at 1.",
     "select": {
-      "tag": "#minecraft:(is_river)|(is_ocean)|(is_beach)"
+      "tags_or": ["#minecraft:is_river", "#minecraft:is_ocean", "#minecraft:is_beach"]
     },
     "apply": {
       "species" : "null",
