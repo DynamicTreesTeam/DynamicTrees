@@ -6,6 +6,8 @@ plugins {
     id 'maven-publish'
 }
 
+version = mod_version
+
 neoForge {
     neoFormVersion = neo_form_version
     // Automatically enable AccessTransformers if the file exists

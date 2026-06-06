@@ -20,6 +20,17 @@ public final class DTLootParameterSets {
                     .optional(LootContextParams.EXPLOSION_RADIUS)
     );
 
+    public static final LootContextParamSet LEAVES_BLOCK = register("leaves_block", builder ->
+            builder.required(LootContextParams.BLOCK_STATE)
+                    .required(LootContextParams.ORIGIN)
+                    .required(LootContextParams.TOOL)
+                    .optional(LootContextParams.THIS_ENTITY)
+                    .optional(LootContextParams.BLOCK_ENTITY)
+                    .optional(LootContextParams.EXPLOSION_RADIUS)
+                    .required(DTLootContextParams.SPECIES)
+                    .required(DTLootContextParams.SEASONAL_SEED_DROP_FACTOR)
+    );
+
     public static final LootContextParamSet VOLUNTARY = register("voluntary", builder ->
             builder.required(LootContextParams.BLOCK_STATE)
                     .required(DTLootContextParams.SEASONAL_SEED_DROP_FACTOR)

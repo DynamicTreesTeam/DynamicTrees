@@ -13,6 +13,7 @@ import com.dtteam.dynamictrees.data.tags.DTEntityTypeTags;
 import com.dtteam.dynamictrees.item.Seed;
 import com.dtteam.dynamictrees.loot.DTLootContextParams;
 import com.dtteam.dynamictrees.config.DTConfigs;
+import com.dtteam.dynamictrees.loot.DTLootParameterSets;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.tree.ChunkTreeHelper;
@@ -45,6 +46,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.*;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -687,14 +689,17 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         if (lootTable == LootTable.EMPTY) {
             return Collections.emptyList();
         } else {
-            LootParams context = builder
-                    .withParameter(LootContextParams.BLOCK_STATE, state)
-                    .withParameter(DTLootContextParams.SPECIES, species)
-                    .withParameter(DTLootContextParams.SEASONAL_SEED_DROP_FACTOR,
-                            species.seasonalSeedDropFactor(LevelContext.create(level), pos))
-                    .create(LootContextParamSets.BLOCK);
+            LootParams context = createLootParams(state, builder, species, level, pos);
             return lootTable.getRandomItems(context);
         }
+    }
+
+    private LootParams createLootParams(BlockState state, LootParams.Builder builder, Species species, ServerLevel level, BlockPos pos) {
+        return builder.withParameter(LootContextParams.BLOCK_STATE, state)
+                .withParameter(DTLootContextParams.SPECIES, species)
+                .withParameter(DTLootContextParams.SEASONAL_SEED_DROP_FACTOR,
+                        species.seasonalSeedDropFactor(LevelContext.create(level), pos))
+                .create(DTLootParameterSets.LEAVES_BLOCK);
     }
 
     /**

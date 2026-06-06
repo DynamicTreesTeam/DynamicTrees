@@ -52,7 +52,7 @@ pluginManager.withPlugin('me.modmuss50.mod-publish-plugin') {
     afterEvaluate {
         publishMods {
             file = isFabric ? remapJar.archiveFile : jar.archiveFile
-            displayName = "${mod_name.replace(' ','')}-${loaderName}-${minecraft_version} ${mod_version}"
+            displayName = "${mod_name.replace(' ','')}-${loaderName}-${minecraft_version} ${project.mod_version}"
             println(displayName)
             if (changelogFile.exists()) {
                 changelog.set(changelogFile.getText())
