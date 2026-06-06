@@ -66,6 +66,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 public abstract class BranchBlock extends BlockWithDynamicHardness implements TreePart, FutureBreakable, BonemealableBlock {
@@ -744,10 +745,9 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
      * @param level     The {@link Level} instance.
      * @param pos       The {@link BlockPos} of the {@link BranchBlock} being exploded.
      * @param explosion The {@link Explosion} destroying the {@link BranchBlock}.
-     *
-     * NeoForge Override */
-    @SuppressWarnings("unused")
-    public void onBlockExploded(BlockState state, Level level, BlockPos pos, Explosion explosion) {
+     */
+    @Override
+    protected void onExplosionHit(BlockState state, Level level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> dropConsumer) {
         final SpeciesNode speciesNode = new SpeciesNode();
         final MapSignal signal = analyse(state, level, pos, null, new MapSignal(speciesNode));
         if (signal.foundRoot){ //Some root blocks may need to be reminded the tree exploded (Cough cough AerialRoots cough)
@@ -756,6 +756,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         final Species species = speciesNode.getSpecies();
         final BranchDestructionData destroyData = destroyBranchFromNode(level, pos, Direction.DOWN, false, null);
         final NetVolumeNode.Volume woodVolume = destroyData.woodVolume;
+
         final List<ItemStack> woodDropList = species.getBranchesDrops(level, woodVolume, ItemStack.EMPTY, explosion.radius());
         final FallingTreeEntity treeEntity = FallingTreeEntity.dropTree(level, destroyData, woodDropList, FallingTreeEntity.DestroyType.EXPLODE);
 
@@ -768,8 +769,6 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
                         (treeEntity.getZ() - expPos.z) / distance);
             }
         }
-
-        this.wasExploded(level, pos, explosion);
     }
 
     @Override
