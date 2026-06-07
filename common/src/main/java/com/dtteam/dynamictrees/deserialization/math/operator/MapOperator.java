@@ -27,7 +27,7 @@ public class MapOperator implements MathOperator {
 		double e1 = fromEnd.apply(mc);
 		double s2 = toStart.apply(mc);
 		double e2 = toEnd.apply(mc);
-		return Mth.map(d, s1, e1, s2, e2);
+		return Mth.clampedMap(d, s1, e1, s2, e2);
 	}
 
 }

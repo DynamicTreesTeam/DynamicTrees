@@ -4,6 +4,7 @@ import com.dtteam.dynamictrees.deserialization.math.noise.NoiseType;
 import com.dtteam.dynamictrees.deserialization.math.operator.*;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.google.gson.JsonParseException;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,7 +61,7 @@ public final class ExpressionParser {
     private int cursor;
     
     public static MathOperator parse(String expression) throws JsonParseException {
-        expression = expression.replaceAll("\\s", "");
+        expression = sanitizeInput(expression);
         if (CACHE.containsKey(expression)) {
             return CACHE.get(expression);
         }
@@ -69,7 +70,13 @@ public final class ExpressionParser {
         CACHE.put(expression, result);
         return result;
     }
-    
+
+    private static @NotNull String sanitizeInput(String expression) {
+        return expression
+                .replaceAll("\\s", "")
+                .toLowerCase(Locale.ENGLISH);
+    }
+
     private ExpressionParser(String expression) {
         this.expression = expression;
     }

@@ -156,7 +156,7 @@ public class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> {
             return GeneratorResult.FAIL_SOIL;
         }
         
-        MathContext mc = new MathContext(originPos, RANDOM, species, circle.radius);
+        MathContext mc = new MathContext(groundPos, RANDOM, species, circle.radius);
         if (getChanceSelector(biomeEntry).getChance(mc) != BiomePropertySelectors.Chance.OK) {
             return GeneratorResult.FAIL_CHANCE;
         }
