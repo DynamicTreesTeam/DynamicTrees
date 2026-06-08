@@ -2568,7 +2568,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     /**
-     * Searches first for the full tree name.  If that fails then it will find the first tree matching the simple name
+     * Searches first for the full tree name.  If that fails, then it will find the first tree matching the simple name
      * and return it instead otherwise null
      *
      * @param name The name of the tree.  Either the simple name or the full name

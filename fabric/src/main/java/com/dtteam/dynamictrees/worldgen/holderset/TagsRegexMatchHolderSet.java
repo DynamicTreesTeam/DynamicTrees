@@ -13,6 +13,8 @@ public class TagsRegexMatchHolderSet<T> extends RegexMatchHolderSet<T> {
 
     @Override
     protected Stream<String> getInput(Holder<T> holder) {
-        return holder.tags().map(tagKey -> tagKey.location().toString());
+        return holder.tags().map(tagKey ->
+                tagKey.location().toString()
+        );
     }
 }
