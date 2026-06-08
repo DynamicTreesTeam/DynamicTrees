@@ -92,8 +92,10 @@ public final class Resources {
     private static void addModTreePack(ModFileContainer modFile) {
         final Optional<Path> treesPath = modFile.findResource(TREES);
         if (treesPath.isEmpty()) {
-            DynamicTrees.LOG.debug("No Tree Pack found for mod {}", modFile.getModId());
+            DynamicTrees.LOG.debug("Tree Pack not found for mod {}", modFile.getModId());
             return;
+        } else {
+            DynamicTrees.LOG.info("Found Tree Pack for mod {}", modFile.getModId());
         }
         final Path absTreesPath = treesPath.get().toAbsolutePath();
 
