@@ -10,6 +10,7 @@ import net.minecraft.world.level.Level;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -18,7 +19,7 @@ public class NormalSeasonManager implements SeasonManager {
 
 	public static final Supplier<SeasonManager> NULL = NormalSeasonManager::new;
 
-    private final Map<ResourceLocation, SeasonContext> seasonContextMap = new HashMap<>();
+    private final Map<ResourceLocation, SeasonContext> seasonContextMap = new ConcurrentHashMap<>();
     private Function<Level, Tuple<SeasonProvider, SeasonGrowthCalculator>> seasonMapper = w -> new Tuple<>(new NullSeasonProvider(), new NullSeasonGrowthCalculator());
 
     public NormalSeasonManager() {

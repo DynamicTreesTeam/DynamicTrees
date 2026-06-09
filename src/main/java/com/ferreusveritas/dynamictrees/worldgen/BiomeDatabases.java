@@ -7,6 +7,7 @@ import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -18,9 +19,9 @@ public final class BiomeDatabases {
 
     private static final BiomeDatabase DEFAULT_DATABASE = new BiomeDatabase();
     /** Dimension names to their respective {@link com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase}. */
-    private static final Map<ResourceLocation, BiomeDatabase> DIMENSIONAL_DATABASES = Maps.newHashMap();
+    private static final Map<ResourceLocation, BiomeDatabase> DIMENSIONAL_DATABASES = Collections.synchronizedMap(Maps.newHashMap());
     /** Dimension names for dimensions that are blacklisted. */
-    private static final Set<ResourceLocation> BLACKLIST = Sets.newHashSet();
+    private static final Set<ResourceLocation> BLACKLIST = Collections.synchronizedSet(Sets.newHashSet());
 
     public static BiomeDatabase getDefault() {
         return DEFAULT_DATABASE;
