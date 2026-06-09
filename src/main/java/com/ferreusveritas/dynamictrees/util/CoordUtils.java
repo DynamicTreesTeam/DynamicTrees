@@ -174,7 +174,7 @@ public final class CoordUtils {
         final BlockPos vantagePos = BlockPos.containing(vantageVec); // Convert Vector to BlockPos for testing.
 
         if (!safeBounds.inBounds(vantagePos, false) || level.isEmptyBlock(vantagePos)) { // The observing block must be in free space.
-            final BlockHitResult result = rayTraceBlocks(level, new CustomRayTraceContext(vantageVec, branchVec, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE), safeBounds);
+            final BlockHitResult result = rayTraceBlocks(level, new CustomRayTraceContext(vantageVec, branchVec, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE), safeBounds);
             // Beyond here should be safe since the only blocks that can possibly be hit are in loaded chunks.
             final BlockPos hitPos = BlockPos.containing(result.getLocation());
             if (result.getType() == HitResult.Type.BLOCK && !hitPos.equals(BlockPos.ZERO)) { // We found a block.
