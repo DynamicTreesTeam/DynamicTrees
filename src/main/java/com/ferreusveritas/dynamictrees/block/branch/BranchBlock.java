@@ -727,7 +727,8 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
      */
     public void breakDeliberate(LevelAccessor level, BlockPos pos, DynamicTrees.DestroyMode mode) {
         destroyMode = mode;
-        FluidState state = level.getFluidState(pos);
+        FluidState state = Optional.ofNullable(CoordUtils.getStateSafe(level, pos))
+                .orElse(Blocks.AIR.defaultBlockState()).getFluidState();
         if (state.isEmpty())
             level.removeBlock(pos, false);
         else
