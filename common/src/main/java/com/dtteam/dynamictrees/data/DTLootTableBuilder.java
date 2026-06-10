@@ -82,7 +82,7 @@ public class DTLootTableBuilder {
                                 .apply(ApplyExplosionDecay.explosionDecay())
                                 .when(BonusLevelTableCondition.bonusLevelFlatChance(ItemUtils.getEnchantment(Enchantments.FORTUNE, registries), 0.02F,
                                         0.022222223F, 0.025F, 0.033333335F, 0.1F)))
-        ).setParamSet(LootContextParamSets.BLOCK);
+        ).setParamSet(DTLootParameterSets.LEAVES_BLOCK);
     }
 
     public static LootTable.Builder createPalmLeavesBlockDrops(Block primitiveLeavesBlock, float[] seedChances, HolderLookup.Provider registries) {
@@ -93,7 +93,7 @@ public class DTLootTableBuilder {
                         .when(ExplosionCondition.survivesExplosion())
                         .when(BonusLevelTableCondition.bonusLevelFlatChance(ItemUtils.getEnchantment(Enchantments.FORTUNE, registries), seedChances))
                         .when(SeasonalSeedDropChance.seasonalSeedDropChance())
-        ).setParamSet(LootContextParamSets.BLOCK);
+        ).setParamSet(DTLootParameterSets.LEAVES_BLOCK);
     }
 
     public static LootTable.Builder createWartBlockDrops(Block primitiveWartBlock, HolderLookup.Provider registries) {

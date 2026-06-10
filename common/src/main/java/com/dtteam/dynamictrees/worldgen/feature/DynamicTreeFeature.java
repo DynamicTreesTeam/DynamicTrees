@@ -116,11 +116,7 @@ public class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> {
 
         RANDOM.setXOR(groundPos);
         
-        GeneratorResult result = genTree(levelContext,
-            biomeEntry,
-            circle,
-            originPos,
-            groundPos
+        GeneratorResult result = genTree(levelContext, biomeEntry, circle, originPos, groundPos
         );
         
         // Display concrete circles for testing the circle algorithm.
@@ -131,12 +127,7 @@ public class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> {
         return result;
     }
     
-    private GeneratorResult genTree(
-        LevelContext levelContext,
-        BiomeDatabase.EntryReader biomeEntry,
-        PoissonDisc circle,
-        BlockPos originPos,
-        BlockPos groundPos
+    private GeneratorResult genTree(LevelContext levelContext, BiomeDatabase.EntryReader biomeEntry, PoissonDisc circle, BlockPos originPos, BlockPos groundPos
     ) {
         
         BlockState dirtState = levelContext.accessor().getBlockState(groundPos);

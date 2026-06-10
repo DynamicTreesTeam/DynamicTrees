@@ -36,6 +36,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 
 public class CreakingHeartBranchBlock extends BasicBranchBlock implements EntityBlock {
 
@@ -147,7 +148,7 @@ public class CreakingHeartBranchBlock extends BasicBranchBlock implements Entity
     }
 
     @Override
-    public void onBlockExploded(BlockState state, ServerLevel level, BlockPos pos, Explosion explosion) {
+    protected void onExplosionHit(BlockState state, ServerLevel level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> onHit) {
         if (level.getBlockEntity(pos) instanceof CreakingHeartBlockEntity creakingHeartBlockEntity
                 && explosion instanceof ServerExplosion serverExplosion
                 && explosion.getBlockInteraction().shouldAffectBlocklikeEntities()) {
@@ -157,7 +158,7 @@ public class CreakingHeartBranchBlock extends BasicBranchBlock implements Entity
                 this.tryAwardExperience(player, level, pos);
             }
         }
-        super.onBlockExploded(state, level, pos, explosion);
+        super.onExplosionHit(state, level, pos, explosion, onHit);
     }
 
     private void tryAwardExperience(Player player, Level level, BlockPos pos) {
