@@ -2020,19 +2020,21 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     // MEGANESS
     ///////////////////////////////////////////
 
-    private Species megaSpecies = Species.NULL_SPECIES;
-    private Species preMegaSpecies = Species.NULL_SPECIES;
+    private Species megaSpecies = NULL_SPECIES;
+    private Species preMegaSpecies = NULL_SPECIES;
 
     public Species getMegaSpecies() {
+        if (megaSpecies == null) megaSpecies = NULL_SPECIES;
         return this.megaSpecies;
     }
 
     public Species getPreMegaSpecies() {
+        if (preMegaSpecies == null) preMegaSpecies = NULL_SPECIES;
         return this.preMegaSpecies;
     }
 
     public boolean isMegaSpecies() {
-        return preMegaSpecies.isValid();
+        return getPreMegaSpecies().isValid();
     }
 
     public void setMegaSpecies(final Species megaSpecies) {

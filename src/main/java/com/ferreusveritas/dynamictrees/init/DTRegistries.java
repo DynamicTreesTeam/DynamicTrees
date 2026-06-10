@@ -24,6 +24,8 @@ import com.ferreusveritas.dynamictrees.item.Staff;
 import com.ferreusveritas.dynamictrees.loot.condition.DTLootConditions;
 import com.ferreusveritas.dynamictrees.loot.entry.DTLootPoolEntries;
 import com.ferreusveritas.dynamictrees.loot.function.DTLootFunctions;
+import com.ferreusveritas.dynamictrees.recipe.MegaSeedRecipe;
+import com.ferreusveritas.dynamictrees.recipe.SeedConversionRecipe;
 import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
 import com.ferreusveritas.dynamictrees.systems.genfeature.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeature.GenFeatures;
@@ -54,6 +56,9 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CustomRecipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -91,6 +96,7 @@ public class DTRegistries {
     public static final DeferredRegister<HolderSetType> HOLDER_SET_TYPES = DeferredRegister.create(ForgeRegistries.Keys.HOLDER_SET_TYPES, DynamicTrees.MOD_ID);
     public static final DeferredRegister<BlockStateProviderType<?>> BLOCK_STATE_PROVIDER_TYPES = DeferredRegister.create(Registries.BLOCK_STATE_PROVIDER_TYPE, DynamicTrees.MOD_ID);
     public static final DeferredRegister<StructurePoolElementType<?>> STRUCTURE_POOL_ELEMENT_TYPES = DeferredRegister.create(Registries.STRUCTURE_POOL_ELEMENT, DynamicTrees.MOD_ID);
+    public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(Registries.RECIPE_SERIALIZER, DynamicTrees.MOD_ID);
 
     public static final LinkedList<Item> CREATIVE_TAB_ITEMS = new LinkedList<>();
     public static final RegistryObject<CreativeModeTab> DT_CREATIVE_TAB = CREATIVE_MODE_TABS.register(DynamicTrees.MOD_ID, () -> CreativeModeTab.builder()
@@ -130,6 +136,7 @@ public class DTRegistries {
         HOLDER_SET_TYPES.register(modBus);
         BLOCK_STATE_PROVIDER_TYPES.register(modBus);
         STRUCTURE_POOL_ELEMENT_TYPES.register(modBus);
+        RECIPE_SERIALIZERS.register(modBus);
         DTLootPoolEntries.LOOT_POOL_ENTRY_TYPES.register(modBus);
         DTLootConditions.LOOT_CONDITION_TYPES.register(modBus);
         DTLootFunctions.LOOT_FUNCTION_TYPES.register(modBus);
@@ -313,4 +320,16 @@ public class DTRegistries {
     private static RegistryObject<SoundEvent> registerSoundEvent(String name) {
         return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(DynamicTrees.location(name)));
     }
+
+    ///////////////////////////////////////////
+    // RECIPE
+    ///////////////////////////////////////////
+
+    public static final RegistryObject<RecipeSerializer<SeedConversionRecipe>> SEED_CONVERSION_RECIPE_TYPE = registerSimpleCraftingRecipe("seed_conversion", SeedConversionRecipe::new);
+    public static final RegistryObject<RecipeSerializer<MegaSeedRecipe>> MEGA_SEED_RECIPE_TYPE = registerSimpleCraftingRecipe("mega_seed", MegaSeedRecipe::new);
+
+    private static <T extends CustomRecipe> RegistryObject<RecipeSerializer<T>> registerSimpleCraftingRecipe(String name, SimpleCraftingRecipeSerializer.Factory<T> supplier) {
+        return RECIPE_SERIALIZERS.register(name, ()->new SimpleCraftingRecipeSerializer<>(supplier));
+    }
+
 }

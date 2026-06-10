@@ -183,32 +183,32 @@ public final class Resources {
             // Reload all reload listeners in the trees resource manager and registers dirt bucket recipes.
             return CompletableFuture.allOf(futures)
                     .thenCompose(stage::wait)
-                    .thenAcceptAsync(v -> MANAGER.reload(futures), gameExecutor)
-                    .thenRunAsync(this::registerDirtBucketRecipes, gameExecutor);
+                    .thenAcceptAsync(v -> MANAGER.reload(futures), gameExecutor);
+//                    .thenRunAsync(this::registerDirtBucketRecipes, gameExecutor);
         }
 
-        private void registerDirtBucketRecipes() {
-            if (!DTConfigs.GENERATE_DIRT_BUCKET_RECIPES.get()
-                    && !DTConfigs.GENERATE_MEGA_SEED_RECIPE.get()) {
-                return;
-            }
-
-            final Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> recipes = new HashMap<>();
-
-            // Put the recipes into the new map and make each type's recipes mutable.
-            this.dataPackRegistries.getRecipeManager().recipes.forEach(((recipeType, currentRecipes) ->
-                    recipes.put(recipeType, new HashMap<>(currentRecipes))));
-
-            // Register dirt bucket recipes.
-            DTRecipes.registerDirtBucketRecipes(recipes.get(RecipeType.CRAFTING));
-
-            // Revert each type's recipes back to immutable.
-            recipes.forEach(
-                    ((recipeType, currentRecipes) -> recipes.put(recipeType, ImmutableMap.copyOf(currentRecipes))));
-
-            // Set the new recipes.
-            dataPackRegistries.getRecipeManager().recipes = ImmutableMap.copyOf(recipes);
-        }
+//        private void registerDirtBucketRecipes() {
+//            if (!DTConfigs.GENERATE_DIRT_BUCKET_RECIPES.get()
+//                    && !DTConfigs.GENERATE_MEGA_SEED_RECIPE.get()) {
+//                return;
+//            }
+//
+//            final Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> recipes = new HashMap<>();
+//
+//            // Put the recipes into the new map and make each type's recipes mutable.
+//            this.dataPackRegistries.getRecipeManager().recipes.forEach(((recipeType, currentRecipes) ->
+//                    recipes.put(recipeType, new HashMap<>(currentRecipes))));
+//
+//            // Register dirt bucket recipes.
+//            DTRecipes.registerDirtBucketRecipes(recipes.get(RecipeType.CRAFTING));
+//
+//            // Revert each type's recipes back to immutable.
+//            recipes.forEach(
+//                    ((recipeType, currentRecipes) -> recipes.put(recipeType, ImmutableMap.copyOf(currentRecipes))));
+//
+//            // Set the new recipes.
+//            dataPackRegistries.getRecipeManager().recipes = ImmutableMap.copyOf(recipes);
+//        }
     }
 
 }
