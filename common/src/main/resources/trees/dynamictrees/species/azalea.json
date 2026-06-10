@@ -19,7 +19,8 @@
         },
         {
             "sapling_block": "flowering_azalea",
-            "replace_sapling_when_placed": false
+            "replace_sapling_when_placed": false,
+            "can_craft_seed_to_sapling": false
         }
     ],
     "force_soil": "rooted_dirt",

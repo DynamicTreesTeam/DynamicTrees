@@ -1,44 +1,63 @@
 package com.dtteam.dynamictrees.recipe;
 
-import com.dtteam.dynamictrees.config.*;
-import com.dtteam.dynamictrees.registry.*;
-import com.dtteam.dynamictrees.tree.species.*;
-import net.minecraft.core.*;
-import net.minecraft.world.item.*;
-import net.minecraft.world.item.crafting.*;
-import net.minecraft.world.level.*;
+import com.dtteam.dynamictrees.config.DTConfigs;
+import com.dtteam.dynamictrees.item.Seed;
+import com.dtteam.dynamictrees.registry.DTRegistries;
+import com.dtteam.dynamictrees.tree.species.Species;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.CustomRecipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.Level;
+
+import java.util.stream.Stream;
 
 public class MegaSeedRecipe extends CustomRecipe {
-    public MegaSeedRecipe(CraftingBookCategory category) {
-        super(category);
+
+    public MegaSeedRecipe(CraftingBookCategory pCategory) {
+        super(pCategory);
     }
 
     @Override
     public boolean matches(CraftingInput craftingInput, Level level) {
-        if (DTConfigs.COMMON.generateMegaSeedRecipe.get()) {
-//            if(craftingInput.items().stream().anyMatch(stack->stack.is(DTRegistries.DIRT_BUCKET.get()))) {
-            for (Species species : Species.REGISTRY) {
-                if (species.isMegaSpecies()) {
-                    if (craftingInput.items().stream().filter(stack -> stack.is(species.getPreMegaSpecies().getSeed().get())).count() == 4) {
-                        return craftingInput.items().stream().filter(stack -> !stack.isEmpty()).count() == 4;
-                    }
+        if(DTConfigs.COMMON.generateMegaSeedRecipe.get() && atLeastHasSeed(craftingInput)){
+            for(Species species : Species.REGISTRY) {
+                if(recipeMatchCondition(craftingInput, species)) {
+                    return nonEmptyStacksStream(craftingInput).count() == 4;
                 }
             }
-//          }
         }
         return false;
     }
 
     @Override
-    public ItemStack assemble(CraftingInput craftingInput, HolderLookup.Provider provider) {
+    public ItemStack assemble(CraftingInput craftingInput, HolderLookup.Provider registryAccess) {
         for (Species species : Species.REGISTRY) {
-            if (species.isMegaSpecies()) {
-                if (craftingInput.items().stream().filter(stack -> stack.is(species.getPreMegaSpecies().getSeed().get())).count() == 4) {
-                    return new ItemStack(species.getSeed().get());
-                }
+            if (recipeMatchCondition(craftingInput, species)) {
+                return new ItemStack(species.getSeed().get());
             }
         }
         return ItemStack.EMPTY;
+    }
+
+    private static boolean atLeastHasSeed(CraftingInput craftingInput) {
+        return craftingInput.items().stream().anyMatch(s -> !s.isEmpty() && s.getItem() instanceof Seed);
+    }
+
+    private static boolean recipeMatchCondition(CraftingInput craftingInput, Species species) {
+        return species.isMegaSpecies() && species.hasSeed()
+                && species.getPreMegaSpecies().canCraftMegaSeed()
+                && allItemsMatchSeed(craftingInput, species.getPreMegaSpecies());
+    }
+
+    private static boolean allItemsMatchSeed(CraftingInput craftingInput, Species species) {
+        return nonEmptyStacksStream(craftingInput).allMatch(stack -> stack.is(species.getSeed().get()));
+    }
+
+    private static Stream<ItemStack> nonEmptyStacksStream(CraftingInput craftingInput) {
+        return craftingInput.items().stream().filter(stack -> !stack.isEmpty());
     }
 
     @Override
@@ -50,4 +69,5 @@ public class MegaSeedRecipe extends CustomRecipe {
     public RecipeSerializer<?> getSerializer() {
         return DTRegistries.MEGA_SEED_RECIPE_TYPE.get();
     }
+
 }
