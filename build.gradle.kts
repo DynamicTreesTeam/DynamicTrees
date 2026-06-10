@@ -103,10 +103,6 @@ dependencies {
     //Spark profiler
     runtimeOnly(fg.deobf("curse.maven:spark-361579:4738952"))
 
-    //testing
-    implementation(fg.deobf("curse.maven:slice-and-dice-659674:7184951"))
-    runtimeOnly(fg.deobf("curse.maven:kotlin-for-forge-351264:7291067"))
-    runtimeOnly(fg.deobf("curse.maven:create-328085:7178761"))
     // runtimeOnly(fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix-1.19:${property("suggestionProviderFixVersion")}"))
 }
 
