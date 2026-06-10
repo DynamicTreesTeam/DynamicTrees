@@ -5,7 +5,11 @@ import com.dtteam.dynamictrees.block.branch.ThickBranchBlock;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import com.dtteam.dynamictrees.utility.CoordUtils.Surround;
 import com.google.common.collect.Maps;
+import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
+import net.fabricmc.fabric.api.renderer.v1.material.MaterialFinder;
+import net.fabricmc.fabric.api.renderer.v1.material.RenderMaterial;
+import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockElement;
 import net.minecraft.client.renderer.block.model.BlockElementFace;
@@ -26,6 +30,7 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -37,7 +42,7 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
     private final List<BakedQuad>[] trunksBarkQuads = new List[16];
     private final List<BakedQuad>[] trunksTopBarkQuads = new List[16];
     private final List<BakedQuad>[] trunksTopRingsQuads = new List[16];
-    private final List<BakedQuad>[] trunksBotRingsQuads = new List[16];
+    public final List<BakedQuad>[] trunksBotRingsQuads = new List[16];
 
     public ThickBranchBlockBakedModel(TextureAtlasSprite barkTexture, TextureAtlasSprite ringsTexture, TextureAtlasSprite thickRingsTexture) {
         super(barkTexture, ringsTexture);
@@ -169,67 +174,44 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
     }
 
     @Override
-    public void emitBlockQuads(BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext context) {
-        if (state == null) return;
+    protected int maxBranchRadius() {
+        return ThickBranchBlock.MAX_RADIUS_THICK;
+    }
 
-        int coreRadius = getRadius(state);
-
+    @Override
+    public EnumMap<Direction, List<BakedQuad>> collectQuads(int coreRadius, int[] connections, int twigRadius, Direction forceRingDir) {
         if (coreRadius <= BranchBlock.MAX_RADIUS) {
-            super.emitBlockQuads(blockView, state, pos, randomSupplier, context);
-            return;
+            return super.collectQuads(coreRadius, connections, twigRadius, forceRingDir);
         }
-
-        coreRadius = Mth.clamp(coreRadius, 9, 24);
-
-        int[] connections = new int[]{0, 0, 0, 0, 0, 0};
-        int twigRadius = 1;
-
-        if (state.getBlock() instanceof BranchBlock branchBlock) {
-            connections = branchBlock.getConnectionData(blockView, pos, state).getAllRadii();
-            twigRadius = branchBlock.getFamily().getPrimaryThickness();
-        }
-
-        var emitter = context.getEmitter();
 
         boolean branchesAround = connections[2] + connections[3] + connections[4] + connections[5] != 0;
 
-        int radiusIndex = coreRadius - 9;
-        if (radiusIndex < 0 || radiusIndex >= trunksBarkQuads.length) return;
+        int radiusIndex = coreRadius - BranchBlock.MAX_RADIUS - 1;
+        if (radiusIndex >= trunksBarkQuads.length) return null;
+
+        EnumMap<Direction, List<BakedQuad>> bakedQuads = new EnumMap<>(Direction.class);
 
         for (Direction face : Direction.values()) {
-            List<BakedQuad> barkQuads = trunksBarkQuads[radiusIndex];
-            if (barkQuads != null) {
-                for (BakedQuad quad : barkQuads) {
-                    if (quad.getDirection() == face) {
-                        emitter.fromVanilla(quad, null, face);
-                        emitter.emit();
-                    }
-                }
-            }
+            List<BakedQuad> quads = bakedQuads.computeIfAbsent(face, dir->new ArrayList<>());
+            quads.addAll(trunksBarkQuads[radiusIndex]);
 
             if (face == Direction.UP || face == Direction.DOWN) {
                 if (connections[face.get3DDataValue()] < twigRadius && !branchesAround) {
-                    List<BakedQuad> ringQuads = trunksTopRingsQuads[radiusIndex];
-                    if (ringQuads != null) {
-                        for (BakedQuad quad : ringQuads) {
-                            if (quad.getDirection() == face) {
-                                emitter.fromVanilla(quad, null, face);
-                                emitter.emit();
-                            }
-                        }
-                    }
+                    quads.addAll(trunksTopRingsQuads[radiusIndex]);
                 } else if (connections[face.get3DDataValue()] < coreRadius) {
-                    List<BakedQuad> topBarkQuads = trunksTopBarkQuads[radiusIndex];
-                    if (topBarkQuads != null) {
-                        for (BakedQuad quad : topBarkQuads) {
-                            if (quad.getDirection() == face) {
-                                emitter.fromVanilla(quad, null, face);
-                                emitter.emit();
-                            }
-                        }
-                    }
+                    quads.addAll(trunksTopBarkQuads[radiusIndex]);
                 }
             }
         }
+
+        return bakedQuads;
+    }
+
+    @Override
+    public List<BakedQuad> getRingQuads(int radius) {
+        if (radius <= BranchBlock.MAX_RADIUS){
+            return super.getRingQuads(radius);
+        }
+        return trunksBotRingsQuads[radius - BranchBlock.MAX_RADIUS - 1];
     }
 }

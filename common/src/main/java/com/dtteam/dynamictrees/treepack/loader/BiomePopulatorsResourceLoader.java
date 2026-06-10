@@ -102,9 +102,7 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
 
         Services.EVENT.postBiomeEntryApplierEvent(this.entryAppliers, ENTRY_APPLIERS);
     }
-
-
-
+    
     private PropertyApplierResult applySpecies(BiomeDatabase.BaseEntry entry, JsonElement jsonElement) {
         return PropertyApplierResult.from(JsonDeserializers.SPECIES_SELECTOR.deserialize(jsonElement)
                 .ifSuccess(speciesSelector ->

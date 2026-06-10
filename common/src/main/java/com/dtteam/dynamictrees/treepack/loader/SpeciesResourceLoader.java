@@ -125,6 +125,7 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .register("big_tree_sound_threshold", Float.class, Species::setBigTreeSoundThreshold)
                 .register("plantable_on_fluid", Boolean.class, Species::setPlantableOnFluid)
                 .register("allowed_water_height_for_world_gen", Integer.class, Species::setAllowedWaterHeightForWorldgen)
+                .register("override_sapling_replacement_when_crouching", Boolean.class, Species::setOverrideSaplingReplacementWhenCrouching)
 
                 .register("seasonal_seed_drop_offset", Float.class, (s,o)->
                         LOGGER.warn("The \"seasonal_seed_drop_offset\" property has been removed. Use \"seasonal_offsets\" instead! Species {}.", s.getRegistryName())

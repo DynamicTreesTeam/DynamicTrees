@@ -7,6 +7,9 @@ import com.google.common.collect.Maps;
 import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
+import net.fabricmc.fabric.api.renderer.v1.material.MaterialFinder;
+import net.fabricmc.fabric.api.renderer.v1.material.RenderMaterial;
+import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockElement;
 import net.minecraft.client.renderer.block.model.BlockElementFace;
@@ -25,13 +28,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 
 @SuppressWarnings("unchecked")
@@ -220,16 +221,29 @@ public class SurfaceRootBlockBakedModel implements BakedModel, FabricBakedModel 
 
     @Override
     public void emitBlockQuads(BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext context) {
-        if (state == null) return;
+        EnumMap<Direction, List<BakedQuad>> bakedQuads = collectQuads(blockView, state, pos);
+        if (bakedQuads == null) return;
+
+        QuadEmitter emitter = context.getEmitter();
+        RenderMaterial material = getRenderMaterial();
+        if (material == null) return;
+
+        bakedQuads.forEach((dir, quads) ->
+                emitQuads(dir, emitter, material, quads));
+    }
+
+    @Nullable
+    public EnumMap<Direction, List<BakedQuad>> collectQuads(BlockAndTintGetter getter, BlockState state, BlockPos pos) {
+        if (state == null) return null;
 
         int coreRadius = getRadius(state);
-        if (coreRadius <= 0 || coreRadius > 8) return;
+        if (coreRadius <= 0 || coreRadius > 8) return null;
 
         int[] connections = new int[]{0, 0, 0, 0};
         RootConnections.ConnectionLevel[] connectionLevels = RootConnections.PLACEHOLDER_CONNECTION_LEVELS.clone();
 
         if (state.getBlock() instanceof SurfaceRootBlock surfaceRootBlock) {
-            RootConnections connectionData = surfaceRootBlock.getConnectionData(blockView, pos);
+            RootConnections connectionData = surfaceRootBlock.getConnectionData(getter, pos);
             connections = connectionData.getAllRadii();
             connectionLevels = connectionData.getConnectionLevels();
         }
@@ -246,19 +260,12 @@ public class SurfaceRootBlockBakedModel implements BakedModel, FabricBakedModel 
 
         boolean isGrounded = state.getValue(SurfaceRootBlock.GROUNDED);
 
-        QuadEmitter emitter = context.getEmitter();
+        EnumMap<Direction, List<BakedQuad>> bakedQuads = new EnumMap<>(Direction.class);
 
         for (Direction face : Direction.values()) {
+            List<BakedQuad> quads = bakedQuads.computeIfAbsent(face, dir->new ArrayList<>());
             if (isGrounded) {
-                List<BakedQuad> coreQuads = coresQuads[coreDir][coreRadius - 1];
-                if (coreQuads != null) {
-                    for (BakedQuad quad : coreQuads) {
-                        if (quad.getDirection() == face) {
-                            emitter.fromVanilla(quad, null, null);
-                            emitter.emit();
-                        }
-                    }
-                }
+                quads.addAll(coresQuads[coreDir][coreRadius - 1]);
             }
 
             if (coreRadius != 8) {
@@ -267,25 +274,37 @@ public class SurfaceRootBlockBakedModel implements BakedModel, FabricBakedModel 
                     int connRadius = connections[idx];
                     if (connRadius > 0) {
                         if (isGrounded && sleevesQuads[idx][connRadius - 1] != null) {
-                            for (BakedQuad quad : sleevesQuads[idx][connRadius - 1]) {
-                                if (quad.getDirection() == face) {
-                                    emitter.fromVanilla(quad, null, null);
-                                    emitter.emit();
-                                }
-                            }
+                            quads.addAll(sleevesQuads[idx][connRadius - 1]);
                         }
                         if (connectionLevels[idx] == RootConnections.ConnectionLevel.HIGH && vertsQuads[idx][connRadius - 1] != null) {
-                            for (BakedQuad quad : vertsQuads[idx][connRadius - 1]) {
-                                if (quad.getDirection() == face) {
-                                    emitter.fromVanilla(quad, null, null);
-                                    emitter.emit();
-                                }
-                            }
+                            quads.addAll(vertsQuads[idx][connRadius - 1]);
                         }
                     }
                 }
             }
         }
+        return bakedQuads;
+    }
+
+    protected static void emitQuads(Direction face, QuadEmitter emitter, RenderMaterial material, List<BakedQuad> quads) {
+        if (quads == null) return;
+        for (BakedQuad quad : quads) {
+            if (quad.getDirection() == face) {
+                emitter.fromVanilla(quad, material, null);
+                emitter.emit();
+            }
+        }
+    }
+
+    protected static RenderMaterial getRenderMaterial() {
+        var renderer = RendererAccess.INSTANCE.getRenderer();
+        if (renderer == null) return null;
+        MaterialFinder finder = renderer.materialFinder();
+
+//        finder.disableAo(0, true);
+//        finder.disableDiffuse(0, true);
+
+        return finder.find();
     }
 
     @Override

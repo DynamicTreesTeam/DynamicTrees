@@ -1,5 +1,6 @@
 package com.dtteam.dynamictrees.api.worldgen;
 
+import com.dtteam.dynamictrees.deserialization.math.MathContext;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.worldgen.BiomeGenSettingsBuilderWrapper;
 import com.google.common.collect.Sets;
@@ -24,12 +25,12 @@ public class BiomePropertySelectors {
 
     @FunctionalInterface
     public interface ChanceSelector {
-        Chance getChance(RandomSource random, @NotNull Species species, int radius);
+        Chance getChance(MathContext mc);
     }
 
     @FunctionalInterface
     public interface DensitySelector {
-        double getDensity(RandomSource random, double noiseDensity);
+        double getDensity(MathContext context);
     }
 
     @FunctionalInterface
@@ -45,12 +46,12 @@ public class BiomePropertySelectors {
         void cancelFeatures(BiomeGenSettingsBuilderWrapper generationSettingsBuilder);
 
         /**
-         * Tells the canceller to cancel features using the given canceller.
+         * Tells the canceler to cancel features using the given canceler.
          */
         void cancelUsing(FeatureCanceller featureCanceller);
 
         /**
-         * Tells the canceller to cancel features whose names contain the given namespace.
+         * Tells the canceler to cancel features whose names contain the given namespace.
          */
         void cancelWithNamespace(String namespace);
 
@@ -264,8 +265,7 @@ public class BiomePropertySelectors {
         }
 
     }
-
-
+    
     public enum Chance {
         OK,
         CANCEL,
