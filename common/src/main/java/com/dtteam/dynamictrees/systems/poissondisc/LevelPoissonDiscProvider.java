@@ -11,8 +11,12 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Manages and creates all the Poisson discs in a single level (world).
@@ -22,12 +26,12 @@ import java.util.Map.Entry;
 public class LevelPoissonDiscProvider implements PoissonDiscProvider {
 
     private final RadiusCoordinator radiusCoordinator;
-    private final HashMap<ChunkPos, PoissonDiscChunkSet> chunkDiscs;
+    private final Map<ChunkPos, PoissonDiscChunkSet> chunkDiscs;
     private RandomXOR random = new RandomXOR();
     private PoissonDebug debug = PoissonDebug.EMPTY_POISSON_DEBUG;
 
     public LevelPoissonDiscProvider(RadiusCoordinator radCoord) {
-        this.chunkDiscs = new HashMap<>();
+        this.chunkDiscs = new ConcurrentHashMap<>();
         this.radiusCoordinator = radCoord;
     }
 

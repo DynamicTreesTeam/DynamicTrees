@@ -18,9 +18,9 @@ public final class BiomeDatabases {
 
     private static final BiomeDatabase DEFAULT_DATABASE = new BiomeDatabase();
     /** Dimension names to their respective {@link com.dtteam.dynamictrees.worldgen.BiomeDatabase}. */
-    private static final Map<ResourceLocation, BiomeDatabase> DIMENSIONAL_DATABASES = Maps.newHashMap();
+    private static final Map<ResourceLocation, BiomeDatabase> DIMENSIONAL_DATABASES = Maps.newConcurrentMap();
     /** Dimension names for dimensions that are blacklisted. */
-    private static final Set<ResourceLocation> BLACKLIST = Sets.newHashSet();
+    private static final Set<ResourceLocation> BLACKLIST = Sets.newConcurrentHashSet();
 
     public static BiomeDatabase getDefault() {
         return DEFAULT_DATABASE;
