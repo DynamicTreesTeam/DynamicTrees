@@ -4,7 +4,7 @@ import com.dtteam.dynamictrees.api.worldgen.RadiusCoordinator;
 import com.dtteam.dynamictrees.deserialization.math.MathContext;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Vec3i;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelAccessor;
@@ -15,11 +15,11 @@ import java.util.function.Function;
 public class BiomeRadiusCoordinator implements RadiusCoordinator {
     
     protected final LevelAccessor level;
-    protected final ResourceLocation dimensionName;
+    protected final Identifier dimensionName;
     protected int pass;
     protected Function<Integer, Integer> chunkMultipass;
 
-    public BiomeRadiusCoordinator(ResourceLocation dimensionName, LevelAccessor level) {
+    public BiomeRadiusCoordinator(Identifier dimensionName, LevelAccessor level) {
         this.level = level;
         this.dimensionName = dimensionName;
     }
@@ -36,12 +36,12 @@ public class BiomeRadiusCoordinator implements RadiusCoordinator {
     }
     
     private double calcDensity(int x, int z) {
-        final Holder<Biome> biome = this.level.getUncachedNoiseBiome((x + 8) >> 2, level.getMaxBuildHeight() >> 2, (z + 8) >> 2); // Placement is offset by +8,+8
+        final Holder<Biome> biome = this.level.getUncachedNoiseBiome((x + 8) >> 2, level.getMaxY() >> 2, (z + 8) >> 2); // Placement is offset by +8,+8
         final Vec3i pos = new Vec3i(x, 0, z);
         final RandomSource randomSource = this.level.getRandom();
         final MathContext mathContext = new MathContext(pos, randomSource);
         return BiomeDatabases
-            .getDimensionalOrDefault(this.dimensionName)
+            .getDimensionalOrDefault(dimensionName)
             .getDensitySelector(biome)
             .getDensity(mathContext);
     }
@@ -63,7 +63,7 @@ public class BiomeRadiusCoordinator implements RadiusCoordinator {
         this.pass = pass;
 
         if (pass == 0) {
-            final Holder<Biome> biome = this.level.getUncachedNoiseBiome(((chunkX << 4) + 8) >> 2, level.getMaxBuildHeight() >> 2, ((chunkZ << 4) + 8) >> 2); // Aim at center of chunk
+            final Holder<Biome> biome = this.level.getUncachedNoiseBiome(((chunkX << 4) + 8) >> 2, level.getMaxY() >> 2, ((chunkZ << 4) + 8) >> 2); // Aim at center of chunk
             this.chunkMultipass = BiomeDatabases.getDimensionalOrDefault(this.dimensionName).getMultipass(biome);
         }
 

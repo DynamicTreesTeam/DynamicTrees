@@ -4,7 +4,6 @@ import com.dtteam.dynamictrees.block.sapling.DynamicSaplingBlock;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.ItemUtils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -34,11 +33,6 @@ public class VanillaSaplingEventHandler {
 
         // If we should be overriding for this location, then correct the species to the override.
         final Species species = targetSpecies.selfOrLocationOverride(level, pos);
-
-        //Allow species to override sapling replacement when crouching
-        if (species.overrideSaplingReplacementWhenCrouching() && event.getEntity() != null && event.getEntity().isCrouching()){
-            return;
-        }
 
         level.removeBlock(pos, false); // Remove the block so the plantTree function won't automatically fail.
 
