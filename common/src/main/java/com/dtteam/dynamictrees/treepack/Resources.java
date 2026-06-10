@@ -13,7 +13,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
-import net.minecraft.world.item.crafting.RecipeManager;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -138,11 +137,8 @@ public final class Resources {
      * recipes.
      */
     public static class ReloadListener implements PreparableReloadListener {
-        private RecipeManager recipeManager;
 
-        public ReloadListener(RecipeManager recipeManager) {
-            this.recipeManager = recipeManager;
-        }
+        public ReloadListener() {}
 
         @Override
         public CompletableFuture<Void> reload(SharedState sharedState, Executor executor, PreparationBarrier preparationBarrier, Executor executor1) {

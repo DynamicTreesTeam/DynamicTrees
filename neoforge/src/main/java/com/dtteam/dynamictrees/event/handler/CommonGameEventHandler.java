@@ -142,7 +142,7 @@ public class CommonGameEventHandler {
 
     @SubscribeEvent
     public static void addReloadListeners(final AddServerReloadListenersEvent event) {
-        event.addListener(DynamicTrees.location("resource_reload_listener"), new Resources.ReloadListener(event.getServerResources().getRecipeManager()));
+        event.addListener(DynamicTrees.location("resource_reload_listener"), new Resources.ReloadListener());
     }
 
     ///////////////////////////////////////////

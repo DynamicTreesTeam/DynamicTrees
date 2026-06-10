@@ -130,9 +130,7 @@ public class ClientModEventHandler {
                         else
                             event.register(List.of(BlockTintSources.constant(customColor)), leaves);
                     } else {
-                        event.register(
-                                CloneTintSource.cloneAllSources(blockColors, properties::getPrimitiveLeaves, properties.getFoliageTintLayerCount()),
-                                leaves);
+                        event.register(CloneTintSource.cloneAllSources(blockColors, properties::getPrimitiveLeaves, properties.getFoliageTintLayerCount()), leaves);
                     }
                 });
 
@@ -144,7 +142,9 @@ public class ClientModEventHandler {
                 .forEach(sapling -> {
                             Species species = sapling.getSpecies();
                             event.register(List.of(
+                                    //Leaves for the leaves
                                     new SaplingTintSource(blockColors, species),
+                                    //Mangrove saplings have roots so we provide a branch tint
                                     new SuppliedConstantTintSource(()->species.getFamily().woodBarkColor)
                             ), sapling);
                         }
