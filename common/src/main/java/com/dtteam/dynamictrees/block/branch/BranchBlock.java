@@ -13,11 +13,11 @@ import com.dtteam.dynamictrees.block.FutureBreakable;
 import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.data.DTLootTableBuilder;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
-import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.loot.LootTableSupplier;
-import com.dtteam.dynamictrees.platform.*;
+import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.systems.FutureBreak;
 import com.dtteam.dynamictrees.systems.nodemapper.DestroyerNode;
 import com.dtteam.dynamictrees.systems.nodemapper.NetVolumeNode;
@@ -725,7 +725,8 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
      */
     public void breakDeliberate(LevelAccessor level, BlockPos pos, DynamicTrees.DestroyMode mode) {
         destroyMode = mode;
-        FluidState state = level.getFluidState(pos);
+        FluidState state = Optional.ofNullable(ChunkTreeHelper.getStateSafe(level, pos))
+                .orElse(Blocks.AIR.defaultBlockState()).getFluidState();
         if (state.isEmpty())
             level.removeBlock(pos, false);
         else
