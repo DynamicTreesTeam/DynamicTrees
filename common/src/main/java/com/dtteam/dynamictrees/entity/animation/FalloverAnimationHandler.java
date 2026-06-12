@@ -15,7 +15,7 @@ import com.dtteam.dynamictrees.utility.MathUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.BlockAndTintGetter;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -111,6 +111,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
     }
 
     protected void spawnLeavesParticlesWhileFalling(FallingTreeEntity entity, float fallSpeed){
+        if (!entity.level().isClientSide()) return;
         BranchDestructionData data = entity.getDestroyData();
         if (data.getAllLeavesWithPos().isEmpty()) return;
 
@@ -131,6 +132,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
     }
 
     protected void flingLeavesParticles(FallingTreeEntity entity, float fallSpeed){
+        if (!entity.level().isClientSide()) return;
         int bounces = getData(entity).bounces;
         if (bounces > 1) return;
         int maxParticleBlocks = DTConfigs.COMMON.maxFallingTreeLeavesParticles.get();
@@ -170,7 +172,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
     }
 
     private ParticleOptions getParticle(FallingTreeEntity entity, BlockState leavesState, BlockPos leavesPos){
-        BlockAndTintGetter level = Minecraft.getInstance().level;
+        ClientLevel level = Minecraft.getInstance().level;
         if (level != null) {
             if (leavesState.getBlock() instanceof DynamicLeavesBlock leavesBlock){
                 LeavesProperties properties = leavesBlock.getLeavesProperties();
