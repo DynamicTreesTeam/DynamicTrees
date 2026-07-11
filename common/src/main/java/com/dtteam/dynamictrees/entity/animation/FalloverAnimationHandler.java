@@ -14,7 +14,6 @@ import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.MathUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -25,7 +24,6 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.BlockAndLightGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -170,20 +168,23 @@ public class FalloverAnimationHandler implements AnimationHandler {
     }
 
     private ParticleOptions getParticle(FallingTreeEntity entity, BlockState leavesState, BlockPos leavesPos){
-        BlockAndLightGetter level = Minecraft.getInstance().level;
-        if (level != null) {
-            if (leavesState.getBlock() instanceof DynamicLeavesBlock leavesBlock){
-                LeavesProperties properties = leavesBlock.getLeavesProperties();
-                Integer leavesColor = properties.getForceParticleColor();
-                if (leavesColor == null) leavesColor = TintSourceHelper.getLeavesColor(entity.getSpecies(), level, leavesPos);
-
-                //if the chance is 0 it means we do not want leaves particles, so use block particles.
-                if (properties.getLeavesParticleChance() > 0){
-                    ParticleOptions opts = properties.getLeavesParticle(leavesColor);
-                    //if it's not null then we have custom particles, otherwise do regular
-                    if (opts != null) return opts;
-                    return ColorParticleOption.create(ParticleTypes.TINTED_LEAVES, leavesColor);
+        if (leavesState.getBlock() instanceof DynamicLeavesBlock leavesBlock) {
+            LeavesProperties properties = leavesBlock.getLeavesProperties();
+            Integer leavesColor = properties.getForceParticleColor();
+            if (leavesColor == null) {
+                if (entity.level().isClientSide()) {
+                    leavesColor = TintSourceHelper.getLeavesColor(entity.getSpecies(), entity.level(), leavesPos);
+                } else {
+                    leavesColor = 0;
                 }
+            }
+
+            //if the chance is 0 it means we do not want leaves particles, so use block particles.
+            if (properties.getLeavesParticleChance() > 0) {
+                ParticleOptions opts = properties.getLeavesParticle(leavesColor);
+                //if it's not null then we have custom particles, otherwise do regular
+                if (opts != null) return opts;
+                return ColorParticleOption.create(ParticleTypes.TINTED_LEAVES, leavesColor);
             }
         }
         return new BlockParticleOption(ParticleTypes.BLOCK, leavesState);
