@@ -5,12 +5,14 @@ import com.dtteam.dynamictrees.recipe.DendroPotionRecipeHandler;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.serialization.MapCodec;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityDataRegistry;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.ArgumentTypeInfos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
@@ -100,6 +102,15 @@ public class FabricRegistryLoader extends RegistryLoader {
     public <T> Supplier<DataComponentType<T>> registerDataComponentType(String name, UnaryOperator<DataComponentType.Builder<T>> operator) {
         DataComponentType<T> type = Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, DynamicTrees.location(name), operator.apply(DataComponentType.builder()).build());
         return ()-> type;
+    }
+
+    @Override
+    public <T> Supplier<EntityDataSerializer<T>> registerEntityDataSerializer(String name, Supplier<EntityDataSerializer<T>> operator) {
+        EntityDataSerializer<T> serializer = operator.get();
+        // Fabric API forbids vanilla's EntityDataSerializers.registerSerializer at runtime
+        // ("use FabricEntityDataRegistry.register instead"), so register through its API.
+        FabricEntityDataRegistry.register(DynamicTrees.location(name), serializer);
+        return ()-> serializer;
     }
 
     @Override
