@@ -15,7 +15,7 @@ import com.dtteam.dynamictrees.worldgen.feature.DynamicTreeFeature;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLevelEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
@@ -32,16 +32,16 @@ public class CommonEventHandler {
 
     public static void RegisterEvents(){
 
-        ServerTickEvents.START_WORLD_TICK.register((level)->{
+        ServerTickEvents.START_LEVEL_TICK.register((level)->{
             FutureBreak.process(level);
-            SeasonHelper.updateTick(level, level.getDayTime());
+            SeasonHelper.updateTick(level, level.getDefaultClockTime());
         });
 
-        ServerWorldEvents.LOAD.register(((minecraftServer, serverLevel) -> {
+        ServerLevelEvents.LOAD.register(((minecraftServer, serverLevel) -> {
             BiomeDatabases.populateBlacklistFromConfig();
         }));
 
-        ServerWorldEvents.UNLOAD.register(((minecraftServer, serverLevel) -> {
+        ServerLevelEvents.UNLOAD.register(((minecraftServer, serverLevel) -> {
             DynamicTreeFeature.DISC_PROVIDER.unloadWorld(serverLevel);
         }));
 
@@ -57,13 +57,13 @@ public class CommonEventHandler {
         PlayerBlockBreakEvents.BEFORE.register((level, player, pos, state, blockEntity) -> {
             Block block = state.getBlock();
             if (block instanceof BranchBlock branchBlock) {
-                return branchBlock.onDestroyedByPlayer(state, level, pos, player, true, level.getFluidState(pos));
+                return branchBlock.onDestroyedByPlayer(state, level, pos, player, player.getMainHandItem(), true, level.getFluidState(pos));
             } else if (block instanceof TrunkShellBlock trunkShellBlock) {
-                return trunkShellBlock.onDestroyedByPlayer(state, level, pos, player, true, level.getFluidState(pos));
+                return trunkShellBlock.onDestroyedByPlayer(state, level, pos, player, player.getMainHandItem(), true, level.getFluidState(pos));
             } else if (block instanceof SoilBlock soilBlock) {
                 return soilBlock.onDestroyedByPlayer(state, level, pos, player, true, level.getFluidState(pos));
             } else if (block instanceof PottedSaplingBlock pottedSaplingBlock) {
-                return pottedSaplingBlock.onDestroyedByPlayer(state, level, pos, player, true, level.getFluidState(pos));
+                return pottedSaplingBlock.onDestroyedByPlayer(state, level, pos, player, player.getMainHandItem(), true, level.getFluidState(pos));
             }
             return true;
         });
@@ -79,10 +79,9 @@ public class CommonEventHandler {
         }
 
         @Override
-        public CompletableFuture<Void> reload(PreparationBarrier stage, ResourceManager resourceManager,
-                                              ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler,
-                                              Executor backgroundExecutor, Executor gameExecutor) {
-            return super.reload(stage, resourceManager, preparationsProfiler, reloadProfiler, backgroundExecutor, gameExecutor);
+        public CompletableFuture<Void> reload(SharedState sharedState, Executor backgroundExecutor,
+                                              PreparationBarrier preparationBarrier, Executor gameExecutor) {
+            return super.reload(sharedState, backgroundExecutor, preparationBarrier, gameExecutor);
         }
 
         @Override

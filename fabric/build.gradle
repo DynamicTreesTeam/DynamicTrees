@@ -26,6 +26,9 @@ dependencies {
     compileOnly "maven.modrinth:jade:26.2.9+fabric"
     compileOnly "maven.modrinth:continuity:3.0.1+26.2"
     compileOnly "maven.modrinth:serene-seasons:26.1.2.0.4"
+    compileOnly "maven.modrinth:glitchcore:26.2.0.0.0" // transitive API of serene-seasons, needed at compile time
+    implementation "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${project.forge_config_api_port_version}"
+    compileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2' // javax.annotation used by common sources
 }
 
 loom {

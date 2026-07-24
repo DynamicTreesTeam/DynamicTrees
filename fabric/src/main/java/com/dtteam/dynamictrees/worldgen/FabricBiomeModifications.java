@@ -72,7 +72,7 @@ public class FabricBiomeModifications {
 
         for (GenerationStep.Decoration stage : featureCancellations.getDecorationSteps()) {
             int stageIndex = stage.ordinal();
-            List<HolderSet<PlacedFeature>> features = selectionContext.getBiomeRegistryEntry()
+            List<HolderSet<PlacedFeature>> features = selectionContext.getBiomeHolder()
                     .value()
                     .getGenerationSettings()
                     .features();
@@ -90,9 +90,9 @@ public class FabricBiomeModifications {
 
                 PlacedFeature placedFeature = placedFeatureHolder.value();
 
-                boolean shouldCancel = placedFeature.getFeatures().anyMatch(configuredFeature -> {
+                boolean shouldCancel = placedFeature.getFeatures().anyMatch(configuredFeatureHolder -> {
                     for (FeatureCanceller featureCanceller : featureCancellations.getCancellers()) {
-                        if (featureCanceller.shouldCancel(configuredFeature, featureCancellations)) {
+                        if (featureCanceller.shouldCancel(configuredFeatureHolder.value(), featureCancellations)) {
                             return true;
                         }
                     }

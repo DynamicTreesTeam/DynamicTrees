@@ -47,12 +47,12 @@ public class VanillaSaplingEventHandler {
             return InteractionResult.PASS;
         }
 
-        Species targetSpecies = DynamicSaplingBlock.SAPLING_REPLACERS.get(block);
-        Species species = targetSpecies.selfOrLocationOverride(level, placePos);
-
-        if (species.overrideSaplingReplacementWhenCrouching() && player.isCrouching()){
+        if (!DynamicSaplingBlock.shouldReplaceSaplingWhenPlaced(block.defaultBlockState())) {
             return InteractionResult.PASS;
         }
+
+        Species targetSpecies = DynamicSaplingBlock.SAPLING_REPLACERS.get(block);
+        Species species = targetSpecies.selfOrLocationOverride(level, placePos);
 
         if (!species.plantSapling(level, placePos, targetSpecies != species)) {
             if (!player.isCreative()) stack.grow(1);

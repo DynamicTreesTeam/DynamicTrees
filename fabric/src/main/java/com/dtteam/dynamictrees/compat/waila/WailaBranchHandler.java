@@ -28,8 +28,6 @@ import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
-import snownee.jade.api.ui.IElement;
-import snownee.jade.impl.ui.ElementHelper;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -57,7 +55,7 @@ public class WailaBranchHandler implements IBlockComponentProvider {
 
         //Attempt to get species from server via NBT data
         if (nbtData.contains("species")) {
-            species = Species.findSpecies(Identifier.parse(nbtData.getString("species")));
+            species = Species.findSpecies(Identifier.parse(nbtData.getString("species").get()));
         }
 
         //Attempt to get species by checking if we're still looking at the same block
@@ -91,47 +89,49 @@ public class WailaBranchHandler implements IBlockComponentProvider {
                 tooltip.add(Component.literal(ChatFormatting.DARK_GRAY + species.getRegistryName().toString()));
             }
 
-            ItemStack seedStack = species.getSeedStack(1);
-
-            List<IElement> elements = new LinkedList<>();
-            elements.add(getElement(seedStack)); //adds seed;
-
-            if (species.hasFruits()){
-                for (Fruit fruit : species.getFruits()){
-                    ItemStack fruitStack = fruit.getItemStack();
-                    if (fruitStack.getItem() != seedStack.getItem())
-                        elements.add(getElement(fruitStack));
-                }
-            }
-            if (species.hasPods()){
-                for (Pod pod : species.getPods()){
-                    ItemStack podStack = pod.getItemStack();
-                    if (podStack.getItem() != seedStack.getItem())
-                        elements.add(getElement(podStack));
-                }
-            }
-
-            int silkTouch = ItemUtils.getEnchantmentLevel(Enchantments.SILK_TOUCH, accessor.getPlayer().getMainHandItem(), accessor.getPlayer().registryAccess());
-            int fortune = ItemUtils.getEnchantmentLevel(Enchantments.FORTUNE, accessor.getPlayer().getMainHandItem(), accessor.getPlayer().registryAccess());
-            if (lastVolume.getVolume() > 0) {
-                LogsAndSticks las = species.getLogsAndSticks(lastVolume, silkTouch > 0, fortune);
-                List<ItemStack> logStacks = las.logs;
-                if (!logStacks.isEmpty()) {
-                    for (ItemStack logStack : logStacks) {
-                        elements.add(getElement(logStack));
-                    }
-                }
-                if (las.sticks > 0) {
-                    ItemStack stickStack = species.getFamily().getStickStack(las.sticks);
-                    if (!stickStack.isEmpty()) {
-                        elements.add(getElement(stickStack));
-                    }
-                }
-            }
-
-            tooltip.add(elements.removeFirst());
-            elements.forEach(tooltip::append);
-            tooltip.add(ElementHelper.INSTANCE.spacer(0, 2));
+            // TODO 26.2 port: Jade removed the IElement/ElementHelper API; the item icon row
+            //  (seed/fruit/pod/log/stick stacks) needs to be reimplemented against the new Jade API.
+//            ItemStack seedStack = species.getSeedStack(1);
+//
+//            List<IElement> elements = new LinkedList<>();
+//            elements.add(getElement(seedStack)); //adds seed;
+//
+//            if (species.hasFruits()){
+//                for (Fruit fruit : species.getFruits()){
+//                    ItemStack fruitStack = fruit.getItemStack();
+//                    if (fruitStack.getItem() != seedStack.getItem())
+//                        elements.add(getElement(fruitStack));
+//                }
+//            }
+//            if (species.hasPods()){
+//                for (Pod pod : species.getPods()){
+//                    ItemStack podStack = pod.getItemStack();
+//                    if (podStack.getItem() != seedStack.getItem())
+//                        elements.add(getElement(podStack));
+//                }
+//            }
+//
+//            int silkTouch = ItemUtils.getEnchantmentLevel(Enchantments.SILK_TOUCH, accessor.getPlayer().getMainHandItem(), accessor.getPlayer().registryAccess());
+//            int fortune = ItemUtils.getEnchantmentLevel(Enchantments.FORTUNE, accessor.getPlayer().getMainHandItem(), accessor.getPlayer().registryAccess());
+//            if (lastVolume.getVolume() > 0) {
+//                LogsAndSticks las = species.getLogsAndSticks(lastVolume, silkTouch > 0, fortune);
+//                List<ItemStack> logStacks = las.logs;
+//                if (!logStacks.isEmpty()) {
+//                    for (ItemStack logStack : logStacks) {
+//                        elements.add(getElement(logStack));
+//                    }
+//                }
+//                if (las.sticks > 0) {
+//                    ItemStack stickStack = species.getFamily().getStickStack(las.sticks);
+//                    if (!stickStack.isEmpty()) {
+//                        elements.add(getElement(stickStack));
+//                    }
+//                }
+//            }
+//
+//            tooltip.add(elements.removeFirst());
+//            elements.forEach(tooltip::append);
+//            tooltip.add(ElementHelper.INSTANCE.spacer(0, 2));
         }
     }
 
@@ -167,13 +167,13 @@ public class WailaBranchHandler implements IBlockComponentProvider {
         return TreeHelper.getBestGuessSpecies(level, pos);
     }
 
-    private static IElement getElement(ItemStack stack) {
-        if (!stack.isEmpty()) {
-            return ElementHelper.INSTANCE.item(stack);
-        } else {
-            return ElementHelper.INSTANCE.spacer(0, 0);
-        }
-    }
+//    private static IElement getElement(ItemStack stack) {
+//        if (!stack.isEmpty()) {
+//            return ElementHelper.INSTANCE.item(stack);
+//        } else {
+//            return ElementHelper.INSTANCE.spacer(0, 0);
+//        }
+//    }
 
     @Override
     public Identifier getUid() {

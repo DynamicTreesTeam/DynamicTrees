@@ -24,6 +24,11 @@ public class DelayedHolderSet<T> implements HolderSet<T> {
     }
 
     @Override
+    public boolean isBound() {
+        return this.holderSetSupplier.get().isBound();
+    }
+
+    @Override
     public Stream<Holder<T>> stream() {
         return this.holderSetSupplier.get().stream();
     }

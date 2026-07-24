@@ -7,6 +7,7 @@ import com.dtteam.dynamictrees.model.FallingTreeEntityModelFabric;
 import com.dtteam.dynamictrees.platform.services.IClientHelper;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.renderer.texture.SpriteContents;
+import net.minecraft.util.ARGB;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 public class FabricClientHelper implements IClientHelper {
@@ -17,7 +18,8 @@ public class FabricClientHelper implements IClientHelper {
             SpriteContents contents = sprite.contents();
             NativeImage image = contents.originalImage;
             if (image != null) {
-                return image.getPixelRGBA(x, y);
+                // getPixel returns ARGB; convert to the ABGR layout the old getPixelRGBA returned.
+                return ARGB.toABGR(image.getPixel(x, y));
             }
             return 0;
         } catch (Exception e) {

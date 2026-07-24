@@ -4,243 +4,177 @@ import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.block.branch.BasicRootsBlock;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.branch.SurfaceRootBlock;
+import com.dtteam.dynamictrees.block.sapling.PottedSaplingBlock;
 import com.dtteam.dynamictrees.model.baked.BasicBranchBlockBakedModel;
 import com.dtteam.dynamictrees.model.baked.BasicRootsBlockBakedModel;
 import com.dtteam.dynamictrees.model.baked.SurfaceRootBlockBakedModel;
 import com.dtteam.dynamictrees.model.baked.ThickBranchBlockBakedModel;
-import com.dtteam.dynamictrees.tree.family.Family;
+import com.dtteam.dynamictrees.model.parts.BranchModelPart;
 import com.dtteam.dynamictrees.tree.family.AerialRootsFamily;
+import com.dtteam.dynamictrees.tree.family.Family;
+import com.dtteam.dynamictrees.utility.IdentifierUtils;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelModifier;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.ModelIdentifier;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.resources.model.ModelBaker;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Swaps the baked block state models of dynamic branch, root and potted sapling blocks
+ * for DT's procedurally generated models, using the Fabric Model Loading API.
+ */
 public class DTModelLoadingPlugin implements ModelLoadingPlugin {
 
     public static final Identifier POTTED_SAPLING_MODEL = DynamicTrees.location("potted_sapling");
-    private static final Map<Identifier, BakedModel> BRANCH_MODEL_CACHE = new HashMap<>();
-    private static final Map<Identifier, BakedModel> ROOT_MODEL_CACHE = new HashMap<>();
-    private static final Map<Identifier, BakedModel> UNDERGROUND_ROOTS_MODEL_CACHE = new HashMap<>();
-    private static boolean modelsInitialized = false;
+
+    private static final Map<Identifier, BlockStateModel> MODEL_CACHE = new ConcurrentHashMap<>();
 
     @Override
-    public void onInitializeModelLoader(Context pluginContext) {
-        modelsInitialized = false;
-        BRANCH_MODEL_CACHE.clear();
-        ROOT_MODEL_CACHE.clear();
-        UNDERGROUND_ROOTS_MODEL_CACHE.clear();
-        pluginContext.modifyModelAfterBake().register(ModelModifier.WRAP_PHASE, this::modifyModelAfterBake);
+    public void initialize(Context pluginContext) {
+        MODEL_CACHE.clear();
+        pluginContext.modifyBlockModelAfterBake().register(ModelModifier.WRAP_PHASE, DTModelLoadingPlugin::modifyModelAfterBake);
     }
 
-    private void initBranchModels(Function<Material, TextureAtlasSprite> spriteGetter) {
-        if (modelsInitialized) return;
-        modelsInitialized = true;
+    private static BlockStateModel modifyModelAfterBake(BlockStateModel model, ModelModifier.AfterBakeBlock.Context context) {
+        BlockState state = context.state();
+        Block block = state.getBlock();
 
-        for (Family family : Family.REGISTRY.getAll()) {
-            if (!family.isValid()) continue;
-
-            family.getPrimitiveLog().ifPresent(primitiveLog -> {
-                Identifier primitiveLogId = BuiltInRegistries.BLOCK.getKey(primitiveLog);
-                Identifier barkTexture = Identifier.fromNamespaceAndPath(primitiveLogId.getNamespace(), "block/" + primitiveLogId.getPath());
-                Identifier ringsTexture = barkTexture.withSuffix("_top");
-
-                AtomicReference<Identifier> barkRef = new AtomicReference<>(barkTexture);
-                AtomicReference<Identifier> ringsRef = new AtomicReference<>(ringsTexture);
-
-                family.getTexturePath(Family.BRANCH).ifPresent(barkRef::set);
-                family.getTexturePath(Family.BRANCH_TOP).ifPresent(ringsRef::set);
-
-                boolean isThick = family.isThick();
-
-                family.getBranch().ifPresent(branch -> {
-                    Identifier blockId = BuiltInRegistries.BLOCK.getKey(branch);
-                    BakedModel model = createBranchModel(barkRef.get(), ringsRef.get(), isThick, spriteGetter);
-                    BRANCH_MODEL_CACHE.put(blockId, model);
-                });
-            });
-
-            family.getPrimitiveStrippedLog().ifPresent(strippedLog -> {
-                Identifier strippedLogId = BuiltInRegistries.BLOCK.getKey(strippedLog);
-                Identifier strippedBarkTexture = Identifier.fromNamespaceAndPath(strippedLogId.getNamespace(), "block/" + strippedLogId.getPath());
-                Identifier strippedRingsTexture = strippedBarkTexture.withSuffix("_top");
-
-                AtomicReference<Identifier> barkRef = new AtomicReference<>(strippedBarkTexture);
-                AtomicReference<Identifier> ringsRef = new AtomicReference<>(strippedRingsTexture);
-
-                family.getTexturePath(Family.STRIPPED_BRANCH).ifPresent(barkRef::set);
-                family.getTexturePath(Family.STRIPPED_BRANCH_TOP).ifPresent(ringsRef::set);
-
-                boolean isThick = family.isThick();
-
-                family.getStrippedBranch().ifPresent(strippedBranch -> {
-                    Identifier blockId = BuiltInRegistries.BLOCK.getKey(strippedBranch);
-                    BakedModel model = createBranchModel(barkRef.get(), ringsRef.get(), isThick, spriteGetter);
-                    BRANCH_MODEL_CACHE.put(blockId, model);
-                });
-            });
-
-            family.getSurfaceRoot().ifPresent(surfaceRoot -> {
-                family.getPrimitiveLog().ifPresent(primitiveLog -> {
-                    Identifier primitiveLogId = BuiltInRegistries.BLOCK.getKey(primitiveLog);
-                    Identifier barkTexture = Identifier.fromNamespaceAndPath(primitiveLogId.getNamespace(), "block/" + primitiveLogId.getPath());
-                    AtomicReference<Identifier> barkRef = new AtomicReference<>(barkTexture);
-                    family.getTexturePath(Family.BRANCH).ifPresent(barkRef::set);
-
-                    Identifier blockId = BuiltInRegistries.BLOCK.getKey(surfaceRoot);
-                    BakedModel model = createRootModel(barkRef.get(), spriteGetter);
-                    ROOT_MODEL_CACHE.put(blockId, model);
-                });
-            });
-
-            if (family instanceof AerialRootsFamily rootsFamily) {
-                rootsFamily.getRoots().ifPresent(roots -> {
-                    Identifier blockId = BuiltInRegistries.BLOCK.getKey(roots);
-
-                    rootsFamily.getPrimitiveRoots().ifPresent(primitiveRoots -> {
-                        Identifier primitiveRootsId = BuiltInRegistries.BLOCK.getKey(primitiveRoots);
-                        Identifier barkTexture = Identifier.fromNamespaceAndPath(primitiveRootsId.getNamespace(), "block/" + primitiveRootsId.getPath() + "_side");
-                        Identifier ringsTexture = Identifier.fromNamespaceAndPath(primitiveRootsId.getNamespace(), "block/" + primitiveRootsId.getPath() + "_top");
-
-                        AtomicReference<Identifier> barkRef = new AtomicReference<>(barkTexture);
-                        AtomicReference<Identifier> ringsRef = new AtomicReference<>(ringsTexture);
-
-                        family.getTexturePath(Family.ROOTS_SIDE).ifPresent(barkRef::set);
-                        family.getTexturePath(Family.ROOTS_TOP).ifPresent(ringsRef::set);
-
-                        BakedModel model = createRootsBlockModel(barkRef.get(), ringsRef.get(), spriteGetter);
-                        UNDERGROUND_ROOTS_MODEL_CACHE.put(blockId.withSuffix("_exposed"), model);
-                    });
-
-                    rootsFamily.getPrimitiveFilledRoots().ifPresent(primitiveFilledRoots -> {
-                        Identifier primitiveFilledRootsId = BuiltInRegistries.BLOCK.getKey(primitiveFilledRoots);
-                        Identifier barkTexture = Identifier.fromNamespaceAndPath(primitiveFilledRootsId.getNamespace(), "block/" + primitiveFilledRootsId.getPath() + "_side");
-                        Identifier ringsTexture = Identifier.fromNamespaceAndPath(primitiveFilledRootsId.getNamespace(), "block/" + primitiveFilledRootsId.getPath() + "_top");
-
-                        BakedModel model = createRootsBlockModel(barkTexture, ringsTexture, spriteGetter);
-                        UNDERGROUND_ROOTS_MODEL_CACHE.put(blockId.withSuffix("_filled"), model);
-                    });
-
-
-                });
-            }
-        }
-    }
-
-    private BakedModel createBranchModel(Identifier barkTexture, Identifier ringsTexture, boolean isThick, Function<Material, TextureAtlasSprite> spriteGetter) {
-        TextureAtlasSprite barkSprite = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, barkTexture));
-        TextureAtlasSprite ringsSprite = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, ringsTexture));
-
-        if (isThick) {
-            Identifier thickRingsTexture = ringsTexture.withSuffix("_thick");
-            TextureAtlasSprite thickRingsSprite = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, thickRingsTexture));
-            return new ThickBranchBlockBakedModel(barkSprite, ringsSprite, thickRingsSprite);
-        }
-
-        return new BasicBranchBlockBakedModel(barkSprite, ringsSprite);
-    }
-
-    private BakedModel createRootModel(Identifier barkTexture, Function<Material, TextureAtlasSprite> spriteGetter) {
-        TextureAtlasSprite barkSprite = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, barkTexture));
-        return new SurfaceRootBlockBakedModel(barkSprite);
-    }
-
-    private BakedModel createRootsBlockModel(Identifier barkTexture, Identifier ringsTexture, Function<Material, TextureAtlasSprite> spriteGetter) {
-        TextureAtlasSprite barkSprite = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, barkTexture));
-        TextureAtlasSprite ringsSprite = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, ringsTexture));
-        return new BasicRootsBlockBakedModel(barkSprite, ringsSprite);
-    }
-
-    private BakedModel createFallbackRootsModel(AerialRootsFamily family, String variant, Function<Material, TextureAtlasSprite> spriteGetter) {
-        if (variant.contains("layer=exposed")) {
-            return family.getPrimitiveRoots().map(primitiveRoots -> {
-                Identifier primitiveRootsId = BuiltInRegistries.BLOCK.getKey(primitiveRoots);
-                Identifier barkTexture = Identifier.fromNamespaceAndPath(primitiveRootsId.getNamespace(), "block/" + primitiveRootsId.getPath() + "_side");
-                Identifier ringsTexture = Identifier.fromNamespaceAndPath(primitiveRootsId.getNamespace(), "block/" + primitiveRootsId.getPath() + "_top");
-                return createRootsBlockModel(barkTexture, ringsTexture, spriteGetter);
-            }).orElse(null);
-        } else if (variant.contains("layer=filled")) {
-            return family.getPrimitiveFilledRoots().map(primitiveFilledRoots -> {
-                Identifier primitiveFilledRootsId = BuiltInRegistries.BLOCK.getKey(primitiveFilledRoots);
-                Identifier barkTexture = Identifier.fromNamespaceAndPath(primitiveFilledRootsId.getNamespace(), "block/" + primitiveFilledRootsId.getPath() + "_side");
-                Identifier ringsTexture = Identifier.fromNamespaceAndPath(primitiveFilledRootsId.getNamespace(), "block/" + primitiveFilledRootsId.getPath() + "_top");
-                return createRootsBlockModel(barkTexture, ringsTexture, spriteGetter);
-            }).orElse(null);
-        }
-        return null;
-    }
-
-    private BakedModel modifyModelAfterBake(BakedModel model, ModelModifier.AfterBake.Context context) {
-        ModelIdentifier modelId = context.topLevelId();
-        if (modelId == null) return model;
-
-        if (modelId.id().equals(POTTED_SAPLING_MODEL)) {
+        if (block instanceof PottedSaplingBlock) {
             return new BakedModelBlockPottedSapling(model);
         }
 
-        Identifier blockId = modelId.id();
-        Block block = BuiltInRegistries.BLOCK.get(blockId);
-
         if (block instanceof BasicRootsBlock rootsBlock) {
-            initBranchModels(context.textureGetter());
-
-            String variant = modelId.variant();
-            Identifier cacheKey;
-            if (variant.contains("layer=filled")) {
-                cacheKey = blockId.withSuffix("_filled");
-            } else if (variant.contains("layer=exposed")) {
-                cacheKey = blockId.withSuffix("_exposed");
-            } else if (variant.contains("layer=covered")) {
-                return model;
-            } else {
-                return model;
-            }
-
-            BakedModel rootsModel = UNDERGROUND_ROOTS_MODEL_CACHE.get(cacheKey);
-            if (rootsModel != null) {
-                return rootsModel;
-            }
-
-            if (rootsBlock.getFamily() instanceof AerialRootsFamily undergroundFamily) {
-                BakedModel fallbackModel = createFallbackRootsModel(undergroundFamily, variant, context.textureGetter());
-                if (fallbackModel != null) {
-                    UNDERGROUND_ROOTS_MODEL_CACHE.put(cacheKey, fallbackModel);
-                    return fallbackModel;
-                }
-            }
-            return model;
+            BlockStateModel rootsModel = getOrCreateRootsModel(rootsBlock, state, context.baker());
+            return rootsModel != null ? rootsModel : model;
         }
 
-        if (block instanceof SurfaceRootBlock) {
-            initBranchModels(context.textureGetter());
-
-            BakedModel rootModel = ROOT_MODEL_CACHE.get(blockId);
-            if (rootModel != null) {
-                return rootModel;
-            }
-            return model;
+        if (block instanceof SurfaceRootBlock surfaceRootBlock) {
+            BlockStateModel rootModel = getOrCreateSurfaceRootModel(surfaceRootBlock, context.baker());
+            return rootModel != null ? rootModel : model;
         }
 
-        if (block instanceof BranchBlock) {
-            initBranchModels(context.textureGetter());
-
-            BakedModel branchModel = BRANCH_MODEL_CACHE.get(blockId);
-            if (branchModel != null) {
-                return branchModel;
-            }
+        if (block instanceof BranchBlock branchBlock) {
+            BlockStateModel branchModel = getOrCreateBranchModel(branchBlock, context.baker());
+            return branchModel != null ? branchModel : model;
         }
-
 
         return model;
+    }
+
+    ///////////////////////////////////////////
+    // BRANCHES
+    ///////////////////////////////////////////
+
+    @Nullable
+    private static BlockStateModel getOrCreateBranchModel(BranchBlock branchBlock, ModelBaker baker) {
+        Family family = branchBlock.getFamily();
+        if (family == null || !family.isValid()) return null;
+
+        Identifier blockId = BuiltInRegistries.BLOCK.getKey(branchBlock);
+
+        boolean stripped = family.getStrippedBranch().map(b -> b == branchBlock).orElse(false);
+        Optional<Block> primitiveLog = stripped ? family.getPrimitiveStrippedLog() : family.getPrimitiveLog();
+        if (primitiveLog.isEmpty()) return null;
+
+        Identifier primitiveLogId = BuiltInRegistries.BLOCK.getKey(primitiveLog.get());
+        Identifier barkTexture = Identifier.fromNamespaceAndPath(primitiveLogId.getNamespace(), "block/" + primitiveLogId.getPath());
+        Identifier ringsTexture = IdentifierUtils.suffix(barkTexture, "_top");
+
+        Identifier barkOverride = family.getTexturePath(stripped ? Family.STRIPPED_BRANCH : Family.BRANCH).orElse(barkTexture);
+        Identifier ringsOverride = family.getTexturePath(stripped ? Family.STRIPPED_BRANCH_TOP : Family.BRANCH_TOP).orElse(ringsTexture);
+
+        boolean isThick = family.isThick();
+
+        return MODEL_CACHE.computeIfAbsent(blockId, id -> createBranchModel(barkOverride, ringsOverride, isThick, baker));
+    }
+
+    private static BlockStateModel createBranchModel(Identifier barkTexture, Identifier ringsTexture, boolean isThick, ModelBaker baker) {
+        Material.Baked barkMat = bakeMaterial(baker, barkTexture);
+        Material.Baked ringsMat = bakeMaterial(baker, ringsTexture);
+
+        BasicBranchBlockBakedModel regular = BasicBranchBlockBakedModel.bakeBasic(baker,
+                new BranchModelPart.UnbakedCore(barkMat),
+                new BranchModelPart.UnbakedSleeve(barkMat),
+                new BranchModelPart.UnbakedCore(ringsMat),
+                null);
+
+        if (isThick) {
+            Identifier thickRingsTexture = IdentifierUtils.suffix(ringsTexture, "_thick");
+            Material.Baked thickRingsMat = bakeMaterial(baker, thickRingsTexture);
+            return ThickBranchBlockBakedModel.bakeThick(baker, regular,
+                    new BranchModelPart.UnbakedThickTrunk(barkMat, false),
+                    new BranchModelPart.UnbakedThickTrunk(thickRingsMat, true));
+        }
+
+        return regular;
+    }
+
+    ///////////////////////////////////////////
+    // SURFACE ROOTS
+    ///////////////////////////////////////////
+
+    @Nullable
+    private static BlockStateModel getOrCreateSurfaceRootModel(SurfaceRootBlock surfaceRootBlock, ModelBaker baker) {
+        Family family = surfaceRootBlock.getFamily();
+        if (family == null || !family.isValid()) return null;
+
+        Optional<Block> primitiveLog = family.getPrimitiveLog();
+        if (primitiveLog.isEmpty()) return null;
+
+        Identifier blockId = BuiltInRegistries.BLOCK.getKey(surfaceRootBlock);
+        Identifier primitiveLogId = BuiltInRegistries.BLOCK.getKey(primitiveLog.get());
+        Identifier barkTexture = Identifier.fromNamespaceAndPath(primitiveLogId.getNamespace(), "block/" + primitiveLogId.getPath());
+        Identifier barkOverride = family.getTexturePath(Family.BRANCH).orElse(barkTexture);
+
+        return MODEL_CACHE.computeIfAbsent(blockId, id -> SurfaceRootBlockBakedModel.bake(baker, barkOverride));
+    }
+
+    ///////////////////////////////////////////
+    // UNDERGROUND (AERIAL) ROOTS
+    ///////////////////////////////////////////
+
+    @Nullable
+    private static BlockStateModel getOrCreateRootsModel(BasicRootsBlock rootsBlock, BlockState state, ModelBaker baker) {
+        if (!(rootsBlock.getFamily() instanceof AerialRootsFamily rootsFamily) || !rootsFamily.isValid()) return null;
+        if (!state.hasProperty(BasicRootsBlock.LAYER)) return null;
+
+        BasicRootsBlock.Layer layer = state.getValue(BasicRootsBlock.LAYER);
+        Identifier blockId = BuiltInRegistries.BLOCK.getKey(rootsBlock);
+
+        return switch (layer) {
+            case EXPOSED -> rootsFamily.getPrimitiveRoots().map(primitiveRoots -> {
+                Identifier primitiveRootsId = BuiltInRegistries.BLOCK.getKey(primitiveRoots);
+                Identifier barkTexture = Identifier.fromNamespaceAndPath(primitiveRootsId.getNamespace(), "block/" + primitiveRootsId.getPath() + "_side");
+                Identifier ringsTexture = Identifier.fromNamespaceAndPath(primitiveRootsId.getNamespace(), "block/" + primitiveRootsId.getPath() + "_top");
+
+                Identifier barkOverride = rootsFamily.getTexturePath(Family.ROOTS_SIDE).orElse(barkTexture);
+                Identifier ringsOverride = rootsFamily.getTexturePath(Family.ROOTS_TOP).orElse(ringsTexture);
+
+                return MODEL_CACHE.computeIfAbsent(IdentifierUtils.suffix(blockId, "_exposed"), id ->
+                        BasicRootsBlockBakedModel.bakeRoots(baker, bakeMaterial(baker, barkOverride), bakeMaterial(baker, ringsOverride), false));
+            }).orElse(null);
+            case FILLED -> rootsFamily.getPrimitiveFilledRoots().map(primitiveFilledRoots -> {
+                Identifier primitiveFilledRootsId = BuiltInRegistries.BLOCK.getKey(primitiveFilledRoots);
+                Identifier barkTexture = Identifier.fromNamespaceAndPath(primitiveFilledRootsId.getNamespace(), "block/" + primitiveFilledRootsId.getPath() + "_side");
+                Identifier ringsTexture = Identifier.fromNamespaceAndPath(primitiveFilledRootsId.getNamespace(), "block/" + primitiveFilledRootsId.getPath() + "_top");
+
+                return MODEL_CACHE.computeIfAbsent(IdentifierUtils.suffix(blockId, "_filled"), id ->
+                        BasicRootsBlockBakedModel.bakeRoots(baker, bakeMaterial(baker, barkTexture), bakeMaterial(baker, ringsTexture), true));
+            }).orElse(null);
+            case COVERED -> null; // Covered roots keep their regular (soil-like) model.
+        };
+    }
+
+    private static Material.Baked bakeMaterial(ModelBaker baker, Identifier texture) {
+        return baker.materials().get(new Material(texture), texture::toDebugFileName);
     }
 }

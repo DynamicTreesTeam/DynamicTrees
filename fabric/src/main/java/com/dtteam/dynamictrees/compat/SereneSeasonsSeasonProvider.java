@@ -3,8 +3,8 @@ package com.dtteam.dynamictrees.compat;
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.season.SeasonProvider;
 import com.dtteam.dynamictrees.systems.season.*;
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.BlockPos;
-import net.minecraft.util.Tuple;
 import net.minecraft.world.level.Level;
 import sereneseasons.api.season.Season;
 import sereneseasons.init.ModConfig;
@@ -26,7 +26,7 @@ public class SereneSeasonsSeasonProvider implements SeasonProvider {
     @Override
     public boolean shouldSnowMelt(Level level, BlockPos pos) {
         if (ModConfig.seasons.generateSnowAndIce && seasonValue < SeasonHelper.WINTER_START) {
-            return level.getBiome(pos).value().warmEnoughToRain(pos);
+            return level.getBiome(pos).value().warmEnoughToRain(pos, level.getSeaLevel());
         }
         return false;
     }
@@ -35,8 +35,8 @@ public class SereneSeasonsSeasonProvider implements SeasonProvider {
         SeasonCompatibilityHandler.registerSeasonManager(DynamicTrees.SERENE_SEASONS, () -> {
             NormalSeasonManager seasonManager = new NormalSeasonManager(
                     world -> ModConfig.seasons.isDimensionWhitelisted(world.dimension()) ?
-                            new Tuple<>(new SereneSeasonsSeasonProvider(), new ActiveSeasonGrowthCalculator()) :
-                            new Tuple<>(new NullSeasonProvider(), new NullSeasonGrowthCalculator())
+                            new Pair<>(new SereneSeasonsSeasonProvider(), new ActiveSeasonGrowthCalculator()) :
+                            new Pair<>(new NullSeasonProvider(), new NullSeasonGrowthCalculator())
             );
             seasonManager.setTropicalPredicate((world, pos) -> sereneseasons.api.season.SeasonHelper.usesTropicalSeasons(world.getBiome(pos)));
             return seasonManager;

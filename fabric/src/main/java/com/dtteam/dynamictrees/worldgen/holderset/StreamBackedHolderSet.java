@@ -1,7 +1,7 @@
 package com.dtteam.dynamictrees.worldgen.holderset;
 
 import com.mojang.datafixers.util.Either;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.tags.TagKey;
@@ -11,6 +11,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class StreamBackedHolderSet<T> implements HolderSet<T> {
+
+    @Override
+    public boolean isBound() {
+        return true;
+    }
+
     public List<Holder<T>> contents() {
         return this.stream().collect(Collectors.toList());
     }

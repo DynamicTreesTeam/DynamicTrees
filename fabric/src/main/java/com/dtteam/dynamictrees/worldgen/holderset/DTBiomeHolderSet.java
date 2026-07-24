@@ -43,6 +43,11 @@ public class DTBiomeHolderSet implements IDTBiomeHolderSet {
     }
 
     @Override
+    public boolean isBound() {
+        return true;
+    }
+
+    @Override
     public boolean containsKey(ResourceKey<Biome> biomeKey) {
         Set<Holder<Biome>> currentSet = this.getSet();
         for (Holder<Biome> holder : currentSet) {

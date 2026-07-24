@@ -9,7 +9,7 @@ import com.dtteam.dynamictrees.platform.FabricMiscHelper;
 import com.dtteam.dynamictrees.registry.FabricRegistryHandler;
 import com.dtteam.dynamictrees.registry.FabricRegistryLoader;
 import com.dtteam.dynamictrees.worldgen.FabricBiomeModifications;
-import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.*;
+import fuzs.forgeconfigapiport.fabric.api.v5.ConfigRegistry;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
@@ -21,8 +21,8 @@ public class DynamicTreesFabric implements ModInitializer {
     @Override
     public void onInitialize() {
 
-        NeoForgeConfigRegistry.INSTANCE.register(DynamicTrees.MOD_ID,ModConfig.Type.SERVER, DTConfigs.SERVER_CONFIG);
-        NeoForgeConfigRegistry.INSTANCE.register(DynamicTrees.MOD_ID,ModConfig.Type.COMMON, DTConfigs.COMMON_CONFIG);
+        ConfigRegistry.INSTANCE.register(DynamicTrees.MOD_ID, ModConfig.Type.SERVER, DTConfigs.SERVER_CONFIG);
+        ConfigRegistry.INSTANCE.register(DynamicTrees.MOD_ID, ModConfig.Type.COMMON, DTConfigs.COMMON_CONFIG);
 
 
         FabricRegistryHandler.setup(DynamicTrees.MOD_ID);

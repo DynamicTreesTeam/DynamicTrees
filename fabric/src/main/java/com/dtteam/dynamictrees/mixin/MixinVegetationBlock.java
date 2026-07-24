@@ -24,7 +24,8 @@ public class MixinVegetationBlock {
         BlockState belowBlockState = level.getBlockState(blockpos);
         if (belowBlockState.getBlock() instanceof BasicRootsBlock roots){
             if (belowBlockState.getValue(BasicRootsBlock.LAYER) == BasicRootsBlock.Layer.COVERED){
-                Block block = BasicRootsBlock.Layer.COVERED.getPrimitive(roots.getFamily()).orElse(null);
+                if (!(roots.getFamily() instanceof com.dtteam.dynamictrees.tree.family.AerialRootsFamily rootsFamily)) return;
+                Block block = BasicRootsBlock.Layer.COVERED.getPrimitive(rootsFamily).orElse(null);
                 if (block == null) return;
                 cir.setReturnValue(mayPlaceOn(block.defaultBlockState(), level, blockpos));
             }

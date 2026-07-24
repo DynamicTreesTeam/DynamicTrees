@@ -26,11 +26,6 @@ public class FabricInteractionHelper implements IInteractionHelper {
     }
 
     @Override
-    public boolean canToolAxeDig(ItemStack stack) {
-        return stack.is(ItemTags.AXES);
-    }
-
-    @Override
     public int setSeedItemEntityLifespan(ItemEntity entityItem, Seed seed) {
         return 0;
     }
@@ -38,14 +33,15 @@ public class FabricInteractionHelper implements IInteractionHelper {
     @Override
     public boolean blockDestroyByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluidState) {
         Block block = state.getBlock();
+        ItemStack toolStack = player.getMainHandItem();
         if (block instanceof BranchBlock branchBlock) {
-            return branchBlock.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluidState);
+            return branchBlock.onDestroyedByPlayer(state, level, pos, player, toolStack, willHarvest, fluidState);
         } else if (block instanceof TrunkShellBlock trunkShellBlock) {
-            return trunkShellBlock.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluidState);
+            return trunkShellBlock.onDestroyedByPlayer(state, level, pos, player, toolStack, willHarvest, fluidState);
         } else if (block instanceof SoilBlock soilBlock) {
             return soilBlock.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluidState);
         } else if (block instanceof PottedSaplingBlock pottedSaplingBlock) {
-            return pottedSaplingBlock.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluidState);
+            return pottedSaplingBlock.onDestroyedByPlayer(state, level, pos, player, toolStack, willHarvest, fluidState);
         }
         return true;
     }
