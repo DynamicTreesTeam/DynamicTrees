@@ -1,5 +1,9 @@
 package com.dtteam.dynamictrees.block.leaves;
 
+import net.minecraft.world.entity.EntityTypes;
+
+import com.dtteam.dynamictrees.utility.TagUtils;
+
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.cell.CellKit;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
@@ -573,7 +577,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
                 .randomTicks()
                 .sound(SoundType.GRASS)
                 .noOcclusion()
-                .isValidSpawn((s, r, p, e) -> e == EntityType.OCELOT || e == EntityType.PARROT)
+                .isValidSpawn((s, r, p, e) -> e == EntityTypes.OCELOT || e == EntityTypes.PARROT)
                 .isSuffocating((s, r, p) -> false)
                 .isViewBlocking((s, r, p) -> false)
                 .isRedstoneConductor((s, r, p) -> false)
@@ -710,13 +714,13 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
                 Pair.of("connectAnyRadius", this.connectAnyRadius));
     }
 
-    public void addGeneratedBlockTags (Function<TagKey<Block>, TagAppender<Block, Block>> tagAppender){
+    public void addGeneratedBlockTags (Function<TagKey<Block>, TagAppender<Block>> tagAppender){
         getDynamicLeavesBlock().ifPresent(leaves ->
                 defaultLeavesTags().forEach(tag -> {
                     if (isOnlyIfLoaded()) {
-                        tagAppender.apply(tag).addOptional(leaves);
+                        tagAppender.apply(tag).addOptional(TagUtils.key(leaves));
                     } else {
-                        tagAppender.apply(tag).add(leaves);
+                        tagAppender.apply(tag).add(TagUtils.key(leaves));
                     }
                 })
         );

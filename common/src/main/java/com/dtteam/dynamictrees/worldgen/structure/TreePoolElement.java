@@ -2,7 +2,6 @@ package com.dtteam.dynamictrees.worldgen.structure;
 
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.mojang.logging.annotations.MethodsReturnNonnullByDefault;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
@@ -30,7 +29,6 @@ import java.util.function.Function;
 /**
  * @author Harley O'Connor
  */
-@MethodsReturnNonnullByDefault
 public final class TreePoolElement extends StructurePoolElement {
 
     public static final MapCodec<TreePoolElement> CODEC = RecordCodecBuilder.mapCodec(instance -> instance

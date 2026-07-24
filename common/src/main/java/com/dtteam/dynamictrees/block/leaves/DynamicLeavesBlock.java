@@ -31,7 +31,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.ParticleUtils;
 import net.minecraft.util.RandomSource;
-import net.minecraft.util.Tuple;
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.world.entity.LivingEntity;
@@ -175,15 +175,15 @@ public class DynamicLeavesBlock extends TintedParticleLeavesBlock implements Tre
      */
     public boolean updateAllLeaves(LevelAccessor level, BlockPos startPos, BlockState startState, RandomSource rand, boolean worldGen){
         //We store the position and hydro of the next block.
-        Queue<Tuple<BlockPos, Integer>> toProcess = new ArrayDeque<>();
+        Queue<Pair<BlockPos, Integer>> toProcess = new ArrayDeque<>();
         Set<BlockPos> processedPositions = new HashSet<>();
         int firstHydro = updateHydro(level, startPos, startState, worldGen);
-        toProcess.add(new Tuple<>(startPos, firstHydro));
+        toProcess.add(new Pair<>(startPos, firstHydro));
         if (firstHydro == 0) return false;
         while (!toProcess.isEmpty() && processedPositions.size() <= getLeavesProperties().maxLeavesRecursion()){
-            Tuple<BlockPos, Integer> tup = toProcess.remove();
-            BlockPos pos = tup.getA();
-            int hydro = tup.getB();
+            Pair<BlockPos, Integer> tup = toProcess.remove();
+            BlockPos pos = tup.getFirst();
+            int hydro = tup.getSecond();
             processedPositions.add(pos);
             for (Direction dir : Direction.values()) { // Go on all 6 sides of this block
                 if (hydro > 1 || rand.nextInt(4) == 0) { // we'll give it a 1 in 4 chance to grow leaves if hydro is low to help performance
@@ -201,7 +201,7 @@ public class DynamicLeavesBlock extends TintedParticleLeavesBlock implements Tre
                     //Do not iterate back through bigger hydro values
                     //or if the leaves failed to grow
                     if (sideHydro == 0 || sideHydro <= hydro){
-                        toProcess.add(new Tuple<>(sidePos, sideHydro));
+                        toProcess.add(new Pair<>(sidePos, sideHydro));
                     }
                 }
             }

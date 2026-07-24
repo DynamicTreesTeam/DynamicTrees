@@ -8,7 +8,7 @@ import com.dtteam.dynamictrees.loot.function.MultiplyByLogsCount;
 import com.dtteam.dynamictrees.loot.function.MultiplyBySticksCount;
 import com.dtteam.dynamictrees.loot.function.MultiplyByTotalVolume;
 import com.dtteam.dynamictrees.utility.ItemUtils;
-import net.minecraft.advancements.criterion.*;
+import net.minecraft.advancements.predicates.*;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.predicates.DataComponentPredicates;
 import net.minecraft.core.component.predicates.EnchantmentsPredicate;

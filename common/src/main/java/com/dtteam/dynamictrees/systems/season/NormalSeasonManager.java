@@ -6,7 +6,7 @@ import com.dtteam.dynamictrees.api.season.SeasonManager;
 import com.dtteam.dynamictrees.api.season.SeasonProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.Tuple;
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
@@ -22,23 +22,23 @@ public class NormalSeasonManager implements SeasonManager {
 	public static final Supplier<SeasonManager> NULL = NormalSeasonManager::new;
 
     private final Map<Identifier, SeasonContext> seasonContextMap = new HashMap<>();
-    private Function<Level, Tuple<SeasonProvider, SeasonGrowthCalculator>> seasonMapper = w -> new Tuple<>(new NullSeasonProvider(), new NullSeasonGrowthCalculator());
+    private Function<Level, Pair<SeasonProvider, SeasonGrowthCalculator>> seasonMapper = w -> new Pair<>(new NullSeasonProvider(), new NullSeasonGrowthCalculator());
 
     public NormalSeasonManager() {
     }
 
-    public NormalSeasonManager(Function<Level, Tuple<SeasonProvider, SeasonGrowthCalculator>> seasonMapper) {
+    public NormalSeasonManager(Function<Level, Pair<SeasonProvider, SeasonGrowthCalculator>> seasonMapper) {
         this.seasonMapper = seasonMapper;
     }
 
-    private Tuple<SeasonProvider, SeasonGrowthCalculator> createProvider(Level level) {
+    private Pair<SeasonProvider, SeasonGrowthCalculator> createProvider(Level level) {
         return seasonMapper.apply(level);
     }
 
     private SeasonContext getContext(Level level) {
         return seasonContextMap.computeIfAbsent(level.dimension().identifier(), d -> {
-            Tuple<SeasonProvider, SeasonGrowthCalculator> tuple = createProvider(level);
-            return new SeasonContext(tuple.getA(), tuple.getB());
+            Pair<SeasonProvider, SeasonGrowthCalculator> tuple = createProvider(level);
+            return new SeasonContext(tuple.getFirst(), tuple.getSecond());
         });
     }
 

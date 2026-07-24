@@ -1,5 +1,7 @@
 package com.dtteam.dynamictrees.tree.species;
 
+import com.dtteam.dynamictrees.utility.TagUtils;
+
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.lazyvalue.LazyValue;
 import com.dtteam.dynamictrees.api.network.BranchDestructionData;
@@ -2387,20 +2389,20 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return DynamicTrees.location("item/standard_seed");
     }
 
-    public void addGeneratedBlockTags (Function<TagKey<Block>, TagAppender<Block, Block>> tagAppender){
+    public void addGeneratedBlockTags (Function<TagKey<Block>, TagAppender<Block>> tagAppender){
         // Create dynamic sapling block tags.
         getSapling().ifPresent(sapling ->
                 defaultSaplingTags().forEach(tag -> {
                     if (isOnlyIfLoaded()) {
-                        tagAppender.apply(tag).addOptional(sapling);
+                        tagAppender.apply(tag).addOptional(TagUtils.key(sapling));
                     } else {
-                        tagAppender.apply(tag).add(sapling);
+                        tagAppender.apply(tag).add(TagUtils.key(sapling));
                     }
                 })
         );
     }
 
-    public void addGeneratedItemTags (Function<TagKey<Item>, TagAppender<Item, Item>> tagAppender){
+    public void addGeneratedItemTags (Function<TagKey<Item>, TagAppender<Item>> tagAppender){
         // Some species return the common seed, so only return if the species has its own seed.
         if (!hasSeed()) {
             return;
@@ -2409,9 +2411,9 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         getSeed().ifPresent(seed ->
                 defaultSeedTags().forEach(tag ->{
                     if (isOnlyIfLoaded()) {
-                        tagAppender.apply(tag).addOptional(seed);
+                        tagAppender.apply(tag).addOptional(TagUtils.key(seed));
                     } else {
-                        tagAppender.apply(tag).add(seed);
+                        tagAppender.apply(tag).add(TagUtils.key(seed));
                     }
                 })
         );

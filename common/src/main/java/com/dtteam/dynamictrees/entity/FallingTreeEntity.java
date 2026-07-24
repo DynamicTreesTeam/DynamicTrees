@@ -185,7 +185,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
 
         cleanupShellBlocks(destroyData);
 
-        Minecraft.getInstance().levelRenderer.setBlocksDirty(renderBounds.getMin().getX(), renderBounds.getMin().getY(), renderBounds.getMin().getZ(), renderBounds.getMax().getX(), renderBounds.getMax().getY(), renderBounds.getMax().getZ());//This forces the client to rerender the chunks
+        Minecraft.getInstance().levelExtractor.setBlocksDirty(renderBounds.getMin().getX(), renderBounds.getMin().getY(), renderBounds.getMin().getZ(), renderBounds.getMax().getX(), renderBounds.getMax().getY(), renderBounds.getMax().getZ());//This forces the client to rerender the chunks
     }
 
     protected void cleanupShellBlocks(BranchDestructionData destroyData) {

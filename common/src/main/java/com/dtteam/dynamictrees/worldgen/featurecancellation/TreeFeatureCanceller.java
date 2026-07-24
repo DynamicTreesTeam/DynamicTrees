@@ -47,8 +47,8 @@ public class TreeFeatureCanceller<T extends FeatureConfiguration> extends Featur
 
 
     private boolean doesContainTrees(RandomFeatureConfiguration featureConfig, BiomePropertySelectors.NormalFeatureCancellation featureCancellations) {
-        for (WeightedPlacedFeature feature : featureConfig.features) {
-            final PlacedFeature currentConfiguredFeature = feature.feature.value();
+        for (WeightedPlacedFeature feature : featureConfig.features()) {
+            final PlacedFeature currentConfiguredFeature = feature.feature().value();
             ConfiguredFeature<?,?> cf = currentConfiguredFeature.getFeatures()
                     .findFirst().map(Holder::value).orElse(null);
             if (cf == null) return false;

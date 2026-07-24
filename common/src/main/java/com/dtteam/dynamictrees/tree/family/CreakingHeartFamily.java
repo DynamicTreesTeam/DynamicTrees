@@ -1,5 +1,7 @@
 package com.dtteam.dynamictrees.tree.family;
 
+import com.dtteam.dynamictrees.utility.TagUtils;
+
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.block.branch.*;
@@ -113,15 +115,15 @@ public class CreakingHeartFamily extends AltBranchFamily {
         }
     }
 
-    public void addGeneratedBlockTags (Function<TagKey<Block>, TagAppender<Block, Block>> tagAppender){
+    public void addGeneratedBlockTags (Function<TagKey<Block>, TagAppender<Block>> tagAppender){
         super.addGeneratedBlockTags(tagAppender);
         getHeartBranch().ifPresent(branch -> {
-            tierTag(getDefaultBranchHarvestTier(), tagAppender).ifPresent(tagBuilder -> tagBuilder.add(branch));
+            tierTag(getDefaultBranchHarvestTier(), tagAppender).ifPresent(tagBuilder -> tagBuilder.add(TagUtils.key(branch)));
             defaultBranchTags().forEach(tag -> {
                 if (!isOnlyIfLoaded()) {
-                    tagAppender.apply(tag).add(branch);
+                    tagAppender.apply(tag).add(TagUtils.key(branch));
                 } else {
-                    tagAppender.apply(tag).addOptional(branch);
+                    tagAppender.apply(tag).addOptional(TagUtils.key(branch));
                 }
             });
         });

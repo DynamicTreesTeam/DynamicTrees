@@ -191,7 +191,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
     }
 
     protected void spawnParticlesAtLeaves(FallingTreeEntity entity, BlockPos leavesPos, ParticleOptions particle, Vec3 velocity, RandomSource rand, int particleCount, double limitChance){
-        Vec3 newPos = getRelativeLeavesPosition(entity, leavesPos.getCenter());
+        Vec3 newPos = getRelativeLeavesPosition(entity, Vec3.atCenterOf(leavesPos));
         for (int j=0; j<particleCount; j++){
             if (rand.nextDouble() < limitChance){
                 entity.level().addParticle(particle,
@@ -205,9 +205,9 @@ public class FalloverAnimationHandler implements AnimationHandler {
         BranchDestructionData data = entity.getDestroyData();
         float angle = (data.toolDir.getAxis() == Direction.Axis.X ? entity.getYRot() : entity.getXRot()) * -data.toolDir.getAxisDirection().getStep() * 0.0174533f;
         return rotateAroundAxis(
-                leaves.subtract(data.basePos.getCenter()),
+                leaves.subtract(Vec3.atCenterOf(data.basePos)),
                 new Vec3(-data.toolDir.getStepZ(),0, data.toolDir.getStepX()),
-                angle).add(data.basePos.getCenter()).subtract(0.5,0.5,0.5);
+                angle).add(Vec3.atCenterOf(data.basePos)).subtract(0.5,0.5,0.5);
     }
 
     @Override

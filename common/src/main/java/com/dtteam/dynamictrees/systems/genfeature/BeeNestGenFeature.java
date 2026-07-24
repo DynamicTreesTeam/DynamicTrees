@@ -1,5 +1,7 @@
 package com.dtteam.dynamictrees.systems.genfeature;
 
+import net.minecraft.world.level.block.entity.BlockEntityTypes;
+
 import com.dtteam.dynamictrees.api.configuration.ConfigurationProperty;
 import com.dtteam.dynamictrees.api.function.TetraFunction;
 import com.dtteam.dynamictrees.data.tags.DTBiomeTags;
@@ -145,7 +147,7 @@ public class BeeNestGenFeature extends GenFeature {
             nestState = nestState.setValue(BeehiveBlock.FACING, faceDir);
         }
         world.setBlock(pos, nestState, 3);
-        world.getBlockEntity(pos, BlockEntityType.BEEHIVE).ifPresent((blockEntity) -> {
+        world.getBlockEntity(pos, BlockEntityTypes.BEEHIVE).ifPresent((blockEntity) -> {
             int j = 2 + random.nextInt(2);
 
             for(int k = 0; k < j; ++k) {

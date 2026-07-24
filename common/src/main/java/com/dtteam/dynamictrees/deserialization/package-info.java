@@ -1,4 +1,0 @@
-@MethodsReturnNonnullByDefault
-package com.dtteam.dynamictrees.deserialization;
-
-import com.mojang.logging.annotations.MethodsReturnNonnullByDefault;

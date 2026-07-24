@@ -1,5 +1,7 @@
 package com.dtteam.dynamictrees.block.soil;
 
+import com.dtteam.dynamictrees.utility.TagUtils;
+
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
@@ -294,14 +296,14 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
         this.onlyIfLoaded.add(onlyIfLoaded);
     }
 
-    public void addGeneratedBlockTags (Function<TagKey<Block>, TagAppender<Block, Block>> tagAppender){
+    public void addGeneratedBlockTags (Function<TagKey<Block>, TagAppender<Block>> tagAppender){
         // add rooty blocks to the rooty soil tag.
         getBlock().ifPresent(rootyBlock ->
                 defaultSoilBlockTags().forEach(tag -> {
                     if (!isOnlyIfLoaded()) {
-                        tagAppender.apply(tag).add(rootyBlock);
+                        tagAppender.apply(tag).add(TagUtils.key(rootyBlock));
                     } else {
-                        tagAppender.apply(tag).addOptional(rootyBlock);
+                        tagAppender.apply(tag).addOptional(TagUtils.key(rootyBlock));
                     }
                 }));
     }
