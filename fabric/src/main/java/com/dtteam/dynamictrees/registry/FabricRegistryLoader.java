@@ -51,13 +51,15 @@ public class FabricRegistryLoader extends RegistryLoader {
     @Override
     public <T extends Block> Supplier<T> registerBlock(String name, Function<Identifier, T> newBlock) {
         Identifier id = DynamicTrees.location(name);
-        return ()-> Registry.register(BuiltInRegistries.BLOCK, id, newBlock.apply(id));
+        T block = Registry.register(BuiltInRegistries.BLOCK, id, newBlock.apply(id));
+        return ()-> block;
     }
 
     @Override
     public <T extends Item> Supplier<T> registerItem(String name, Function<Identifier, T> newBlock) {
         Identifier id = DynamicTrees.location(name);
-        return ()-> Registry.register(BuiltInRegistries.ITEM, id, newBlock.apply(id));
+        T item = Registry.register(BuiltInRegistries.ITEM, id, newBlock.apply(id));
+        return ()-> item;
     }
 
     @Override
