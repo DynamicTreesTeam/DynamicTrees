@@ -44,7 +44,14 @@ public class DynamicTreesFabric implements ModInitializer {
 
         FabricRegistryLoader.setup();
 
-        DynamicTrees.commonSetup();
+        // Note: DynamicTrees.commonSetup() is deliberately NOT called here. It applies the
+        // treepack "setup" stage (primitive log/leaves/stripped log block lookups etc.), which
+        // must run after ALL mods have registered their blocks. Fabric invokes ModInitializers
+        // in an order that may put this mod before content mods (e.g. Biomes O' Plenty), which
+        // previously made every add-on treepack primitive lookup fail on the first pass.
+        // It is instead called from the client/dedicated-server entrypoints, which Fabric runs
+        // after the whole main entrypoint phase (mirroring NeoForge's FMLCommonSetupEvent
+        // timing). See DynamicTreesFabricClient and DynamicTreesFabricServer.
 
         FabricBiomeModifications.register();
 

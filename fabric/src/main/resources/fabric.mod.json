@@ -22,7 +22,10 @@
     "client": [
       "com.dtteam.dynamictrees.DynamicTreesFabricClient"
     ],
-    "dynamictrees": []
+    "dynamictrees": [],
+    "server": [
+      "com.dtteam.dynamictrees.DynamicTreesFabricServer"
+    ]
   },
   "mixins": [
     "${mod_id}.mixins.json",
@@ -41,4 +44,3 @@
     "forgeconfigapiport": "*"
   }
 }
-  

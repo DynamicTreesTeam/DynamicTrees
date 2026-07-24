@@ -52,6 +52,11 @@ public class DynamicTreesFabricClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        // Runs after ALL main entrypoints, so every mod's blocks are registered and the
+        // treepack setup stage (primitive log/leaves lookups) resolves add-on blocks.
+        // This must happen before the first resource load so models bake with correct data.
+        DynamicTrees.commonSetup();
+
         ConfigRegistry.INSTANCE.register(DynamicTrees.MOD_ID, ModConfig.Type.CLIENT, DTConfigs.CLIENT_CONFIG);
         SpriteSourceRegistry.register(ThickBranchRingsSource.ID, ThickBranchRingsSource.CODEC);
         registerModelLoaders();
