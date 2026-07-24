@@ -2,6 +2,7 @@
   "variants": {
     "": {
       "type": "dynamictrees:branch",
+      "fabric:type": "dynamictrees:branch",
       "family": "dynamictrees:warped",
       "textures": {
         "bark": "minecraft:block/warped_stem",

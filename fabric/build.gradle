@@ -31,6 +31,12 @@ dependencies {
     compileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2' // javax.annotation used by common sources
 }
 
+// Include the datagenned assets/data (blockstates, item/block models, loot, ...) like the neoforge jar does.
+sourceSets.main.resources { srcDir project(':common').file('src/generated/resources') }
+// The generated directory can be seen twice by the copy spec (identical files); first one wins.
+tasks.named('processResources', ProcessResources) { duplicatesStrategy = DuplicatesStrategy.EXCLUDE }
+tasks.named('sourcesJar', Jar) { duplicatesStrategy = DuplicatesStrategy.EXCLUDE }
+
 // Ship the generated data (tags, loot tables) in the fabric jar too. The generated assets
 // (blockstates using the custom "dynamictrees:branch" model type) stay neoforge-only —
 // the fabric model layer replaces branch models after bake and cannot parse them.

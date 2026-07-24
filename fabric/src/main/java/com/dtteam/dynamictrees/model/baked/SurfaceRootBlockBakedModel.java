@@ -4,14 +4,11 @@ import com.dtteam.dynamictrees.api.network.Connections;
 import com.dtteam.dynamictrees.api.network.RootConnections;
 import com.dtteam.dynamictrees.block.branch.SurfaceRootBlock;
 import com.dtteam.dynamictrees.model.BlockStateModelWithConnectionData;
+import com.dtteam.dynamictrees.model.FabricDynamicBlockStateModel;
 import com.dtteam.dynamictrees.model.ModelHelper;
 import com.dtteam.dynamictrees.model.parts.SurfaceRootModelPart;
 import com.dtteam.dynamictrees.utility.CoordUtils;
-import net.fabricmc.fabric.api.client.renderer.v1.mesh.QuadEmitter;
-import net.fabricmc.fabric.api.client.renderer.v1.model.FabricBlockStateModel;
-import net.fabricmc.fabric.api.client.renderer.v1.model.FabricBlockStateModelPart;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
@@ -24,14 +21,12 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 
 /**
  * Dynamic surface root model for Fabric. Mirrors the NeoForge {@code SurfaceRootBlockStateModel}.
  */
-public class SurfaceRootBlockBakedModel implements BlockStateModel, FabricBlockStateModel, BlockStateModelWithConnectionData {
+public class SurfaceRootBlockBakedModel implements FabricDynamicBlockStateModel, BlockStateModelWithConnectionData {
 
     protected final SurfaceRootModelPart[][] cores;
     protected final SurfaceRootModelPart[][] sleeves;
@@ -82,13 +77,8 @@ public class SurfaceRootBlockBakedModel implements BlockStateModel, FabricBlockS
     ///////////////////////////////////////////
 
     @Override
-    public void emitQuads(QuadEmitter emitter, BlockAndTintGetter level, BlockPos pos, BlockState state,
-                          RandomSource random, Predicate<@Nullable Direction> cullTest) {
-        List<BlockStateModelPart> parts = new ArrayList<>();
+    public void collectParts(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random, List<BlockStateModelPart> parts) {
         collectParts(state, parts, ModelHelper.getRootConnections(level, pos, state));
-        for (BlockStateModelPart part : parts) {
-            ((FabricBlockStateModelPart) part).emitQuads(emitter, cullTest);
-        }
     }
 
     @Override
@@ -178,11 +168,6 @@ public class SurfaceRootBlockBakedModel implements BlockStateModel, FabricBlockS
     ///////////////////////////////////////////
     // VANILLA MODEL METHODS
     ///////////////////////////////////////////
-
-    @Override
-    public void collectParts(RandomSource random, List<BlockStateModelPart> parts) {
-        // Geometry is entirely dynamic; without level context there is nothing meaningful to collect.
-    }
 
     @Override
     public Material.Baked particleMaterial() {

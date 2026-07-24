@@ -4,15 +4,22 @@ import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.block.branch.BasicRootsBlock;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.branch.SurfaceRootBlock;
-import com.dtteam.dynamictrees.block.sapling.PottedSaplingBlock;
 import com.dtteam.dynamictrees.model.baked.BasicBranchBlockBakedModel;
 import com.dtteam.dynamictrees.model.baked.BasicRootsBlockBakedModel;
 import com.dtteam.dynamictrees.model.baked.SurfaceRootBlockBakedModel;
 import com.dtteam.dynamictrees.model.baked.ThickBranchBlockBakedModel;
+import com.dtteam.dynamictrees.model.blockstate.AerialRootsSoilBlockStateModel;
+import com.dtteam.dynamictrees.model.blockstate.PottedSaplingBlockStateModel;
+import com.dtteam.dynamictrees.model.blockstate.UnbakedBranchModel;
+import com.dtteam.dynamictrees.model.blockstate.UnbakedCreakingHeartModel;
+import com.dtteam.dynamictrees.model.blockstate.UnbakedRootsMossModel;
+import com.dtteam.dynamictrees.model.blockstate.UnbakedRootsModel;
+import com.dtteam.dynamictrees.model.blockstate.UnbakedSurfaceRootModel;
 import com.dtteam.dynamictrees.model.parts.BranchModelPart;
 import com.dtteam.dynamictrees.tree.family.AerialRootsFamily;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.utility.IdentifierUtils;
+import net.fabricmc.fabric.api.client.model.loading.v1.CustomUnbakedBlockStateModel;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelModifier;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
@@ -29,28 +36,59 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Swaps the baked block state models of dynamic branch, root and potted sapling blocks
- * for DT's procedurally generated models, using the Fabric Model Loading API.
+ * Model loading hooks for DT's dynamic models on Fabric.
+ *
+ * <p>The primary path is codec-based: blockstate JSONs using DT's custom model types
+ * ({@code dynamictrees:branch}, {@code dynamictrees:roots}, ...) are deserialized through the
+ * codecs registered in {@link #registerModelTypes()}, exactly mirroring NeoForge's
+ * {@code RegisterBlockStateModels} registrations. Note that Fabric dispatches these on the
+ * {@code "fabric:type"} key (NeoForge uses {@code "type"}), so DT's generated blockstates carry
+ * both keys.
+ *
+ * <p>The secondary path is an after-bake fallback for dynamic blocks whose blockstate definitions
+ * are missing or unparseable (e.g. add-on tree packs still shipping pre-26.2 assets): any branch,
+ * surface root or underground roots block state that did not resolve to a DT model gets a
+ * procedurally built model based on its family's primitive log textures.
  */
 public class DTModelLoadingPlugin implements ModelLoadingPlugin {
 
-    public static final Identifier POTTED_SAPLING_MODEL = DynamicTrees.location("potted_sapling");
+    public static final Identifier BRANCH = DynamicTrees.location("branch");
+    public static final Identifier SURFACE_ROOT = DynamicTrees.location("surface_root");
+    public static final Identifier ROOTS = DynamicTrees.location("roots");
+    public static final Identifier CREAKING_HEART = DynamicTrees.location("creaking_heart");
+    public static final Identifier POTTED_DYNAMIC_SAPLING = DynamicTrees.location("potted_dynamic_sapling");
+    public static final Identifier AERIAL_ROOTS_SOIL = DynamicTrees.location("aerial_roots_soil");
+    public static final Identifier ROOTS_MOSS = DynamicTrees.location("roots_moss");
 
-    private static final Map<Identifier, BlockStateModel> MODEL_CACHE = new ConcurrentHashMap<>();
+    private static final Map<Identifier, BlockStateModel> FALLBACK_MODEL_CACHE = new ConcurrentHashMap<>();
+
+    /**
+     * Registers the custom blockstate model codecs. Must only be called once.
+     */
+    public static void registerModelTypes() {
+        CustomUnbakedBlockStateModel.register(BRANCH, UnbakedBranchModel.CODEC);
+        CustomUnbakedBlockStateModel.register(ROOTS, UnbakedRootsModel.CODEC);
+        CustomUnbakedBlockStateModel.register(CREAKING_HEART, UnbakedCreakingHeartModel.CODEC);
+        CustomUnbakedBlockStateModel.register(SURFACE_ROOT, UnbakedSurfaceRootModel.CODEC);
+        CustomUnbakedBlockStateModel.register(POTTED_DYNAMIC_SAPLING, PottedSaplingBlockStateModel.Unbaked.CODEC);
+        CustomUnbakedBlockStateModel.register(AERIAL_ROOTS_SOIL, AerialRootsSoilBlockStateModel.Unbaked.CODEC);
+        CustomUnbakedBlockStateModel.register(ROOTS_MOSS, UnbakedRootsMossModel.CODEC);
+    }
 
     @Override
     public void initialize(Context pluginContext) {
-        MODEL_CACHE.clear();
+        FALLBACK_MODEL_CACHE.clear();
         pluginContext.modifyBlockModelAfterBake().register(ModelModifier.WRAP_PHASE, DTModelLoadingPlugin::modifyModelAfterBake);
     }
 
     private static BlockStateModel modifyModelAfterBake(BlockStateModel model, ModelModifier.AfterBakeBlock.Context context) {
+        // Models already loaded through DT's codecs (or another DT path) are left untouched.
+        if (model instanceof FabricDynamicBlockStateModel || model instanceof PottedSaplingBlockStateModel) {
+            return model;
+        }
+
         BlockState state = context.state();
         Block block = state.getBlock();
-
-        if (block instanceof PottedSaplingBlock) {
-            return new BakedModelBlockPottedSapling(model);
-        }
 
         if (block instanceof BasicRootsBlock rootsBlock) {
             BlockStateModel rootsModel = getOrCreateRootsModel(rootsBlock, state, context.baker());
@@ -94,7 +132,7 @@ public class DTModelLoadingPlugin implements ModelLoadingPlugin {
 
         boolean isThick = family.isThick();
 
-        return MODEL_CACHE.computeIfAbsent(blockId, id -> createBranchModel(barkOverride, ringsOverride, isThick, baker));
+        return FALLBACK_MODEL_CACHE.computeIfAbsent(blockId, id -> createBranchModel(barkOverride, ringsOverride, isThick, baker));
     }
 
     private static BlockStateModel createBranchModel(Identifier barkTexture, Identifier ringsTexture, boolean isThick, ModelBaker baker) {
@@ -135,7 +173,7 @@ public class DTModelLoadingPlugin implements ModelLoadingPlugin {
         Identifier barkTexture = Identifier.fromNamespaceAndPath(primitiveLogId.getNamespace(), "block/" + primitiveLogId.getPath());
         Identifier barkOverride = family.getTexturePath(Family.BRANCH).orElse(barkTexture);
 
-        return MODEL_CACHE.computeIfAbsent(blockId, id -> SurfaceRootBlockBakedModel.bake(baker, barkOverride));
+        return FALLBACK_MODEL_CACHE.computeIfAbsent(blockId, id -> SurfaceRootBlockBakedModel.bake(baker, barkOverride));
     }
 
     ///////////////////////////////////////////
@@ -159,7 +197,7 @@ public class DTModelLoadingPlugin implements ModelLoadingPlugin {
                 Identifier barkOverride = rootsFamily.getTexturePath(Family.ROOTS_SIDE).orElse(barkTexture);
                 Identifier ringsOverride = rootsFamily.getTexturePath(Family.ROOTS_TOP).orElse(ringsTexture);
 
-                return MODEL_CACHE.computeIfAbsent(IdentifierUtils.suffix(blockId, "_exposed"), id ->
+                return FALLBACK_MODEL_CACHE.computeIfAbsent(IdentifierUtils.suffix(blockId, "_exposed"), id ->
                         BasicRootsBlockBakedModel.bakeRoots(baker, bakeMaterial(baker, barkOverride), bakeMaterial(baker, ringsOverride), false));
             }).orElse(null);
             case FILLED -> rootsFamily.getPrimitiveFilledRoots().map(primitiveFilledRoots -> {
@@ -167,7 +205,7 @@ public class DTModelLoadingPlugin implements ModelLoadingPlugin {
                 Identifier barkTexture = Identifier.fromNamespaceAndPath(primitiveFilledRootsId.getNamespace(), "block/" + primitiveFilledRootsId.getPath() + "_side");
                 Identifier ringsTexture = Identifier.fromNamespaceAndPath(primitiveFilledRootsId.getNamespace(), "block/" + primitiveFilledRootsId.getPath() + "_top");
 
-                return MODEL_CACHE.computeIfAbsent(IdentifierUtils.suffix(blockId, "_filled"), id ->
+                return FALLBACK_MODEL_CACHE.computeIfAbsent(IdentifierUtils.suffix(blockId, "_filled"), id ->
                         BasicRootsBlockBakedModel.bakeRoots(baker, bakeMaterial(baker, barkTexture), bakeMaterial(baker, ringsTexture), true));
             }).orElse(null);
             case COVERED -> null; // Covered roots keep their regular (soil-like) model.

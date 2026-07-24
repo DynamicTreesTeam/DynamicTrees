@@ -2,6 +2,7 @@
   "variants": {
     "": {
       "type": "dynamictrees:branch",
+      "fabric:type": "dynamictrees:branch",
       "family": "dynamictrees:jungle",
       "textures": {
         "bark": "minecraft:block/stripped_jungle_log",

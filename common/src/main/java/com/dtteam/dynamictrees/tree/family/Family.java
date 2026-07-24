@@ -313,9 +313,11 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     }
 
     protected Optional<BranchBlock> getBranchBlock(int index) {
+        if (index < 0 || index >= branches.size()) return Optional.empty(); // Some families (e.g. from add-on tree packs) have no stripped branch entry.
         return Optionals.ofBlock(branches.get(index).getBlock());
     }
     protected Optional<Item> getBranchItem(int index) {
+        if (index < 0 || index >= branches.size()) return Optional.empty();
         return branches.get(index).getItem();
     }
 
