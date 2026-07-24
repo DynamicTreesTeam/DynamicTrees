@@ -11,6 +11,7 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.MutableComponent;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityDataRegistry;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.resources.Identifier;
@@ -45,19 +46,22 @@ public class FabricRegistryLoader extends RegistryLoader {
 
     public static void setup (){
         DTRegistries.setup();
-        DendroPotionRecipeHandler.getAllDendroRecipes();
+        // Dendro brewing recipes are built lazily by MixinPotionBrewing on first use;
+        // building them here is too early on 26.2 (item components are not bound yet).
     }
 
     @Override
     public <T extends Block> Supplier<T> registerBlock(String name, Function<Identifier, T> newBlock) {
         Identifier id = DynamicTrees.location(name);
-        return ()-> Registry.register(BuiltInRegistries.BLOCK, id, newBlock.apply(id));
+        T block = Registry.register(BuiltInRegistries.BLOCK, id, newBlock.apply(id));
+        return ()-> block;
     }
 
     @Override
     public <T extends Item> Supplier<T> registerItem(String name, Function<Identifier, T> newBlock) {
         Identifier id = DynamicTrees.location(name);
-        return ()-> Registry.register(BuiltInRegistries.ITEM, id, newBlock.apply(id));
+        T item = Registry.register(BuiltInRegistries.ITEM, id, newBlock.apply(id));
+        return ()-> item;
     }
 
     @Override
@@ -111,7 +115,7 @@ public class FabricRegistryLoader extends RegistryLoader {
     @Override
     public <T> Supplier<EntityDataSerializer<T>> registerEntityDataSerializer(String name, Supplier<EntityDataSerializer<T>> operator) {
         EntityDataSerializer<T> serializer = operator.get();
-        EntityDataSerializers.registerSerializer(serializer);
+        FabricEntityDataRegistry.register(DynamicTrees.location(name), serializer);
         return ()-> serializer;
     }
 

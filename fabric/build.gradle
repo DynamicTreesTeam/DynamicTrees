@@ -31,6 +31,15 @@ dependencies {
     compileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2' // javax.annotation used by common sources
 }
 
+// Ship the generated data (tags, loot tables) in the fabric jar too. The generated assets
+// (blockstates using the custom "dynamictrees:branch" model type) stay neoforge-only —
+// the fabric model layer replaces branch models after bake and cannot parse them.
+processResources {
+    from(project(':common').file('src/generated/resources')) {
+        include 'data/**'
+    }
+}
+
 loom {
     def aw = project(':common').file("src/main/resources/META-INF/${mod_id}.accesswidener")
     if (aw.exists()) {
