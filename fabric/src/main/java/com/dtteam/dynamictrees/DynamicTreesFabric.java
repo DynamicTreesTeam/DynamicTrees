@@ -57,7 +57,6 @@ public class DynamicTreesFabric implements ModInitializer {
 
         ServerLifecycleEvents.SERVER_STARTING.register(server -> {
             VanillaSaplingEventHandler.updateEnabled();
-            FabricMiscHelper.debugSpeciesRegistry();
         });
 
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
