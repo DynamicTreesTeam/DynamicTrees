@@ -23,3 +23,4 @@ eclipse
 run
 runs
 /neoforge/mcmodsrepo
+/buildSrc/src/main/groovy/.idea

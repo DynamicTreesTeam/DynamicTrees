@@ -3,11 +3,11 @@
     "_comment1": "Rivers and oceans have no trees but we set a default density and chance for addons to use.",
     "_comment2": "When adding trees to these biomes in an addon/treepack, always keep density at [1] and chance at 1.",
     "select": {
-      "tag": "#minecraft:(is_river)|(is_ocean)|(is_beach)"
+      "tags_or": ["#minecraft:is_river", "#minecraft:is_ocean", "#minecraft:is_beach"]
     },
     "apply": {
       "species" : "null",
-      "density": [ 1.0 ],
+      "density": "noise()",
       "chance": 1.0
     }
   },
@@ -24,7 +24,7 @@
           "birch": 1
         }
       },
-      "density": [ 1 ],
+      "density": "noise()",
       "chance": 1.0,
       "forestness": 1.0
     }
@@ -32,7 +32,7 @@
   {
     "select": "minecraft:flower_forest",
     "apply": {
-      "density": [ 0.6 ]
+      "density": "noise() * 0.6"
     }
   },
   {
@@ -43,7 +43,7 @@
     },
     "apply": {
       "species": "swamp_oak",
-      "density": [ 0.2 ],
+      "density": "noise() * 0.2",
       "chance": 0.75
     }
   },
@@ -65,7 +65,7 @@
     },
     "apply": {
       "species": "acacia",
-      "density": [ 0.1 ],
+      "density": "noise() * 0.1",
       "chance": "standard"
     }
   },
@@ -79,7 +79,7 @@
           "spruce": 1
         }
       },
-      "density": [ 0.8 ],
+      "density": "noise() * 0.8",
       "chance": 0.8
     }
   },
@@ -89,7 +89,7 @@
     },
     "apply": {
       "species": "cherry",
-      "density": [ 0.3 ],
+      "density": "noise() * 0.3",
       "chance": 1.0
     }
   },
@@ -106,7 +106,7 @@
           "cocoa": 1
         }
       },
-      "density": [ 2 ],
+      "density": "noise() * 2",
       "forestness": 1.0,
       "chance": "standard"
     }
@@ -123,7 +123,7 @@
           "cocoa": 1
         }
       },
-      "density": [ 0.2 ],
+      "density": "noise() * 0.2",
       "chance": 0.5
     }
   },
@@ -134,7 +134,7 @@
     },
     "apply": {
       "species": "spruce",
-      "density": [ 1 ],
+      "density": "noise()",
       "chance": 1,
       "forestness": 1
     }
@@ -146,11 +146,7 @@
     },
     "apply": {
       "species": "dark_oak",
-      "density": {
-        "math": {
-          "div": [ "noise", 3.0 ]
-        }
-      },
+      "density": "noise() / 3",
       "multipass": true
     }
   },
@@ -225,7 +221,7 @@
           "tall_birch": 1
         }
       },
-      "density": [ 0.1 ]
+      "density": "noise() * 0.1"
     }
   },
   {
@@ -245,7 +241,7 @@
     "_comment": "Windswept forests are denser and spawn more trees.",
     "select": "minecraft:windswept_forest",
     "apply": {
-      "density": [ 0.7 ],
+      "density": "noise() * 0.7",
       "chance": 0.6
     }
   },
@@ -261,7 +257,7 @@
           "mega_spruce": 1
         }
       },
-      "density": [ 1 ],
+      "density": "noise()",
       "chance": 1,
       "forestness": 1
     }
@@ -273,7 +269,7 @@
     },
     "apply": {
       "species": "oak",
-      "density": [ 0.5 ],
+      "density": "noise() * 0.5",
       "chance": 0.7
     }
   },
@@ -299,7 +295,7 @@
         }
       },
       "chance": "standard",
-      "density": [ 2.0, 0.3 ]
+      "density": "noise() * 2 + 0.3"
     }
   },
   {
@@ -314,7 +310,7 @@
         }
       },
       "chance": "standard",
-      "density": [ 2.0, 0.3 ]
+      "density": "noise() * 2 + 0.3"
     }
   }
 ]

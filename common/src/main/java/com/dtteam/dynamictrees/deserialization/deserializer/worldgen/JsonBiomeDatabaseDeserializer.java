@@ -12,8 +12,8 @@ public interface JsonBiomeDatabaseDeserializer<T> extends JsonDeserializer<T> {
 
     String STATIC = "static";
     String RANDOM = "random";
-    String MATH = "math";
-    String SCALE = "scale";
+    @Deprecated String MATH = "math";
+    @Deprecated String SCALE = "scale";
 
     default boolean isDefault(String candidate) {
         return DEFAULT.equals(candidate);

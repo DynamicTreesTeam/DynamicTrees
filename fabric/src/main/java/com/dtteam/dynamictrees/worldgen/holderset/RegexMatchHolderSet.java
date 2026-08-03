@@ -37,7 +37,11 @@ public abstract class RegexMatchHolderSet<T> extends StreamBackedHolderSet<T> {
     @Override
     public Stream<Holder<T>> stream() {
         return (Stream<Holder<T>>) (Stream<?>) this.registryLookup.listElements()
-                .filter(holder -> this.getInput(holder).anyMatch(input -> this.getPattern().matcher(input).matches()));
+                .filter(holder ->
+                        this.getInput(holder).anyMatch(input ->
+                                this.getPattern().matcher(input).matches()
+                        )
+                );
     }
 
     @Override

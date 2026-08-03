@@ -42,8 +42,8 @@ public final class BiomeListDeserializer implements JsonDeserializer<IDTBiomeHol
         final boolean notOperator = usingNotOperator(tagRegex);
         if (notOperator)
             tagRegex = tagRegex.substring(1);
-        if (tagRegex.charAt(0) == '#')
-            tagRegex = tagRegex.substring(1);
+        //We gotta get rid of those #, they don't matter for the regex.
+        tagRegex = tagRegex.replaceAll("#","");
 
         try {
             Identifier tagLocation = Identifier.parse(tagRegex);
@@ -57,8 +57,6 @@ public final class BiomeListDeserializer implements JsonDeserializer<IDTBiomeHol
             return PropertyApplierResult.failure(e.getMessage());
         }
 
-        // TODO UPDATE
-        // (notOperator ? biomeList.getExcludeComponents() : biomeList.getIncludeComponents()).add(new TagsRegexMatchHolderSet<>(DELAYED_BIOME_REGISTRY, tagRegex));
         return PropertyApplierResult.success();
     };
 

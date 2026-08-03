@@ -1,5 +1,10 @@
 package com.dtteam.dynamictrees.api.treedata;
 
+import net.minecraft.core.Direction;
+
+/**
+ * params in order of {@link Direction#get3DDataValue()}
+ */
 public record BranchShapeState(byte down, byte up, byte north, byte south, byte west, byte east, byte core){
 
     private static final int[] BLOCK_START = new int[8]; // start offsets for each family of shapes (by core)

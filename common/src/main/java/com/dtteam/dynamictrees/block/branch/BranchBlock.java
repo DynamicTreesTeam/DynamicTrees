@@ -68,6 +68,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -321,7 +322,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         radii[6] = (byte)radius; //last radius is the core
 
         for (Direction dir : Direction.values()) {
-            radii[dir.ordinal()] = (byte)Math.min(getSideConnectionRadius(level, pos, radius, dir), radius);
+            radii[dir.get3DDataValue()] = (byte)Math.min(getSideConnectionRadius(level, pos, radius, dir), radius);
         }
         int shapeStateIndex = BranchShapeState.fromArray(radii).toIndex();
 
@@ -339,7 +340,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         double radius = radii[6] / 16.0;
         VoxelShape shape = Shapes.create(makeCube(radius));
         for (Direction dir : Direction.values()) {
-            double sideRadius = radii[dir.ordinal()] / 16.0f;
+            double sideRadius = radii[dir.get3DDataValue()] / 16.0f;
             if (sideRadius > 0.0f) {
                 double gap = 0.5f - sideRadius;
                 AABB aabb = makeCube(sideRadius);
@@ -740,9 +741,9 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
      * @param pos       The {@link BlockPos} of the {@link BranchBlock} being exploded.
      * @param explosion The {@link Explosion} destroying the {@link BranchBlock}.
      *
-     * NeoForge Override */
-    @SuppressWarnings("unused")
-    public void onBlockExploded(BlockState state, ServerLevel level, BlockPos pos, Explosion explosion) {
+     */
+    @Override
+    protected void onExplosionHit(BlockState state, ServerLevel level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> onHit) {
         final SpeciesNode speciesNode = new SpeciesNode();
         final MapSignal signal = analyse(state, level, pos, null, new MapSignal(speciesNode));
         if (signal.foundRoot){ //Some root blocks may need to be reminded the tree exploded (Cough cough AerialRoots cough)
@@ -763,8 +764,6 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
                         (treeEntity.getZ() - expPos.z) / distance);
             }
         }
-
-        this.wasExploded(level, pos, explosion);
     }
 
     @Override

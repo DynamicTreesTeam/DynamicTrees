@@ -7,6 +7,7 @@ import com.dtteam.dynamictrees.api.worldgen.RandomXOR;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
+import com.dtteam.dynamictrees.deserialization.math.MathContext;
 import com.dtteam.dynamictrees.systems.poissondisc.PoissonDisc;
 import com.dtteam.dynamictrees.systems.poissondisc.UniversalPoissonDiscProvider;
 import com.dtteam.dynamictrees.tree.species.Species;
@@ -97,59 +98,72 @@ public class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> {
         return pLevel.isStateAtPosition(pPos, (state) -> state.is(DTBlockTags.FOLIAGE));
     }
 
-    protected GeneratorResult generateTree(LevelContext levelContext, BiomeDatabase.EntryReader biomeEntry, PoissonDisc circle, BlockPos originPos, BlockPos groundPos) {
+    protected GeneratorResult generateTree(
+        LevelContext levelContext,
+        BiomeDatabase.EntryReader biomeEntry,
+        PoissonDisc circle,
+        BlockPos originPos,
+        BlockPos groundPos
+    ) {
         if (groundPos == BlockPos.ZERO) {
             return GeneratorResult.NO_GROUND;
         }
 
-        // If there is already a rooty block, a cave rooted tree has taken this disc, so ignore
+        // If there is already a rooty block, a cave-rooted tree has taken this disc, so ignore
         if (levelContext.accessor().getBlockState(groundPos).getBlock() instanceof SoilBlock) {
             return GeneratorResult.ALREADY_GENERATED;
         }
 
         RANDOM.setXOR(groundPos);
-
-        BlockState dirtState = levelContext.accessor().getBlockState(groundPos);
-
-        GeneratorResult result = GeneratorResult.GENERATED;
-
-        BiomePropertySelectors.SpeciesSelector speciesSelector = getSpeciesSelector(biomeEntry);
-        BiomePropertySelectors.SpeciesSelection speciesSelection = speciesSelector.getSpecies(groundPos, dirtState, RANDOM);
-
-        if (!biomeEntry.isBlacklisted() && speciesSelection.isHandled()) {
-            Species species = speciesSelection.getSpecies();
-            if (species.isValid()) {
-                if (species.isAcceptableSoilForWorldgen(levelContext.accessor(), groundPos, dirtState)) {
-                    if (getChanceSelector(biomeEntry).getChance(RANDOM, species, circle.radius) == BiomePropertySelectors.Chance.OK) {
-                        Holder<Biome> biome = getNoiseBiome(levelContext, groundPos);
-                        if (!species.generate(new DynamicTreeGenerationContext(levelContext, species, originPos, groundPos.mutable(), biome, CoordUtils.getRandom2DDir(RANDOM), circle.radius, true))) {
-                            result = GeneratorResult.FAIL_GENERATION;
-                        }
-                    } else {
-                        result = GeneratorResult.FAIL_CHANCE;
-                    }
-                } else {
-                    result = GeneratorResult.FAIL_SOIL;
-                }
-            } else {
-                result = GeneratorResult.NO_TREE;
-            }
-        } else {
-            result = GeneratorResult.UNHANDLED_BIOME;
-        }
-
-        // Display concrete circles for testing the circle growing algorithm.
+        
+        GeneratorResult result = genTree(levelContext, biomeEntry, circle, originPos, groundPos
+        );
+        
+        // Display concrete circles for testing the circle algorithm.
         if (DTConfigs.SERVER.debug.get()) {
             this.generateConcreteCircle(levelContext.accessor(), circle, groundPos.getY(), result);
         }
 
         return result;
     }
-
-    protected BiomePropertySelectors.SpeciesSelector getSpeciesSelector (BiomeDatabase.EntryReader biomeEntry){
+    
+    private GeneratorResult genTree(LevelContext levelContext, BiomeDatabase.EntryReader biomeEntry, PoissonDisc circle, BlockPos originPos, BlockPos groundPos
+    ) {
+        
+        BlockState dirtState = levelContext.accessor().getBlockState(groundPos);
+        BiomePropertySelectors.SpeciesSelector speciesSelector = getSpeciesSelector(biomeEntry);
+        BiomePropertySelectors.SpeciesSelection speciesSelection = speciesSelector.getSpecies(groundPos, dirtState, RANDOM);
+        
+        if (biomeEntry.isBlacklisted() || !speciesSelection.isHandled()) {
+            return GeneratorResult.UNHANDLED_BIOME;
+        }
+        
+        Species species = speciesSelection.getSpecies();
+        if (!species.isValid()) {
+            return GeneratorResult.NO_TREE;
+        }
+        
+        if (!species.isAcceptableSoilForWorldgen(levelContext.accessor(), groundPos, dirtState)) {
+            return GeneratorResult.FAIL_SOIL;
+        }
+        
+        MathContext mc = new MathContext(groundPos, RANDOM, species, circle.radius);
+        if (getChanceSelector(biomeEntry).getChance(mc) != BiomePropertySelectors.Chance.OK) {
+            return GeneratorResult.FAIL_CHANCE;
+        }
+        
+        Holder<Biome> biome = getNoiseBiome(levelContext, groundPos);
+        if (species.generate(new DynamicTreeGenerationContext(levelContext, species, originPos, groundPos.mutable(), biome, CoordUtils.getRandom2DDir(RANDOM), circle.radius, true))) {
+            return GeneratorResult.GENERATED;
+        }
+        
+        return GeneratorResult.FAIL_GENERATION;
+    }
+    
+    protected BiomePropertySelectors.SpeciesSelector getSpeciesSelector (BiomeDatabase.EntryReader biomeEntry) {
         return biomeEntry.getSpeciesSelector();
     }
-    protected BiomePropertySelectors.ChanceSelector getChanceSelector (BiomeDatabase.EntryReader biomeEntry){
+    protected BiomePropertySelectors.ChanceSelector getChanceSelector (BiomeDatabase.EntryReader biomeEntry) {
         return biomeEntry.getChanceSelector();
     }
 
