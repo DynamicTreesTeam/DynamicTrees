@@ -17,6 +17,7 @@ import com.dtteam.dynamictrees.tree.*;
 import com.dtteam.dynamictrees.tree.family.*;
 import com.dtteam.dynamictrees.tree.species.*;
 import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.*;
+import fuzs.forgeconfigapiport.fabric.impl.core.*;
 import net.fabricmc.api.*;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.*;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.*;
@@ -46,7 +47,7 @@ public class DynamicTreesFabricClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        NeoForgeConfigRegistry.INSTANCE.register(DynamicTrees.MOD_ID, ModConfig.Type.CLIENT, DTConfigs.CLIENT_CONFIG);
+        ConfigRegistryImpl.INSTANCE.register(DynamicTrees.MOD_ID, ModConfig.Type.CLIENT, DTConfigs.CLIENT_CONFIG);
         AtlasSourceTypeRegistryImpl.register(ThickBranchRingsSource.ID, ThickBranchRingsSource.setType(ThickBranchRingsSource.CODEC));
         registerModelLoaders();
         registerEntityRenderers();
@@ -79,8 +80,8 @@ public class DynamicTreesFabricClient implements ClientModInitializer {
     }
 
     private void registerColorHandlers() {
-        BlockColorMultipliers.register("birch", (state, level, pos, tintIndex) -> FoliageColor.getBirchColor());
-        BlockColorMultipliers.register("spruce", (state, level, pos, tintIndex) -> FoliageColor.getEvergreenColor());
+        BlockColorMultipliers.register("birch", (state, level, pos, tintIndex) -> FoliageColor.FOLIAGE_BIRCH);
+        BlockColorMultipliers.register("spruce", (state, level, pos, tintIndex) -> FoliageColor.FOLIAGE_EVERGREEN);
 
         ColorProviderRegistry.ITEM.register(DTRegistries.DENDRO_POTION.get()::getColor, DTRegistries.DENDRO_POTION.get());
         ColorProviderRegistry.ITEM.register(DTRegistries.STAFF.get()::getColor, DTRegistries.STAFF.get());
