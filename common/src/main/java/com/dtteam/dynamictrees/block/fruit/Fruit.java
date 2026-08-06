@@ -132,9 +132,13 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
      * @param properties the properties of the block. May be the {@linkplain #getDefaultBlockProperties default
      *                   properties} or a modification of them.
      */
-    public final void createBlock(@Nullable Identifier name, Block.Properties properties) {
+    public final void generateBlock(@Nullable Identifier name, Block.Properties properties) {
         Identifier id = name == null ? this.getRegistryName() : name;
-        block = RegistryHandler.addBlock(id, () -> new FruitBlock(id, properties, this));
+        block = RegistryHandler.addBlock(id, () -> createBlock(id, properties));
+    }
+
+    protected FruitBlock createBlock(Identifier id, Block.Properties properties) {
+        return new FruitBlock(id, properties, this);
     }
 
     public MapColor getDefaultMapColor() {

@@ -70,6 +70,8 @@ pluginManager.withPlugin('me.modmuss50.mod-publish-plugin') {
                 projectSlug = "dynamictrees"
                 accessToken = providers.gradleProperty("curseApiKey").getOrElse(providers.environmentVariable("CURSEFORGE_API_KEY").getOrNull())
                 minecraftVersions.add(minecraft_version)
+                client = true
+                server = true
                 if (isFabric) {
                     requires("forge-config-api-port")
                 } else {

@@ -9,6 +9,7 @@ import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.api.worldgen.LevelContext;
 import com.dtteam.dynamictrees.block.DynamicBlockProperties;
 import com.dtteam.dynamictrees.block.Growable;
+import com.dtteam.dynamictrees.block.fruit.FruitBlock;
 import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.data.DTLootTableBuilder;
 import com.dtteam.dynamictrees.treepack.Resettable;
@@ -162,13 +163,16 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
      * @param properties the properties of the block. May be the {@linkplain #getDefaultBlockProperties default
      *                   properties} or a modification of them.
      */
-    public final void createBlock(@Nullable Identifier name, Block.Properties properties) {
+    public final void generateBlock(@Nullable Identifier name, Block.Properties properties) {
         Identifier id = name == null ? this.getRegistryName() : name;
-        block = RegistryHandler.addBlock(id, () -> {
-            if (hasVariableOffset())
-                return new OffsetablePodBlock(id, properties, this);
-            else return new PodBlock(id, properties, this);
-        });
+        block = RegistryHandler.addBlock(id, () -> createBlock(id, properties));
+    }
+
+    protected PodBlock createBlock(Identifier id, Block.Properties properties) {
+        if (hasVariableOffset())
+            return new OffsetablePodBlock(id, properties, this);
+        else
+            return new PodBlock(id, properties, this);
     }
 
     public MapColor getDefaultMapColor() {

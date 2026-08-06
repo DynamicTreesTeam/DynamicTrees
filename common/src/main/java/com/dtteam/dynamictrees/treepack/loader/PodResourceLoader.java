@@ -88,7 +88,7 @@ public final class PodResourceLoader extends JsonRegistryResourceLoader<Pod> {
     }
 
     private void createBlock(Pod pod, JsonObject json) {
-        pod.createBlock(getBlockRegistryName(pod, json), pod.getDefaultBlockProperties());
+        pod.generateBlock(getBlockRegistryName(pod, json), pod.getDefaultBlockProperties());
     }
 
     private void createBlock(Pod pod, JsonObject json, JsonObject propertiesJson) {
@@ -98,7 +98,7 @@ public final class PodResourceLoader extends JsonRegistryResourceLoader<Pod> {
                 error -> this.logError(pod.getRegistryName(), error),
                 warning -> this.logWarning(pod.getRegistryName(), warning)
         );
-        pod.createBlock(getBlockRegistryName(pod, json), blockProperties);
+        pod.generateBlock(getBlockRegistryName(pod, json), blockProperties);
     }
 
     /**
