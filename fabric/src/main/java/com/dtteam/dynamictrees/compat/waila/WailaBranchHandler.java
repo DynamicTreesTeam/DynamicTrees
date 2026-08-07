@@ -19,6 +19,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
@@ -28,6 +29,9 @@ import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
+import snownee.jade.api.ui.Element;
+import snownee.jade.impl.ui.ItemStackElement;
+import snownee.jade.impl.ui.SpacerElement;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -89,50 +93,71 @@ public class WailaBranchHandler implements IBlockComponentProvider {
                 tooltip.add(Component.literal(ChatFormatting.DARK_GRAY + species.getRegistryName().toString()));
             }
 
-            // TODO 26.2 port: Jade removed the IElement/ElementHelper API; the item icon row
-            //  (seed/fruit/pod/log/stick stacks) needs to be reimplemented against the new Jade API.
-//            ItemStack seedStack = species.getSeedStack(1);
-//
-//            List<IElement> elements = new LinkedList<>();
-//            elements.add(getElement(seedStack)); //adds seed;
-//
-//            if (species.hasFruits()){
-//                for (Fruit fruit : species.getFruits()){
-//                    ItemStack fruitStack = fruit.getItemStack();
-//                    if (fruitStack.getItem() != seedStack.getItem())
-//                        elements.add(getElement(fruitStack));
-//                }
-//            }
-//            if (species.hasPods()){
-//                for (Pod pod : species.getPods()){
-//                    ItemStack podStack = pod.getItemStack();
-//                    if (podStack.getItem() != seedStack.getItem())
-//                        elements.add(getElement(podStack));
-//                }
-//            }
-//
-//            int silkTouch = ItemUtils.getEnchantmentLevel(Enchantments.SILK_TOUCH, accessor.getPlayer().getMainHandItem(), accessor.getPlayer().registryAccess());
-//            int fortune = ItemUtils.getEnchantmentLevel(Enchantments.FORTUNE, accessor.getPlayer().getMainHandItem(), accessor.getPlayer().registryAccess());
-//            if (lastVolume.getVolume() > 0) {
-//                LogsAndSticks las = species.getLogsAndSticks(lastVolume, silkTouch > 0, fortune);
-//                List<ItemStack> logStacks = las.logs;
-//                if (!logStacks.isEmpty()) {
-//                    for (ItemStack logStack : logStacks) {
-//                        elements.add(getElement(logStack));
-//                    }
-//                }
-//                if (las.sticks > 0) {
-//                    ItemStack stickStack = species.getFamily().getStickStack(las.sticks);
-//                    if (!stickStack.isEmpty()) {
-//                        elements.add(getElement(stickStack));
-//                    }
-//                }
-//            }
-//
-//            tooltip.add(elements.removeFirst());
-//            elements.forEach(tooltip::append);
-//            tooltip.add(ElementHelper.INSTANCE.spacer(0, 2));
+            appendDropsRow(tooltip, accessor, species);
         }
+    }
+
+    /**
+     * Builds the single-line icon row showing what this tree yields: its seed, any fruits/pods, and
+     * — once the tree's volume is known — the logs and sticks the current tool would actually drop.
+     *
+     * <p>Since 26.2 Jade's {@code IElement}/{@code ElementHelper} API is gone; elements are now
+     * {@link Element}s (which are vanilla {@code LayoutElement}s) added via
+     * {@link ITooltip#add}/{@link ITooltip#append}.
+     */
+    private void appendDropsRow(ITooltip tooltip, BlockAccessor accessor, Species species) {
+        final ItemStack seedStack = species.getSeedStack(1);
+
+        final List<Element> elements = new LinkedList<>();
+        if (!seedStack.isEmpty()) {
+            elements.add(ItemStackElement.of(seedStack));
+        }
+
+        if (species.hasFruits()) {
+            for (Fruit fruit : species.getFruits()) {
+                final ItemStack fruitStack = fruit.getItemStack();
+                if (!fruitStack.isEmpty() && fruitStack.getItem() != seedStack.getItem()) {
+                    elements.add(ItemStackElement.of(fruitStack));
+                }
+            }
+        }
+        if (species.hasPods()) {
+            for (Pod pod : species.getPods()) {
+                final ItemStack podStack = pod.getItemStack();
+                if (!podStack.isEmpty() && podStack.getItem() != seedStack.getItem()) {
+                    elements.add(ItemStackElement.of(podStack));
+                }
+            }
+        }
+
+        if (lastVolume.getVolume() > 0) {
+            final Player player = accessor.getPlayer();
+            final ItemStack heldStack = player == null ? ItemStack.EMPTY : player.getMainHandItem();
+            final int silkTouch = ItemUtils.getEnchantmentLevel(Enchantments.SILK_TOUCH, heldStack, accessor.getLevel().registryAccess());
+            final int fortune = ItemUtils.getEnchantmentLevel(Enchantments.FORTUNE, heldStack, accessor.getLevel().registryAccess());
+
+            final LogsAndSticks las = species.getLogsAndSticks(lastVolume, silkTouch > 0, fortune);
+            for (ItemStack logStack : las.logs) {
+                if (!logStack.isEmpty()) {
+                    elements.add(ItemStackElement.of(logStack));
+                }
+            }
+            if (las.sticks > 0) {
+                final ItemStack stickStack = species.getFamily().getStickStack(las.sticks);
+                if (!stickStack.isEmpty()) {
+                    elements.add(ItemStackElement.of(stickStack));
+                }
+            }
+        }
+
+        if (elements.isEmpty()) {
+            return;
+        }
+
+        // First element opens a new line, the rest are appended onto it.
+        tooltip.add(elements.removeFirst());
+        elements.forEach(tooltip::append);
+        tooltip.add(new SpacerElement(0, 2));
     }
 
     private NetVolumeNode.Volume getTreeVolume(Level level, BlockPos pos, Species species) {
@@ -166,14 +191,6 @@ public class WailaBranchHandler implements IBlockComponentProvider {
     private Species getWailaSpecies(Level level, BlockPos pos) {
         return TreeHelper.getBestGuessSpecies(level, pos);
     }
-
-//    private static IElement getElement(ItemStack stack) {
-//        if (!stack.isEmpty()) {
-//            return ElementHelper.INSTANCE.item(stack);
-//        } else {
-//            return ElementHelper.INSTANCE.spacer(0, 0);
-//        }
-//    }
 
     @Override
     public Identifier getUid() {

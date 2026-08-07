@@ -25,6 +25,9 @@
     "dynamictrees": [],
     "server": [
       "com.dtteam.dynamictrees.DynamicTreesFabricServer"
+    ],
+    "jade": [
+      "com.dtteam.dynamictrees.compat.waila.WailaCompat"
     ]
   },
   "mixins": [
