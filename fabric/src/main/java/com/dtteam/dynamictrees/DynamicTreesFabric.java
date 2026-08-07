@@ -59,8 +59,20 @@ public class DynamicTreesFabric implements ModInitializer {
             VanillaSaplingEventHandler.updateEnabled();
         });
 
-        ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
-            FabricMiscHelper.currentServer = null;
+        // Must be SERVER_STOPPED, not SERVER_STOPPING. SERVER_STOPPING fires at the HEAD of
+        // MinecraftServer#stopServer, i.e. *before* saveAllChunks drains the chunk generation
+        // queue. Chunk gen tasks still in flight there run feature placement, which reaches
+        // CaveRootedTreePlacement -> BiomeDatabase -> DTBiomeHolderSet; that resolves the biome
+        // registry off currentServer on every call, so a null here throws
+        // "Queried biome registry too early" out of a worker thread, kills the chunk task, and
+        // hangs the shutdown (the game freezes on world exit). SERVER_STOPPED fires at the TAIL,
+        // after ServerLevel#close, which matches NeoForge clearing its reference in
+        // ServerLifecycleHooks#handleServerStopped.
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+            // Only clear our own reference; never clobber a newer server's registration.
+            if (FabricMiscHelper.currentServer == server) {
+                FabricMiscHelper.currentServer = null;
+            }
         });
 
 

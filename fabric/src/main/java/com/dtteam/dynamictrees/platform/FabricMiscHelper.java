@@ -13,7 +13,9 @@ public class FabricMiscHelper implements IMiscHelper {
         return false;
     }
 
-    public static MinecraftServer currentServer;
+    // Written on the server thread, read from chunk generation worker threads during worldgen.
+    // volatile so those workers cannot observe a stale reference across the start/stop boundary.
+    public static volatile MinecraftServer currentServer;
 
     @Override
     public MinecraftServer getCurrentServer() {
