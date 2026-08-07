@@ -5,6 +5,7 @@ import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.client.TintSourceHelper;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
+import com.dtteam.dynamictrees.model.DynamicModelRegistry;
 import com.dtteam.dynamictrees.model.ModelConnections;
 import com.dtteam.dynamictrees.model.QuadManipulator;
 import com.dtteam.dynamictrees.model.entity.render.FallingTreeRenderState;
@@ -76,7 +77,7 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeRenderState> 
                     BlockState soilState = destructionData.soilState;
                     if (TreeHelper.isRooty(soilState)) {
                         SoilBlock soilBlock = TreeHelper.getRooty(soilState);
-                        BlockStateModel rootyModel = modelSet.get(soilState);
+                        BlockStateModel rootyModel = DynamicModelRegistry.getOrFallback(soilState, modelSet);
                         BlockPos cutOffset = destructionData.getRelativeCutPos();
                         treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(rootyModel, soilState, new Vec3(cutOffset.getX(), cutOffset.getY()-1, cutOffset.getZ()), entity.getRandom(), null),
                                 species.getFamily().getRootColor(soilState, soilBlock != null && soilBlock.getColorFromBark()),
@@ -86,7 +87,7 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeRenderState> 
 
                 }
 
-                BlockStateModel branchModel = modelSet.get(exState);
+                BlockStateModel branchModel = DynamicModelRegistry.getOrFallback(exState, modelSet);
                 //Draw the ring texture cap on the cut block if the rings connection is above 0
                 destructionData.getConnections(0, connectionArray);
                 boolean bottomRingsAdded = false;
@@ -106,7 +107,7 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeRenderState> 
                     if (exState == null) continue;
                     if (!previousBranch.equals(exState.getBlock())) //Update the branch model only if the block is different
                     {
-                        branchModel = modelSet.get(exState);
+                        branchModel = DynamicModelRegistry.getOrFallback(exState, modelSet);
                     }
                     BlockPos relPos = destructionData.getBranchRelPos(index);
                     destructionData.getConnections(index, connectionArray);

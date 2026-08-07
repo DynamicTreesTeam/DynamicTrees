@@ -78,10 +78,26 @@ public class DTModelLoadingPlugin implements ModelLoadingPlugin {
     @Override
     public void initialize(Context pluginContext) {
         FALLBACK_MODEL_CACHE.clear();
+        DynamicModelRegistry.clear();
         pluginContext.modifyBlockModelAfterBake().register(ModelModifier.WRAP_PHASE, DTModelLoadingPlugin::modifyModelAfterBake);
     }
 
     private static BlockStateModel modifyModelAfterBake(BlockStateModel model, ModelModifier.AfterBakeBlock.Context context) {
+        return record(context.state(), resolveModel(model, context));
+    }
+
+    /**
+     * Remembers DT's own models so DT can reach them even if another mod later decorates or replaces
+     * what the model manager hands out. See {@link DynamicModelRegistry}.
+     */
+    private static BlockStateModel record(BlockState state, BlockStateModel model) {
+        if (model instanceof FabricDynamicBlockStateModel || model instanceof PottedSaplingBlockStateModel) {
+            DynamicModelRegistry.register(state, model);
+        }
+        return model;
+    }
+
+    private static BlockStateModel resolveModel(BlockStateModel model, ModelModifier.AfterBakeBlock.Context context) {
         // Models already loaded through DT's codecs (or another DT path) are left untouched.
         if (model instanceof FabricDynamicBlockStateModel || model instanceof PottedSaplingBlockStateModel) {
             return model;
