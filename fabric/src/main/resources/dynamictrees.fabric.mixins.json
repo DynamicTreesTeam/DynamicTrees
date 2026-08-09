@@ -8,6 +8,7 @@
     "MixinBrewingStandBlockEntity",
     "MixinBrewingStandMenu",
     "MixinVegetationBlock",
+    "MixinCreakingHeartBlock",
     "MixinMinecraftServer",
     "MixinPotionBrewing",
     "MixinSaplingBlock"
