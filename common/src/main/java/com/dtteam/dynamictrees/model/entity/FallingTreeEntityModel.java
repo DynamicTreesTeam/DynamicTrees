@@ -158,7 +158,7 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeRenderState> 
                 g *= diffuse;
                 b *= diffuse;
             }
-            int newColor = ((int)(r * 255F) & 255) << 16 | ((int)(g * 255F) & 255) << 8 | ((int)(b * 255F) & 255);
+            int newColor = 0xFF000000 | ((int)(r * 255F) & 255) << 16 | ((int)(g * 255F) & 255) << 8 | ((int)(b * 255F) & 255);
             QuadInstance instance = new QuadInstance();
             instance.setColor(newColor);
             instance.setLightCoords(packedLight);
