@@ -188,9 +188,14 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements Re
         this.locked = true;
         this.dump();
 
-        // Run all of the on lock runnables and then clear them.
-        this.onLockRunnables.forEach(Runnable::run);
-        this.onLockRunnables.clear();
+        if (onLockRunnables.isEmpty()) {
+            return;
+        }
+
+        // Copy the onLockRunnables to prevent a ConcurrentModificationException
+        List<Runnable> current = new ArrayList<>(onLockRunnables);
+        onLockRunnables.clear();
+        current.forEach(Runnable::run);
     }
 
     /**
