@@ -5,11 +5,28 @@ plugins {
 //mod_version = "${mod_version}${fabricVersionAppend}"
 version = mod_version
 
+repositories {
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = 'Modrinth'
+                url = 'https://api.modrinth.com/maven'
+            }
+        }
+        filter { includeGroup 'maven.modrinth' }
+    }
+}
+
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
     implementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     implementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
     implementation "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:26.1.5"
+
+    compileOnly "maven.modrinth:jade:26.1.9+fabric"
+    compileOnly "maven.modrinth:continuity:3.0.1-beta.2+26.1"
+    compileOnly "maven.modrinth:serene-seasons:26.1.2.0.2"
+    compileOnly "maven.modrinth:glitchcore:26.1.2.0.2"
 }
 
 loom {
