@@ -6,7 +6,7 @@ import com.dtteam.dynamictrees.event.handler.*;
 import com.dtteam.dynamictrees.platform.*;
 import com.dtteam.dynamictrees.registry.*;
 import com.dtteam.dynamictrees.worldgen.*;
-import fuzs.forgeconfigapiport.fabric.impl.core.*;
+import fuzs.forgeconfigapiport.fabric.api.v5.ConfigRegistry;
 import net.fabricmc.api.*;
 import net.fabricmc.fabric.api.event.lifecycle.v1.*;
 import net.fabricmc.loader.api.*;
@@ -18,8 +18,8 @@ public class DynamicTreesFabric implements ModInitializer {
     @Override
     public void onInitialize() {
 
-        ConfigRegistryImpl.INSTANCE.register(DynamicTrees.MOD_ID,ModConfig.Type.SERVER, DTConfigs.SERVER_CONFIG);
-        ConfigRegistryImpl.INSTANCE.register(DynamicTrees.MOD_ID,ModConfig.Type.COMMON, DTConfigs.COMMON_CONFIG);
+        ConfigRegistry.INSTANCE.register(DynamicTrees.MOD_ID,ModConfig.Type.SERVER, DTConfigs.SERVER_CONFIG);
+        ConfigRegistry.INSTANCE.register(DynamicTrees.MOD_ID,ModConfig.Type.COMMON, DTConfigs.COMMON_CONFIG);
 
 
         FabricRegistryHandler.setup(DynamicTrees.MOD_ID);

@@ -16,8 +16,7 @@ import com.dtteam.dynamictrees.systems.season.*;
 import com.dtteam.dynamictrees.tree.*;
 import com.dtteam.dynamictrees.tree.family.*;
 import com.dtteam.dynamictrees.tree.species.*;
-import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.*;
-import fuzs.forgeconfigapiport.fabric.impl.core.*;
+import fuzs.forgeconfigapiport.fabric.api.v5.ConfigRegistry;
 import net.fabricmc.api.*;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.*;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.*;
@@ -47,7 +46,7 @@ public class DynamicTreesFabricClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        ConfigRegistryImpl.INSTANCE.register(DynamicTrees.MOD_ID, ModConfig.Type.CLIENT, DTConfigs.CLIENT_CONFIG);
+        ConfigRegistry.INSTANCE.register(DynamicTrees.MOD_ID, ModConfig.Type.CLIENT, DTConfigs.CLIENT_CONFIG);
         AtlasSourceTypeRegistryImpl.register(ThickBranchRingsSource.ID, ThickBranchRingsSource.setType(ThickBranchRingsSource.CODEC));
         registerModelLoaders();
         registerEntityRenderers();
