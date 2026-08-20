@@ -12,19 +12,16 @@ import com.dtteam.dynamictrees.systems.season.SeasonHelper;
 import com.dtteam.dynamictrees.treepack.Resources;
 import com.dtteam.dynamictrees.worldgen.BiomeDatabases;
 import com.dtteam.dynamictrees.worldgen.feature.DynamicTreeFeature;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLevelEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraft.world.item.crafting.*;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.world.level.block.Block;
 
 import java.util.concurrent.CompletableFuture;
@@ -34,16 +31,16 @@ public class CommonEventHandler {
 
     public static void RegisterEvents(){
 
-        ServerTickEvents.START_WORLD_TICK.register((level)->{
+        ServerTickEvents.START_LEVEL_TICK.register((level)->{
             FutureBreak.process(level);
-            SeasonHelper.updateTick(level, level.getDayTime());
+            SeasonHelper.updateTick(level, level.getOverworldClockTime());
         });
 
-        ServerWorldEvents.LOAD.register(((minecraftServer, serverLevel) -> {
+        ServerLevelEvents.LOAD.register(((minecraftServer, serverLevel) -> {
             BiomeDatabases.populateBlacklistFromConfig();
         }));
 
-        ServerWorldEvents.UNLOAD.register(((minecraftServer, serverLevel) -> {
+        ServerLevelEvents.UNLOAD.register(((minecraftServer, serverLevel) -> {
             DynamicTreeFeature.DISC_PROVIDER.unloadWorld(serverLevel);
         }));
 
@@ -81,14 +78,13 @@ public class CommonEventHandler {
         }
 
         @Override
-        public CompletableFuture<Void> reload(PreparationBarrier stage, ResourceManager resourceManager,
-                                              ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler,
-                                              Executor backgroundExecutor, Executor gameExecutor) {
-            return super.reload(stage, resourceManager, preparationsProfiler, reloadProfiler, backgroundExecutor, gameExecutor);
+        public CompletableFuture<Void> reload(PreparableReloadListener.SharedState sharedState, Executor prepareExecutor,
+                                              PreparationBarrier stage, Executor applyExecutor) {
+            return super.reload(sharedState, prepareExecutor, stage, applyExecutor);
         }
 
         @Override
-        public ResourceLocation getFabricId() {
+        public Identifier getFabricId() {
             return DynamicTrees.location(DynamicTrees.MOD_ID);
         }
     }

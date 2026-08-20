@@ -20,7 +20,7 @@ public class MixinPotionBrewing {
         }
     }
 
-    @Inject(at = @At("HEAD"), method = "isContainer", cancellable = true)
+    @Inject(at = @At("HEAD"), method = "isContainerIngredient", cancellable = true)
     private void isContainer(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
         if (stack.getItem() instanceof DendroPotion){ //Add the dendro potion as a valid container
             cir.setReturnValue(true);

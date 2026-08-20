@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(BushBlock.class)
+@Mixin(net.minecraft.world.level.block.VegetationBlock.class)
 public class MixinBushBlock {
 
     @Shadow protected boolean mayPlaceOn(BlockState state, BlockGetter level, BlockPos pos){ return false; }

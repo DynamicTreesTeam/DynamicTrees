@@ -17,7 +17,7 @@ public class FabricClientHelper implements IClientHelper {
             SpriteContents contents = sprite.contents();
             NativeImage image = contents.originalImage;
             if (image != null) {
-                return image.getPixelRGBA(x, y);
+                return image.getPixel(x, y);
             }
             return 0;
         } catch (Exception e) {

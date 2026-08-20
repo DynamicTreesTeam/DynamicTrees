@@ -1,17 +1,18 @@
 package com.dtteam.dynamictrees.registry;
 
 import com.dtteam.dynamictrees.DynamicTrees;
-import com.dtteam.dynamictrees.recipe.DendroPotionRecipeHandler;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.serialization.MapCodec;
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.ArgumentTypeInfos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -30,11 +31,8 @@ import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElementType;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
-import net.minecraft.world.level.storage.loot.entries.LootPoolEntryType;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
-import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
-import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
 
 import java.util.Set;
 import java.util.function.Supplier;
@@ -44,19 +42,30 @@ public class FabricRegistryLoader extends RegistryLoader {
 
     public static void setup (){
         DTRegistries.setup();
-        DendroPotionRecipeHandler.getAllDendroRecipes();
     }
 
     @Override
     public <T extends Block> Supplier<T> registerBlock(String name, Supplier<T> newBlock) {
-        T block = Registry.register(BuiltInRegistries.BLOCK, DynamicTrees.location(name), newBlock.get());
-        return ()-> block;
+        Identifier id = DynamicTrees.location(name);
+        PendingRegistryIds.BLOCK.set(id);
+        try {
+            T block = Registry.register(BuiltInRegistries.BLOCK, id, newBlock.get());
+            return ()-> block;
+        } finally {
+            PendingRegistryIds.BLOCK.remove();
+        }
     }
 
     @Override
     public <T extends Item> Supplier<T> registerItem(String name, Supplier<T> newBlock) {
-        T item = Registry.register(BuiltInRegistries.ITEM, DynamicTrees.location(name), newBlock.get());
-        return ()-> item;
+        Identifier id = DynamicTrees.location(name);
+        PendingRegistryIds.ITEM.set(id);
+        try {
+            T item = Registry.register(BuiltInRegistries.ITEM, id, newBlock.get());
+            return ()-> item;
+        } finally {
+            PendingRegistryIds.ITEM.remove();
+        }
     }
 
     @Override
@@ -68,7 +77,7 @@ public class FabricRegistryLoader extends RegistryLoader {
     @Override
     public Supplier<CreativeModeTab> registerCreativeTab(String name, Supplier<ItemStack> icon, MutableComponent title, CreativeModeTab.DisplayItemsGenerator displayItems) {
         CreativeModeTab tab = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, DynamicTrees.location(DynamicTrees.MOD_ID),
-                FabricItemGroup.builder().icon(icon).title(title).displayItems(displayItems).build());
+                FabricCreativeModeTab.builder().icon(icon).title(title).displayItems(displayItems).build());
         return ()-> tab;
     }
 
@@ -76,19 +85,20 @@ public class FabricRegistryLoader extends RegistryLoader {
     public <T extends Entity> Supplier<EntityType<T>> registerEntity(String name, EntityType.Builder<T> builder, boolean isTree) {
 //        if (isTree)
 //            builder.setShouldReceiveVelocityUpdates(true).setTrackingRange(512).setUpdateInterval(Integer.MAX_VALUE);
-        EntityType<T> entityType = Registry.register(BuiltInRegistries.ENTITY_TYPE, DynamicTrees.location(name), builder.build(name));
+        EntityType<T> entityType = Registry.register(BuiltInRegistries.ENTITY_TYPE, DynamicTrees.location(name),
+                builder.build(ResourceKey.create(Registries.ENTITY_TYPE, DynamicTrees.location(name))));
         return ()-> entityType;
     }
 
     @Override
     public <T extends BlockEntity> Supplier<BlockEntityType<T>> registerBlockEntity(String name, BlockEntityType.BlockEntitySupplier<? extends T> newBlockEntity, Supplier<Set<Block>> validBlocks) {
-        BlockEntityType<T> entityType = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, DynamicTrees.location(name), new BlockEntityType<>(newBlockEntity, validBlocks.get(), null));
+        BlockEntityType<T> entityType = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, DynamicTrees.location(name), new BlockEntityType<>(newBlockEntity, validBlocks.get()));
         return ()-> entityType;
     }
 
     @Override
     public Supplier<SoundEvent> registerSoundEvent(String name) {
-        ResourceLocation location = DynamicTrees.location(name);
+        Identifier location = DynamicTrees.location(name);
         SoundEvent type = Registry.register(BuiltInRegistries.SOUND_EVENT, location, SoundEvent.createVariableRangeEvent(location));
         return ()-> type;
     }
@@ -107,20 +117,20 @@ public class FabricRegistryLoader extends RegistryLoader {
     }
 
     @Override
-    public Supplier<LootItemConditionType> registerLootConditionType(String name, MapCodec<? extends LootItemCondition> serializerFactory) {
-        LootItemConditionType type = Registry.register(BuiltInRegistries.LOOT_CONDITION_TYPE, DynamicTrees.location(name), new LootItemConditionType(serializerFactory));
+    public Supplier<MapCodec<? extends LootItemCondition>> registerLootConditionType(String name, MapCodec<? extends LootItemCondition> serializerFactory) {
+        MapCodec<? extends LootItemCondition> type = Registry.register(BuiltInRegistries.LOOT_CONDITION_TYPE, DynamicTrees.location(name), serializerFactory);
         return ()-> type;
     }
 
     @Override
-    public Supplier<LootPoolEntryType> registerLootPoolEntryType(String name, MapCodec<? extends LootPoolEntryContainer> serializerFactory) {
-        LootPoolEntryType type = Registry.register(BuiltInRegistries.LOOT_POOL_ENTRY_TYPE, DynamicTrees.location(name), new LootPoolEntryType(serializerFactory));
+    public Supplier<MapCodec<? extends LootPoolEntryContainer>> registerLootPoolEntryType(String name, MapCodec<? extends LootPoolEntryContainer> serializerFactory) {
+        MapCodec<? extends LootPoolEntryContainer> type = Registry.register(BuiltInRegistries.LOOT_POOL_ENTRY_TYPE, DynamicTrees.location(name), serializerFactory);
         return ()-> type;
     }
 
     @Override
-    public <L extends LootItemFunction> Supplier<LootItemFunctionType<L>> registerLootFunctionType(String name, MapCodec<L> serializerFactory) {
-        LootItemFunctionType<L> type = Registry.register(BuiltInRegistries.LOOT_FUNCTION_TYPE, DynamicTrees.location(name), new LootItemFunctionType<>(serializerFactory));
+    public <L extends LootItemFunction> Supplier<MapCodec<L>> registerLootFunctionType(String name, MapCodec<L> serializerFactory) {
+        MapCodec<L> type = Registry.register(BuiltInRegistries.LOOT_FUNCTION_TYPE, DynamicTrees.location(name), serializerFactory);
         return ()-> type;
     }
 

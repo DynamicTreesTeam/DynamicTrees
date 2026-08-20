@@ -20,6 +20,7 @@ import com.dtteam.dynamictrees.systems.nodemapper.RootsDestroyerNode;
 import com.dtteam.dynamictrees.systems.nodemapper.SpeciesNode;
 import com.dtteam.dynamictrees.systems.nodemapper.StateNode;
 import com.dtteam.dynamictrees.tree.TreeHelper;
+import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.family.UndergroundRootsFamily;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.tree.species.UndergroundRootsSpecies;
@@ -111,7 +112,8 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         return state.getValue(LAYER) == Layer.COVERED;
     }
     public UndergroundRootsFamily getFamily() {
-        return (UndergroundRootsFamily) super.getFamily();
+        Family family = super.getFamily();
+        return family instanceof UndergroundRootsFamily underground ? underground : null;
     }
 
     /** NeoForge override */
@@ -491,8 +493,9 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     public VoxelShape getCollisionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
         if (isFullBlock(pState)) {
             VoxelShape fullShape = Shapes.block();
-            if (getFamily().getPrimitiveCoveredRoots().isPresent())
-                fullShape = getFamily().getPrimitiveCoveredRoots().get().defaultBlockState().getCollisionShape(pLevel, pPos, pContext);
+            UndergroundRootsFamily family = getFamily();
+            if (family != null && family.getPrimitiveCoveredRoots().isPresent())
+                fullShape = family.getPrimitiveCoveredRoots().get().defaultBlockState().getCollisionShape(pLevel, pPos, pContext);
             return fullShape;
         }
         return super.getCollisionShape(pState, pLevel, pPos, pContext);

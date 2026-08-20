@@ -12,51 +12,50 @@ import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.family.UndergroundRootsFamily;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelModifier;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.resources.model.ModelDebugName;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
 
 public class DTModelLoadingPlugin implements ModelLoadingPlugin {
 
-    public static final ResourceLocation POTTED_SAPLING_MODEL = DynamicTrees.location("potted_sapling");
-    private static final Map<ResourceLocation, BakedModel> BRANCH_MODEL_CACHE = new HashMap<>();
-    private static final Map<ResourceLocation, BakedModel> ROOT_MODEL_CACHE = new HashMap<>();
-    private static final Map<ResourceLocation, BakedModel> UNDERGROUND_ROOTS_MODEL_CACHE = new HashMap<>();
+    public static final Identifier POTTED_SAPLING_MODEL = DynamicTrees.location("potted_sapling");
+    private static final Map<Identifier, BlockStateModel> BRANCH_MODEL_CACHE = new HashMap<>();
+    private static final Map<Identifier, BlockStateModel> ROOT_MODEL_CACHE = new HashMap<>();
+    private static final Map<Identifier, BlockStateModel> UNDERGROUND_ROOTS_MODEL_CACHE = new HashMap<>();
     private static boolean modelsInitialized = false;
 
     @Override
-    public void onInitializeModelLoader(Context pluginContext) {
+    public void initialize(Context pluginContext) {
         modelsInitialized = false;
         BRANCH_MODEL_CACHE.clear();
         ROOT_MODEL_CACHE.clear();
         UNDERGROUND_ROOTS_MODEL_CACHE.clear();
-        pluginContext.modifyModelAfterBake().register(ModelModifier.WRAP_PHASE, this::modifyModelAfterBake);
+        pluginContext.modifyBlockModelAfterBake().register(ModelModifier.WRAP_PHASE, this::modifyModelAfterBake);
     }
 
-    private void initBranchModels(Function<Material, TextureAtlasSprite> spriteGetter) {
+    private void initBranchModels(net.minecraft.client.resources.model.ModelBaker baker) {
         if (modelsInitialized) return;
         modelsInitialized = true;
+        ModelDebugName debugName = () -> "dynamictrees:branch";
 
         for (Family family : Family.REGISTRY.getAll()) {
             if (!family.isValid()) continue;
 
             family.getPrimitiveLog().ifPresent(primitiveLog -> {
-                ResourceLocation primitiveLogId = BuiltInRegistries.BLOCK.getKey(primitiveLog);
-                ResourceLocation barkTexture = ResourceLocation.fromNamespaceAndPath(primitiveLogId.getNamespace(), "block/" + primitiveLogId.getPath());
-                ResourceLocation ringsTexture = barkTexture.withSuffix("_top");
+                Identifier primitiveLogId = BuiltInRegistries.BLOCK.getKey(primitiveLog);
+                Identifier barkTexture = Identifier.fromNamespaceAndPath(primitiveLogId.getNamespace(), "block/" + primitiveLogId.getPath());
+                Identifier ringsTexture = barkTexture.withSuffix("_top");
 
-                AtomicReference<ResourceLocation> barkRef = new AtomicReference<>(barkTexture);
-                AtomicReference<ResourceLocation> ringsRef = new AtomicReference<>(ringsTexture);
+                AtomicReference<Identifier> barkRef = new AtomicReference<>(barkTexture);
+                AtomicReference<Identifier> ringsRef = new AtomicReference<>(ringsTexture);
 
                 family.getTexturePath(Family.BRANCH).ifPresent(barkRef::set);
                 family.getTexturePath(Family.BRANCH_TOP).ifPresent(ringsRef::set);
@@ -64,19 +63,18 @@ public class DTModelLoadingPlugin implements ModelLoadingPlugin {
                 boolean isThick = family.isThick();
 
                 family.getBranch().ifPresent(branch -> {
-                    ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(branch);
-                    BakedModel model = createBranchModel(barkRef.get(), ringsRef.get(), isThick, spriteGetter);
-                    BRANCH_MODEL_CACHE.put(blockId, model);
+                    Identifier blockId = BuiltInRegistries.BLOCK.getKey(branch);
+                    BRANCH_MODEL_CACHE.put(blockId, createBranchModel(baker, debugName, barkRef.get(), ringsRef.get(), isThick));
                 });
             });
 
             family.getPrimitiveStrippedLog().ifPresent(strippedLog -> {
-                ResourceLocation strippedLogId = BuiltInRegistries.BLOCK.getKey(strippedLog);
-                ResourceLocation strippedBarkTexture = ResourceLocation.fromNamespaceAndPath(strippedLogId.getNamespace(), "block/" + strippedLogId.getPath());
-                ResourceLocation strippedRingsTexture = strippedBarkTexture.withSuffix("_top");
+                Identifier strippedLogId = BuiltInRegistries.BLOCK.getKey(strippedLog);
+                Identifier strippedBarkTexture = Identifier.fromNamespaceAndPath(strippedLogId.getNamespace(), "block/" + strippedLogId.getPath());
+                Identifier strippedRingsTexture = strippedBarkTexture.withSuffix("_top");
 
-                AtomicReference<ResourceLocation> barkRef = new AtomicReference<>(strippedBarkTexture);
-                AtomicReference<ResourceLocation> ringsRef = new AtomicReference<>(strippedRingsTexture);
+                AtomicReference<Identifier> barkRef = new AtomicReference<>(strippedBarkTexture);
+                AtomicReference<Identifier> ringsRef = new AtomicReference<>(strippedRingsTexture);
 
                 family.getTexturePath(Family.STRIPPED_BRANCH).ifPresent(barkRef::set);
                 family.getTexturePath(Family.STRIPPED_BRANCH_TOP).ifPresent(ringsRef::set);
@@ -84,162 +82,111 @@ public class DTModelLoadingPlugin implements ModelLoadingPlugin {
                 boolean isThick = family.isThick();
 
                 family.getStrippedBranch().ifPresent(strippedBranch -> {
-                    ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(strippedBranch);
-                    BakedModel model = createBranchModel(barkRef.get(), ringsRef.get(), isThick, spriteGetter);
-                    BRANCH_MODEL_CACHE.put(blockId, model);
+                    Identifier blockId = BuiltInRegistries.BLOCK.getKey(strippedBranch);
+                    BRANCH_MODEL_CACHE.put(blockId, createBranchModel(baker, debugName, barkRef.get(), ringsRef.get(), isThick));
                 });
             });
 
             family.getSurfaceRoot().ifPresent(surfaceRoot -> {
                 family.getPrimitiveLog().ifPresent(primitiveLog -> {
-                    ResourceLocation primitiveLogId = BuiltInRegistries.BLOCK.getKey(primitiveLog);
-                    ResourceLocation barkTexture = ResourceLocation.fromNamespaceAndPath(primitiveLogId.getNamespace(), "block/" + primitiveLogId.getPath());
-                    AtomicReference<ResourceLocation> barkRef = new AtomicReference<>(barkTexture);
+                    Identifier primitiveLogId = BuiltInRegistries.BLOCK.getKey(primitiveLog);
+                    Identifier barkTexture = Identifier.fromNamespaceAndPath(primitiveLogId.getNamespace(), "block/" + primitiveLogId.getPath());
+                    AtomicReference<Identifier> barkRef = new AtomicReference<>(barkTexture);
                     family.getTexturePath(Family.BRANCH).ifPresent(barkRef::set);
 
-                    ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(surfaceRoot);
-                    BakedModel model = createRootModel(barkRef.get(), spriteGetter);
-                    ROOT_MODEL_CACHE.put(blockId, model);
+                    Identifier blockId = BuiltInRegistries.BLOCK.getKey(surfaceRoot);
+                    Material.Baked bark = baker.materials().get(new Material(barkRef.get()), debugName);
+                    ROOT_MODEL_CACHE.put(blockId, new SurfaceRootBlockBakedModel(baker, bark));
                 });
             });
 
             if (family instanceof UndergroundRootsFamily undergroundFamily) {
                 undergroundFamily.getRoots().ifPresent(roots -> {
-                    ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(roots);
+                    Identifier blockId = BuiltInRegistries.BLOCK.getKey(roots);
 
                     undergroundFamily.getPrimitiveRoots().ifPresent(primitiveRoots -> {
-                        ResourceLocation primitiveRootsId = BuiltInRegistries.BLOCK.getKey(primitiveRoots);
-                        ResourceLocation barkTexture = ResourceLocation.fromNamespaceAndPath(primitiveRootsId.getNamespace(), "block/" + primitiveRootsId.getPath() + "_side");
-                        ResourceLocation ringsTexture = ResourceLocation.fromNamespaceAndPath(primitiveRootsId.getNamespace(), "block/" + primitiveRootsId.getPath() + "_top");
+                        Identifier primitiveRootsId = BuiltInRegistries.BLOCK.getKey(primitiveRoots);
+                        Identifier barkTexture = Identifier.fromNamespaceAndPath(primitiveRootsId.getNamespace(), "block/" + primitiveRootsId.getPath() + "_side");
+                        Identifier ringsTexture = Identifier.fromNamespaceAndPath(primitiveRootsId.getNamespace(), "block/" + primitiveRootsId.getPath() + "_top");
 
-                        AtomicReference<ResourceLocation> barkRef = new AtomicReference<>(barkTexture);
-                        AtomicReference<ResourceLocation> ringsRef = new AtomicReference<>(ringsTexture);
+                        AtomicReference<Identifier> barkRef = new AtomicReference<>(barkTexture);
+                        AtomicReference<Identifier> ringsRef = new AtomicReference<>(ringsTexture);
 
                         family.getTexturePath(Family.ROOTS_SIDE).ifPresent(barkRef::set);
                         family.getTexturePath(Family.ROOTS_TOP).ifPresent(ringsRef::set);
 
-                        BakedModel model = createRootsBlockModel(barkRef.get(), ringsRef.get(), spriteGetter);
-                        UNDERGROUND_ROOTS_MODEL_CACHE.put(blockId.withSuffix("_exposed"), model);
+                        UNDERGROUND_ROOTS_MODEL_CACHE.put(blockId.withSuffix("_exposed"),
+                                createRootsBlockModel(baker, debugName, barkRef.get(), ringsRef.get()));
                     });
 
                     undergroundFamily.getPrimitiveFilledRoots().ifPresent(primitiveFilledRoots -> {
-                        ResourceLocation primitiveFilledRootsId = BuiltInRegistries.BLOCK.getKey(primitiveFilledRoots);
-                        ResourceLocation barkTexture = ResourceLocation.fromNamespaceAndPath(primitiveFilledRootsId.getNamespace(), "block/" + primitiveFilledRootsId.getPath() + "_side");
-                        ResourceLocation ringsTexture = ResourceLocation.fromNamespaceAndPath(primitiveFilledRootsId.getNamespace(), "block/" + primitiveFilledRootsId.getPath() + "_top");
-
-                        BakedModel model = createRootsBlockModel(barkTexture, ringsTexture, spriteGetter);
-                        UNDERGROUND_ROOTS_MODEL_CACHE.put(blockId.withSuffix("_filled"), model);
+                        Identifier primitiveFilledRootsId = BuiltInRegistries.BLOCK.getKey(primitiveFilledRoots);
+                        Identifier barkTexture = Identifier.fromNamespaceAndPath(primitiveFilledRootsId.getNamespace(), "block/" + primitiveFilledRootsId.getPath() + "_side");
+                        Identifier ringsTexture = Identifier.fromNamespaceAndPath(primitiveFilledRootsId.getNamespace(), "block/" + primitiveFilledRootsId.getPath() + "_top");
+                        UNDERGROUND_ROOTS_MODEL_CACHE.put(blockId.withSuffix("_filled"),
+                                createRootsBlockModel(baker, debugName, barkTexture, ringsTexture));
                     });
-
-
                 });
             }
         }
     }
 
-    private BakedModel createBranchModel(ResourceLocation barkTexture, ResourceLocation ringsTexture, boolean isThick, Function<Material, TextureAtlasSprite> spriteGetter) {
-        TextureAtlasSprite barkSprite = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, barkTexture));
-        TextureAtlasSprite ringsSprite = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, ringsTexture));
-
+    private BlockStateModel createBranchModel(net.minecraft.client.resources.model.ModelBaker baker, ModelDebugName debugName,
+                                              Identifier barkTexture, Identifier ringsTexture, boolean isThick) {
+        Material.Baked bark = baker.materials().get(new Material(barkTexture), debugName);
+        Material.Baked rings = baker.materials().get(new Material(ringsTexture), debugName);
         if (isThick) {
-            ResourceLocation thickRingsTexture = ringsTexture.withSuffix("_thick");
-            TextureAtlasSprite thickRingsSprite = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, thickRingsTexture));
-            return new ThickBranchBlockBakedModel(barkSprite, ringsSprite, thickRingsSprite);
+            Material.Baked thickRings = baker.materials().get(new Material(ringsTexture.withSuffix("_thick")), debugName);
+            return new ThickBranchBlockBakedModel(baker, bark, rings, thickRings);
         }
-
-        return new BasicBranchBlockBakedModel(barkSprite, ringsSprite);
+        return new BasicBranchBlockBakedModel(baker, bark, rings);
     }
 
-    private BakedModel createRootModel(ResourceLocation barkTexture, Function<Material, TextureAtlasSprite> spriteGetter) {
-        TextureAtlasSprite barkSprite = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, barkTexture));
-        return new SurfaceRootBlockBakedModel(barkSprite);
+    private BlockStateModel createRootsBlockModel(net.minecraft.client.resources.model.ModelBaker baker, ModelDebugName debugName,
+                                                  Identifier barkTexture, Identifier ringsTexture) {
+        Material.Baked bark = baker.materials().get(new Material(barkTexture), debugName);
+        Material.Baked rings = baker.materials().get(new Material(ringsTexture), debugName);
+        return new BasicRootsBlockBakedModel(baker, bark, rings);
     }
 
-    private BakedModel createRootsBlockModel(ResourceLocation barkTexture, ResourceLocation ringsTexture, Function<Material, TextureAtlasSprite> spriteGetter) {
-        TextureAtlasSprite barkSprite = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, barkTexture));
-        TextureAtlasSprite ringsSprite = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, ringsTexture));
-        return new BasicRootsBlockBakedModel(barkSprite, ringsSprite);
-    }
+    private BlockStateModel modifyModelAfterBake(BlockStateModel model, ModelModifier.AfterBakeBlock.Context context) {
+        BlockState state = context.state();
+        Block block = state.getBlock();
+        Identifier blockId = BuiltInRegistries.BLOCK.getKey(block);
 
-    private BakedModel createFallbackRootsModel(UndergroundRootsFamily family, String variant, Function<Material, TextureAtlasSprite> spriteGetter) {
-        if (variant.contains("layer=exposed")) {
-            return family.getPrimitiveRoots().map(primitiveRoots -> {
-                ResourceLocation primitiveRootsId = BuiltInRegistries.BLOCK.getKey(primitiveRoots);
-                ResourceLocation barkTexture = ResourceLocation.fromNamespaceAndPath(primitiveRootsId.getNamespace(), "block/" + primitiveRootsId.getPath() + "_side");
-                ResourceLocation ringsTexture = ResourceLocation.fromNamespaceAndPath(primitiveRootsId.getNamespace(), "block/" + primitiveRootsId.getPath() + "_top");
-                return createRootsBlockModel(barkTexture, ringsTexture, spriteGetter);
-            }).orElse(null);
-        } else if (variant.contains("layer=filled")) {
-            return family.getPrimitiveFilledRoots().map(primitiveFilledRoots -> {
-                ResourceLocation primitiveFilledRootsId = BuiltInRegistries.BLOCK.getKey(primitiveFilledRoots);
-                ResourceLocation barkTexture = ResourceLocation.fromNamespaceAndPath(primitiveFilledRootsId.getNamespace(), "block/" + primitiveFilledRootsId.getPath() + "_side");
-                ResourceLocation ringsTexture = ResourceLocation.fromNamespaceAndPath(primitiveFilledRootsId.getNamespace(), "block/" + primitiveFilledRootsId.getPath() + "_top");
-                return createRootsBlockModel(barkTexture, ringsTexture, spriteGetter);
-            }).orElse(null);
-        }
-        return null;
-    }
-
-    private BakedModel modifyModelAfterBake(BakedModel model, ModelModifier.AfterBake.Context context) {
-        ModelResourceLocation modelId = context.topLevelId();
-        if (modelId == null) return model;
-
-        if (modelId.id().equals(POTTED_SAPLING_MODEL)) {
+        if (blockId.equals(POTTED_SAPLING_MODEL)) {
             return new BakedModelBlockPottedSapling(model);
         }
 
-        ResourceLocation blockId = modelId.id();
-        Block block = BuiltInRegistries.BLOCK.get(blockId);
-
-        if (block instanceof BasicRootsBlock rootsBlock) {
-            initBranchModels(context.textureGetter());
-
-            String variant = modelId.variant();
-            ResourceLocation cacheKey;
-            if (variant.contains("layer=filled")) {
-                cacheKey = blockId.withSuffix("_filled");
-            } else if (variant.contains("layer=exposed")) {
-                cacheKey = blockId.withSuffix("_exposed");
-            } else if (variant.contains("layer=covered")) {
-                return model;
-            } else {
-                return model;
-            }
-
-            BakedModel rootsModel = UNDERGROUND_ROOTS_MODEL_CACHE.get(cacheKey);
-            if (rootsModel != null) {
-                return rootsModel;
-            }
-
-            if (rootsBlock.getFamily() instanceof UndergroundRootsFamily undergroundFamily) {
-                BakedModel fallbackModel = createFallbackRootsModel(undergroundFamily, variant, context.textureGetter());
-                if (fallbackModel != null) {
-                    UNDERGROUND_ROOTS_MODEL_CACHE.put(cacheKey, fallbackModel);
-                    return fallbackModel;
+        if (block instanceof BasicRootsBlock) {
+            initBranchModels(context.baker());
+            if (state.hasProperty(BasicRootsBlock.LAYER)) {
+                BasicRootsBlock.Layer layer = state.getValue(BasicRootsBlock.LAYER);
+                if (layer == BasicRootsBlock.Layer.COVERED) {
+                    return model;
+                }
+                Identifier cacheKey = blockId.withSuffix(layer == BasicRootsBlock.Layer.FILLED ? "_filled" : "_exposed");
+                BlockStateModel rootsModel = UNDERGROUND_ROOTS_MODEL_CACHE.get(cacheKey);
+                if (rootsModel != null) {
+                    return rootsModel;
                 }
             }
             return model;
         }
 
         if (block instanceof SurfaceRootBlock) {
-            initBranchModels(context.textureGetter());
-
-            BakedModel rootModel = ROOT_MODEL_CACHE.get(blockId);
-            if (rootModel != null) {
-                return rootModel;
-            }
-            return model;
+            initBranchModels(context.baker());
+            BlockStateModel rootModel = ROOT_MODEL_CACHE.get(blockId);
+            return rootModel != null ? rootModel : model;
         }
 
         if (block instanceof BranchBlock) {
-            initBranchModels(context.textureGetter());
-
-            BakedModel branchModel = BRANCH_MODEL_CACHE.get(blockId);
+            initBranchModels(context.baker());
+            BlockStateModel branchModel = BRANCH_MODEL_CACHE.get(blockId);
             if (branchModel != null) {
                 return branchModel;
             }
         }
-
 
         return model;
     }

@@ -22,6 +22,12 @@
     "client": [
       "com.dtteam.dynamictrees.DynamicTreesFabricClient"
     ],
+    "jei_mod_plugin": [
+      "com.dtteam.dynamictrees.compat.DTJeiPlugin"
+    ],
+    "jade": [
+      "com.dtteam.dynamictrees.compat.waila.WailaCompat"
+    ],
     "dynamictrees": []
   },
   "mixins": [
@@ -31,8 +37,8 @@
   "depends": {
     "fabricloader": ">=${fabric_loader_version}",
     "fabric-api": "*",
-    "minecraft": "${minecraft_version}",
-    "java": ">=${java_version}",
+    "minecraft": "${fabric_minecraft_version}",
+    "java": ">=${fabric_java_version}",
     "forgeconfigapiport": "*"
   },
   "suggests": {

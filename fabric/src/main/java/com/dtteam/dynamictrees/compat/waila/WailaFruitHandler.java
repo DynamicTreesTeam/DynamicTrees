@@ -4,7 +4,7 @@ import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.block.fruit.FruitBlock;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.ITooltip;
@@ -12,7 +12,7 @@ import snownee.jade.api.config.IPluginConfig;
 
 public class WailaFruitHandler implements IBlockComponentProvider {
 
-    public static final ResourceLocation FRUIT_UID = DynamicTrees.location("fruit");
+    public static final Identifier FRUIT_UID = DynamicTrees.location("fruit");
 
     @Override
     public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
@@ -27,7 +27,7 @@ public class WailaFruitHandler implements IBlockComponentProvider {
     }
 
     @Override
-    public ResourceLocation getUid() {
+    public Identifier getUid() {
         return FRUIT_UID;
     }
 }

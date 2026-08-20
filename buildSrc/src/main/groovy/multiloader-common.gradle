@@ -3,12 +3,15 @@ plugins {
     id 'maven-publish'
 }
 
+def loaderMinecraftVersion = project.name == 'fabric' ? fabric_minecraft_version : minecraft_version
+def loaderJavaVersion = project.name == 'fabric' ? fabric_java_version : java_version
+
 base {
-    archivesName = "${mod_id}-${project.name}-${minecraft_version}"
+    archivesName = "${mod_id}-${project.name}-${loaderMinecraftVersion}"
 }
 
 java {
-    toolchain.languageVersion = JavaLanguageVersion.of(java_version)
+    toolchain.languageVersion = JavaLanguageVersion.of(loaderJavaVersion)
     withSourcesJar()
     withJavadocJar()
 }
@@ -54,7 +57,7 @@ repositories {
 ['apiElements', 'runtimeElements', 'sourcesElements', 'javadocElements'].each { variant ->
     configurations."$variant".outgoing {
         capability("$group:${base.archivesName.get()}:$mod_version")
-        capability("$group:$mod_id-${project.name}-${minecraft_version}:$mod_version")
+        capability("$group:$mod_id-${project.name}-${loaderMinecraftVersion}:$mod_version")
         capability("$group:$mod_id:$mod_version")
     }
     publishing.publications.configureEach {
@@ -81,7 +84,7 @@ jar {
                 'Implementation-Title'  : project.name,
                 'Implementation-Version': project.jar.archiveVersion,
                 'Implementation-Vendor' : mod_author,
-                'Built-On-Minecraft'    : minecraft_version
+                'Built-On-Minecraft'    : loaderMinecraftVersion
         ])
     }
 }
@@ -92,8 +95,10 @@ processResources {
             'group'                        : project.group, //Else we target the task's group.
             'minecraft_version'            : minecraft_version,
             'minecraft_version_range'      : minecraft_version_range,
+            'fabric_minecraft_version'     : fabric_minecraft_version,
             'fabric_version'               : fabric_version,
             'fabric_loader_version'        : fabric_loader_version,
+            'fabric_java_version'          : fabric_java_version,
             'mod_name'                     : mod_name,
             'mod_author'                   : mod_author,
             'mod_id'                       : mod_id,

@@ -108,6 +108,11 @@ public class DTBiomeHolderSet implements IDTBiomeHolderSet {
     }
 
     @Override
+    public boolean isBound() {
+        return true;
+    }
+
+    @Override
     public List<HolderSet<Biome>> getIncludeComponents() {
         return this.includeComponents;
     }

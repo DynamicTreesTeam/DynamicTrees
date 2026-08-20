@@ -1,30 +1,26 @@
 plugins {
     id 'multiloader-loader'
-    id 'fabric-loom'
+    id 'net.fabricmc.fabric-loom'
     id "me.modmuss50.mod-publish-plugin"
 }
 mod_version = "${mod_version}${fabricVersionAppend}"
 version = mod_version
 
 dependencies {
-    minecraft "com.mojang:minecraft:${minecraft_version}"
-    mappings loom.layered {
-        officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-${parchment_minecraft}:${parchment_version}@zip")
-    }
-    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
-    modApi "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${project.forge_config_api_port_version}"
+    minecraft "com.mojang:minecraft:${fabric_minecraft_version}"
+    implementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+    implementation "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${project.fabric_forge_config_api_port_version}"
+}
 
+tasks.withType(JavaCompile).configureEach {
+    it.options.release = 25
 }
 
 loom {
     def aw = project(':common').file("src/main/resources/META-INF/${mod_id}.accesswidener")
     if (aw.exists()) {
         accessWidenerPath.set(aw)
-    }
-    mixin {
-        defaultRefmapName.set("${mod_id}.refmap.json")
     }
     runs {
         client {
@@ -62,25 +58,52 @@ loom {
                 includeGroup "maven.modrinth"
             }
         }
+        maven {
+            name = "BlameJared"
+            url = "https://maven.blamejared.com"
+        }
         flatDir {
             dir 'libs'
         }
     }
     dependencies {
-        modImplementation "curse.maven:jade-324717:6011268"
-        modImplementation "curse.maven:jei-238222:5846878"
+        implementation "maven.modrinth:jade:ue8CO97w"
+        implementation "mezz.jei:jei-26.2-fabric:30.24.0.176"
 
         implementation("net.jodah:typetools:0.6.3")
 
-        modImplementation "curse.maven:glitchcore-955399:5660741"
-        modImplementation "curse.maven:serene-seasons-291874:5753502"
+        implementation "maven.modrinth:glitchcore:SDUCBYRU"
+        implementation "maven.modrinth:serene-seasons:13sXhUkI"
 
-        modCompileOnly "curse.maven:continuity-531351:5962881"
+        compileOnly "maven.modrinth:continuity:mgUN5Xz2"
 
-        modRuntimeOnly "maven.modrinth:sodium:u1OEbNKx"
+        runtimeOnly "maven.modrinth:sodium:2Yom1N68"
     }
 
 }
 
+def common26Dir = layout.buildDirectory.dir("generated/sources/common26")
+
+tasks.register('transformCommonFor26', Exec) {
+    def srcDir = project(':common').file('src/main/java')
+    def destDir = common26Dir
+    def script = file('scripts/transform_common_26.py')
+    inputs.dir(srcDir)
+    inputs.file(script)
+    outputs.dir(destDir)
+    workingDir = project.projectDir
+    commandLine 'python', script.absolutePath, srcDir.absolutePath, destDir.get().asFile.absolutePath
+}
+
+sourceSets.main.java.srcDir(common26Dir)
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
+tasks.named('compileJava', JavaCompile) {
+    dependsOn('transformCommonFor26')
+    options.compilerArgs << '-Xmaxerrs' << '10000'
+}
+
+tasks.named('sourcesJar', Jar) {
+    dependsOn('transformCommonFor26')
+    from(common26Dir)
+}

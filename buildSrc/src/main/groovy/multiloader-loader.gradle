@@ -23,7 +23,9 @@ dependencies {
 
 tasks.named('compileJava', JavaCompile) {
     dependsOn(configurations.commonJava)
-    source(configurations.commonJava)
+    if (project.name != 'fabric') {
+        source(configurations.commonJava)
+    }
 }
 
 processResources {
@@ -33,12 +35,16 @@ processResources {
 
 tasks.named('javadoc', Javadoc).configure {
     dependsOn(configurations.commonJava)
-    source(configurations.commonJava)
+    if (project.name != 'fabric') {
+        source(configurations.commonJava)
+    }
 }
 
 tasks.named('sourcesJar', Jar) {
     dependsOn(configurations.commonJava)
-    from(configurations.commonJava)
+    if (project.name != 'fabric') {
+        from(configurations.commonJava)
+    }
     dependsOn(configurations.commonResources)
     from(configurations.commonResources)
 }
@@ -50,9 +56,10 @@ pluginManager.withPlugin('me.modmuss50.mod-publish-plugin') {
     def releaseType = isFabric ? project.findProperty('fabricVersionType') : project.findProperty('versionType')
 
     afterEvaluate {
+        def publishMcVersion = isFabric ? fabric_minecraft_version : minecraft_version
         publishMods {
-            file = isFabric ? remapJar.archiveFile : jar.archiveFile
-            displayName = "${mod_name.replace(' ','')}-${loaderName}-${minecraft_version} ${project.mod_version}"
+            file = jar.archiveFile
+            displayName = "${mod_name.replace(' ','')}-${loaderName}-${publishMcVersion} ${project.mod_version}"
             println(displayName)
             if (changelogFile.exists()) {
                 changelog.set(changelogFile.getText())
@@ -68,7 +75,7 @@ pluginManager.withPlugin('me.modmuss50.mod-publish-plugin') {
                 projectId = "252818"
                 projectSlug = "dynamictrees"
                 accessToken = providers.gradleProperty("curseApiKey").getOrElse(providers.environmentVariable("CURSEFORGE_API_KEY").getOrNull())
-                minecraftVersions.add(minecraft_version)
+                minecraftVersions.add(publishMcVersion)
                 if (isFabric) {
                     requires("forge-config-api-port")
                 } else {
@@ -78,7 +85,7 @@ pluginManager.withPlugin('me.modmuss50.mod-publish-plugin') {
             modrinth {
                 projectId = "vdjF5PL5"
                 accessToken = providers.gradleProperty("modrinthToken").getOrElse(providers.environmentVariable("MODRINTH_TOKEN").getOrNull())
-                minecraftVersions.add(minecraft_version)
+                minecraftVersions.add(publishMcVersion)
                 if (isFabric) {
                     requires("ohNO6lps")
                 } else {

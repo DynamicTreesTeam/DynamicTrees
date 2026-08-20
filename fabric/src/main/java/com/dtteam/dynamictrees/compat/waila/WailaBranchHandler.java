@@ -18,7 +18,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
@@ -28,14 +28,11 @@ import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
-import snownee.jade.api.ui.IElement;
-import snownee.jade.impl.ui.ElementHelper;
 
-import java.util.LinkedList;
 import java.util.List;
 
 public class WailaBranchHandler implements IBlockComponentProvider {
-    public static final ResourceLocation ID = DynamicTrees.location("branch");
+    public static final Identifier ID = DynamicTrees.location("branch");
 
     private BlockPos lastPos = BlockPos.ZERO;
     private Species lastSpecies = Species.NULL_SPECIES;
@@ -57,7 +54,7 @@ public class WailaBranchHandler implements IBlockComponentProvider {
 
         //Attempt to get species from server via NBT data
         if (nbtData.contains("species")) {
-            species = Species.findSpecies(ResourceLocation.parse(nbtData.getString("species")));
+            species = Species.findSpecies(Identifier.parse(nbtData.getStringOr("species", "")));
         }
 
         //Attempt to get species by checking if we're still looking at the same block
@@ -92,22 +89,19 @@ public class WailaBranchHandler implements IBlockComponentProvider {
             }
 
             ItemStack seedStack = species.getSeedStack(1);
-
-            List<IElement> elements = new LinkedList<>();
-            elements.add(getElement(seedStack)); //adds seed;
-
+            tooltip.add(seedStack.getHoverName());
             if (species.hasFruits()){
                 for (Fruit fruit : species.getFruits()){
                     ItemStack fruitStack = fruit.getItemStack();
                     if (fruitStack.getItem() != seedStack.getItem())
-                        elements.add(getElement(fruitStack));
+                        tooltip.add(Component.literal(" ").append(fruitStack.getHoverName()));
                 }
             }
             if (species.hasPods()){
                 for (Pod pod : species.getPods()){
                     ItemStack podStack = pod.getItemStack();
                     if (podStack.getItem() != seedStack.getItem())
-                        elements.add(getElement(podStack));
+                        tooltip.add(Component.literal(" ").append(podStack.getHoverName()));
                 }
             }
 
@@ -118,20 +112,16 @@ public class WailaBranchHandler implements IBlockComponentProvider {
                 List<ItemStack> logStacks = las.logs;
                 if (!logStacks.isEmpty()) {
                     for (ItemStack logStack : logStacks) {
-                        elements.add(getElement(logStack));
+                        tooltip.add(Component.literal(" ").append(logStack.getHoverName()));
                     }
                 }
                 if (las.sticks > 0) {
                     ItemStack stickStack = species.getFamily().getStick(las.sticks);
                     if (!stickStack.isEmpty()) {
-                        elements.add(getElement(stickStack));
+                        tooltip.add(Component.literal(" ").append(stickStack.getHoverName()));
                     }
                 }
             }
-
-            tooltip.add(elements.removeFirst());
-            elements.forEach(tooltip::append);
-            tooltip.add(ElementHelper.INSTANCE.spacer(0, 2));
         }
     }
 
@@ -167,16 +157,8 @@ public class WailaBranchHandler implements IBlockComponentProvider {
         return TreeHelper.getBestGuessSpecies(level, pos);
     }
 
-    private static IElement getElement(ItemStack stack) {
-        if (!stack.isEmpty()) {
-            return ElementHelper.INSTANCE.item(stack);
-        } else {
-            return ElementHelper.INSTANCE.spacer(0, 0);
-        }
-    }
-
     @Override
-    public ResourceLocation getUid() {
+    public Identifier getUid() {
         return ID;
     }
 }

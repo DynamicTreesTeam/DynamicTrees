@@ -17,9 +17,16 @@ out
 # gradle
 build
 .gradle
+**/build/libs/
+fabric/libs/
+neoforge/libs/
+**/__pycache__/
 
 # other
 eclipse
 run
 runs
 /neoforge/mcmodsrepo
+
+# Port scratch — isolated from the original fork. Never commit.
+.port/

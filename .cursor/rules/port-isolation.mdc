@@ -1,0 +1,26 @@
+---
+description: Keep port scratch out of the original fork via .port/
+alwaysApply: true
+---
+
+# Port isolation
+
+Scratch from the Fabric 26.2 port lives only under gitignored `.port/` at the repo root. Do not add port artifacts, test worlds, logs, experimental copies, extra folders, or throwaway scripts anywhere else.
+
+## Put in `.port/`
+
+- Compile/test logs, error dumps, comparison diffs
+- Experimental copies of Gradle files or Java sources
+- Test run directories, extra mods, jars, world saves
+- Notes, checklists, and generated reports created during the port
+- Any new top-level folder that is not already part of the fork
+
+## Keep in the real tree
+
+Intentional port edits to existing project files (`fabric/`, Gradle pins, mixins, compat plugins). Those are the update, not scratch.
+
+## Do not
+
+- Create `scratch/`, `tmp/`, `test/`, `_backup/`, or similar next to `common/`, `fabric/`, or `neoforge/`
+- Commit `.port/` (it is gitignored)
+- Copy port junk into `common/` or `neoforge/` "for later"
