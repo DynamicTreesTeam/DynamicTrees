@@ -80,6 +80,7 @@ public class CommonEventHandler {
         @Override
         public CompletableFuture<Void> reload(PreparableReloadListener.SharedState sharedState, Executor prepareExecutor,
                                               PreparationBarrier stage, Executor applyExecutor) {
+            com.dtteam.dynamictrees.compat.DeferredItemStacks.flush();
             return super.reload(sharedState, prepareExecutor, stage, applyExecutor);
         }
 

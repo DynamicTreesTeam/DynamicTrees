@@ -1,3 +1,4 @@
 {
-  "primitive_leaves": "minecraft:birch_leaves"
+  "primitive_leaves": "minecraft:birch_leaves",
+  "perishability": "deciduous"
 }

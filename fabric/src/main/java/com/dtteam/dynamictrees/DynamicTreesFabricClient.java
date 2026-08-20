@@ -36,6 +36,7 @@ public class DynamicTreesFabricClient implements ClientModInitializer {
     public void onInitializeClient() {
         ConfigRegistry.INSTANCE.register(DynamicTrees.MOD_ID, ModConfig.Type.CLIENT, DTConfigs.CLIENT_CONFIG);
         SpriteSourceRegistry.register(ThickBranchRingsSource.ID, ThickBranchRingsSource.CODEC);
+        com.dtteam.dynamictrees.compat.DeferredItemStacks.flush();
         FabricClientColors.register();
         registerModelLoaders();
         registerEntityRenderers();

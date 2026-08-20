@@ -176,6 +176,14 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     protected boolean requiresShears = true;
     protected boolean hasTickParticles = false;
     protected boolean waterResistant = false;
+    protected Perishability perishability = Perishability.DECIDUOUS;
+
+    public enum Perishability {
+        DECIDUOUS,
+        EVERGREEN,
+        MARCESCENT,
+        NONE
+    }
 
     private LeavesProperties() {
         this.blockLootTableSupplier = new LootTableSupplier("null/", DynamicTrees.NULL);
@@ -291,6 +299,18 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     public void generateStateData(DTDataProvider.BlockState provider) {
         // Generate leaves block state and model.
         this.leavesStateGenerator.get().generate(provider, this);
+    }
+
+    public void setPerishability(Perishability perishability) {
+        this.perishability = perishability;
+    }
+
+    public Perishability getPerishability() {
+        return perishability;
+    }
+
+    public boolean leavesPerishInWinter() {
+        return perishability == Perishability.DECIDUOUS || perishability == Perishability.MARCESCENT;
     }
 
     @Override

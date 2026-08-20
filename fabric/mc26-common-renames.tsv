@@ -1,0 +1,12 @@
+# Token replacements applied only when Fabric compiles common sources for Minecraft 26.2.
+# Keep common/ on 1.21.1 names. Format: oldToken<TAB>newToken
+ResourceLocation	Identifier
+ResourceLocationException	IdentifierException
+BlockAndTintGetter	BlockGetter
+ItemInteractionResult	InteractionResult
+InteractionResultHolder	InteractionResult
+ItemOverrides	ItemModelResolver
+ItemTransforms	ItemTransform
+IntrinsicHolderTagsProvider	VanillaTagsProvider
+GameRules	GameRules
+Tuple	com.mojang.datafixers.util.Pair

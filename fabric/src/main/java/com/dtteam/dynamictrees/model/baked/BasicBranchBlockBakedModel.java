@@ -1,6 +1,5 @@
 package com.dtteam.dynamictrees.model.baked;
 
-import com.dtteam.dynamictrees.api.network.Connections;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import net.fabricmc.fabric.api.client.renderer.v1.mesh.QuadEmitter;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
@@ -15,6 +14,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -130,27 +130,39 @@ public class BasicBranchBlockBakedModel extends DynamicTreesBlockStateModel {
     @Override
     public void emitQuads(QuadEmitter emitter, BlockAndTintGetter level, BlockPos pos, BlockState state,
                           RandomSource random, Predicate<Direction> cullTest) {
-        if (baker == null) {
-            return;
+        int[] connections = new int[]{0, 0, 0, 0, 0, 0};
+        if (state.getBlock() instanceof BranchBlock branchBlock) {
+            connections = branchBlock.getConnectionData(level, pos, state).getAllRadii();
+        }
+        for (BakedQuad quad : collectQuads(state, connections, null)) {
+            if (cullTest.test(quad.direction())) {
+                continue;
+            }
+            emitter.fromBakedQuad(quad);
+            emitter.cullFace(quad.direction());
+            emitter.emit();
+        }
+    }
+
+    public List<BakedQuad> collectQuads(BlockState state, int[] connections, @Nullable Direction forceRingDir) {
+        List<BakedQuad> out = new ArrayList<>();
+        if (baker == null || !(state.getBlock() instanceof BranchBlock branchBlock)) {
+            return out;
         }
         final int coreRadius = getRadius(state);
-        if (coreRadius > 8 || coreRadius < 1) {
-            return;
+        if (coreRadius > BranchBlock.MAX_RADIUS || coreRadius < 1) {
+            return out;
         }
-
-        int[] connections = new int[]{0, 0, 0, 0, 0, 0};
-        int twigRadius = 1;
-        if (state.getBlock() instanceof BranchBlock branchBlock) {
-            Connections data = branchBlock.getConnectionData(level, pos, state);
-            connections = data.getAllRadii();
-            twigRadius = Math.max(1, branchBlock.getFamily().getPrimaryThickness());
-        }
-
+        int twigRadius = Math.max(1, branchBlock.getFamily().getPrimaryThickness());
         int numConnections = 0;
         for (int radius : connections) {
             if (radius != 0) {
                 numConnections++;
             }
+        }
+        if (numConnections == 0 && forceRingDir != null) {
+            addFace(out, ringsQuads[coreRadius - 1], forceRingDir);
+            return out;
         }
 
         Direction sourceDir = getSourceDir(coreRadius, connections);
@@ -162,16 +174,28 @@ public class BasicBranchBlockBakedModel extends DynamicTreesBlockStateModel {
                 List<BakedQuad> coreQuads = (coreRingDir != null && coreRingDir == face)
                         ? ringsQuads[coreRadius - 1]
                         : cores[coreDir][coreRadius - 1];
-                CuboidQuadBaker.emit(emitter, coreQuads, face, cullTest);
+                addFace(out, coreQuads, face);
             }
             if (coreRadius != 8) {
                 for (Direction connDir : Direction.values()) {
                     int idx = connDir.get3DDataValue();
                     int connRadius = connections[idx];
                     if (connRadius > 0 && connRadius < 8 && (connRadius <= twigRadius || face != connDir)) {
-                        CuboidQuadBaker.emit(emitter, sleeves[idx][connRadius - 1], face, cullTest);
+                        addFace(out, sleeves[idx][connRadius - 1], face);
                     }
                 }
+            }
+        }
+        return out;
+    }
+
+    protected static void addFace(List<BakedQuad> out, List<BakedQuad> src, Direction face) {
+        if (src == null) {
+            return;
+        }
+        for (BakedQuad quad : src) {
+            if (quad.direction() == face) {
+                out.add(quad);
             }
         }
     }

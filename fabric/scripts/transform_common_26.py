@@ -629,7 +629,27 @@ public class FallingTreeEntityModel {
     s = s.replace("originalSprite.metadata()", "null")
     s = s.replace(
         "DELAYED_BIOME_REGISTRY.get().getOrCreateTag(tagKey)",
-        "net.minecraft.core.HolderSet.direct()",
+        "DELAYED_BIOME_REGISTRY.get().get(tagKey).map(hs -> (net.minecraft.core.HolderSet<net.minecraft.world.level.biome.Biome>) hs).orElseGet(net.minecraft.core.HolderSet::empty)",
+    )
+    s = s.replace(
+        "this.branch.get().setPrimitiveLogDrops(new ItemStack(primitiveLog));",
+        "com.dtteam.dynamictrees.compat.DeferredItemStacks.setWhenBound(stack -> this.branch.get().setPrimitiveLogDrops(stack), primitiveLog);",
+    )
+    s = s.replace(
+        "this.strippedBranch.get().setPrimitiveLogDrops(new ItemStack(primitiveStrippedLog));",
+        "com.dtteam.dynamictrees.compat.DeferredItemStacks.setWhenBound(stack -> this.strippedBranch.get().setPrimitiveLogDrops(stack), primitiveStrippedLog);",
+    )
+    s = s.replace(
+        "this.roots.get().setPrimitiveLogDrops(new ItemStack(primitiveRoots));",
+        "com.dtteam.dynamictrees.compat.DeferredItemStacks.setWhenBound(stack -> this.roots.get().setPrimitiveLogDrops(stack), primitiveRoots);",
+    )
+    s = s.replace(
+        "(fruit, item) -> fruit.setItemStack(new ItemStack(item))",
+        "(fruit, item) -> com.dtteam.dynamictrees.compat.DeferredItemStacks.setWhenBound(fruit::setItemStack, item)",
+    )
+    s = s.replace(
+        "(pod, item) -> pod.setItemStack(new ItemStack(item))",
+        "(pod, item) -> com.dtteam.dynamictrees.compat.DeferredItemStacks.setWhenBound(pod::setItemStack, item)",
     )
     s = re.sub(r"\b((?:data\.)?(?:basePos|leavesPos|pos))\.getCenter\(\)", r"net.minecraft.world.phys.Vec3.atCenterOf(\1)", s)
     s = s.replace("new ChunkPos(context.origin())", "ChunkPos.containing(context.origin())")
@@ -640,12 +660,34 @@ public class FallingTreeEntityModel {
     if "class DTLootTableBuilder" in s:
         s = re.sub(
             r"protected static LootItemCondition\.Builder hasSilkTouch\(HolderLookup\.Provider registries\) \{[\s\S]*?\n    \}",
-            "protected static LootItemCondition.Builder hasSilkTouch(HolderLookup.Provider registries) {\n        return LootItemBlockStatePropertyCondition.hasBlockStateProperties(net.minecraft.world.level.block.Blocks.AIR);\n    }",
+            "protected static LootItemCondition.Builder hasSilkTouch(HolderLookup.Provider registries) {\n"
+            "        HolderLookup.RegistryLookup<Enchantment> registrylookup = registries.lookupOrThrow(Registries.ENCHANTMENT);\n"
+            "        return MatchTool.toolMatches(\n"
+            "                ItemPredicate.Builder.item()\n"
+            "                        .withComponents(\n"
+            "                                DataComponentMatchers.Builder.components()\n"
+            "                                        .partial(\n"
+            "                                                DataComponentPredicates.ENCHANTMENTS,\n"
+            "                                                EnchantmentsPredicate.enchantments(\n"
+            "                                                        List.of(new EnchantmentPredicate(registrylookup.getOrThrow(Enchantments.SILK_TOUCH), MinMaxBounds.Ints.atLeast(1)))\n"
+            "                                                )\n"
+            "                                        )\n"
+            "                                        .build()\n"
+            "                        )\n"
+            "        );\n"
+            "    }",
             s,
             count=1,
         )
+        if "import net.minecraft.advancements.predicates.DataComponentMatchers;" not in s:
+            s = re.sub(r"(package [^\n]+;\n)", r"\1\nimport net.minecraft.advancements.predicates.DataComponentMatchers;\nimport net.minecraft.core.component.predicates.DataComponentPredicates;\nimport net.minecraft.core.component.predicates.EnchantmentsPredicate;\n", s, count=1)
     if "class SoilBlock" in s:
-        s = s.replace("return blockColors.getColor(getPrimitiveSoilState(state), level, pos, tintIndex);", "return 0;")
+        s = s.replace(
+            "return blockColors.getColor(getPrimitiveSoilState(state), level, pos, tintIndex);",
+            "return level instanceof net.minecraft.client.renderer.block.BlockAndTintGetter tintLevel"
+            " ? net.minecraft.client.color.block.BlockTintSources.grass().colorInWorld(getPrimitiveSoilState(state), tintLevel, pos)"
+            " : 0xFFFFFF;",
+        )
     if "originalSprite.metadata()" in s:
         s = s.replace("originalSprite.metadata()", "null")
     s = s.replace(".location().toString()", ".identifier().toString()")
@@ -712,7 +754,7 @@ public class FallingTreeEntityModel {
     if "class DTLootTableBuilder" in s:
         s = s.replace(
             "LootItemCondition.Builder hasShears = MatchTool.toolMatches(ItemPredicate.Builder.item().of(Items.SHEARS));",
-            "LootItemCondition.Builder hasShears = LootItemBlockStatePropertyCondition.hasBlockStateProperties(net.minecraft.world.level.block.Blocks.AIR);",
+            "LootItemCondition.Builder hasShears = MatchTool.toolMatches(ItemPredicate.Builder.item().of(registries.lookupOrThrow(Registries.ITEM), Items.SHEARS));",
         )
     if "class GrowthSubstance" in s or "class HarvestSubstance" in s or "class MegaSubstance" in s:
         s = s.replace("ParticleTypes.EFFECT", "ParticleTypes.HAPPY_VILLAGER")
@@ -816,26 +858,56 @@ public class FallingTreeEntityModel {
     if "GameRules." in s and "import net.minecraft.world.level.gamerules.GameRules;" not in s:
         s = re.sub(r"(package [^\n]+;\n)", r"\1\nimport net.minecraft.world.level.gamerules.GameRules;\n", s, count=1)
 
+    if rel.replace("\\", "/").endswith("item/DendroPotion.java"):
+        s = s.replace("private final ItemStack ingredient;", "private final Item ingredientItem;")
+        s = s.replace("this.ingredient = new ItemStack(ingredient);", "this.ingredientItem = ingredient;")
+        s = s.replace("return this.ingredient;", "return com.dtteam.dynamictrees.compat.DeferredItemStacks.of(this.ingredientItem);")
+
     if rel.replace("\\", "/").endswith("entity/LingeringEffectorEntity.java"):
         s = s.replace("EntityDataSerializers.COMPOUND_TAG", "EntityDataSerializers.STRING")
         s = s.replace("EntityDataAccessor<CompoundTag>", "EntityDataAccessor<String>")
         s = s.replace("builder.define(effectorDataParameter, new CompoundTag());", "builder.define(effectorDataParameter, \"\");")
-        s = s.replace("getEntityData().set(effectorDataParameter, tag);", "getEntityData().set(effectorDataParameter, \"\");")
+        s = s.replace(
+            "getEntityData().set(effectorDataParameter, tag);",
+            "getEntityData().set(effectorDataParameter, tag.toString());",
+        )
         s = s.replace(
             "return getEntityData().get(effectorDataParameter);",
-            "return new CompoundTag();",
+            """try {
+            String snbt = getEntityData().get(effectorDataParameter);
+            return snbt == null || snbt.isEmpty() ? new CompoundTag() : net.minecraft.nbt.TagParser.parseCompoundFully(snbt);
+        } catch (Exception e) {
+            return new CompoundTag();
+        }""",
         )
         s = re.sub(
             r"protected void readAdditionalSaveData\(net\.minecraft\.world\.level\.storage\.ValueInput input\) \{[\s\S]*?\n    \}",
-            "protected void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput input) {\n    }",
+            """protected void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput input) {
+        input.read("effector", CompoundTag.CODEC).ifPresent(this::setEffectorData);
+    }""",
             s,
             count=1,
         )
         s = re.sub(
             r"protected void addAdditionalSaveData\(net\.minecraft\.world\.level\.storage\.ValueOutput output\) \{[\s\S]*?\n    \}",
-            "protected void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput output) {\n    }",
+            """protected void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput output) {
+        output.store("effector", CompoundTag.CODEC, getEffectorData());
+    }""",
             s,
             count=1,
+        )
+        s = s.replace(
+            """        if (level().isClientSide() && !clientBuilt){
+            setEffectorData(getEffectorData());
+            clientBuilt = true;
+        }""",
+            """        if (level().isClientSide() && !clientBuilt) {
+            String snbt = getEntityData().get(effectorDataParameter);
+            if (snbt != null && !snbt.isEmpty()) {
+                setEffectorData(getEffectorData());
+                clientBuilt = true;
+            }
+        }""",
         )
 
     if rel.replace("\\", "/").endswith("entity/FallingTreeEntity.java"):
@@ -844,21 +916,42 @@ public class FallingTreeEntityModel {
         s = s.replace("builder.define(voxelDataParameter, new CompoundTag());", "builder.define(voxelDataParameter, \"\");")
         s = s.replace(
             "getEntityData().set(voxelDataParameter, tag);",
-            "getEntityData().set(voxelDataParameter, \"\");",
+            "getEntityData().set(voxelDataParameter, tag.toString());",
         )
         s = s.replace(
             "return getEntityData().get(voxelDataParameter);",
-            "return new CompoundTag();",
+            """try {
+            String snbt = getEntityData().get(voxelDataParameter);
+            return snbt == null || snbt.isEmpty() ? new CompoundTag() : net.minecraft.nbt.TagParser.parseCompoundFully(snbt);
+        } catch (Exception e) {
+            return new CompoundTag();
+        }""",
         )
         s = re.sub(
             r"protected void readAdditionalSaveData\(net\.minecraft\.world\.level\.storage\.ValueInput input\) \{[\s\S]*?\n    \}",
-            "protected void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput input) {\n    }",
+            """protected void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput input) {
+        input.read("vox", CompoundTag.CODEC).ifPresent(vox -> {
+            setupFromNBT(vox);
+            setVoxelData(vox);
+        });
+        for (ItemStack stack : input.listOrEmpty("payload", ItemStack.CODEC)) {
+            this.payload.add(stack);
+        }
+    }""",
             s,
             count=1,
         )
         s = re.sub(
             r"protected void addAdditionalSaveData\(net\.minecraft\.world\.level\.storage\.ValueOutput output\) \{[\s\S]*?\n    \}",
-            "protected void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput output) {\n    }",
+            """protected void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput output) {
+        output.store("vox", CompoundTag.CODEC, getVoxelData());
+        if (!payload.isEmpty()) {
+            net.minecraft.world.level.storage.ValueOutput.TypedOutputList<ItemStack> list = output.list("payload", ItemStack.CODEC);
+            for (ItemStack stack : payload) {
+                list.add(stack);
+            }
+        }
+    }""",
             s,
             count=1,
         )
@@ -890,6 +983,9 @@ def main() -> int:
     count = 0
     for java in src.rglob("*.java"):
         rel = java.relative_to(src)
+        rel_s = str(rel).replace("\\", "/")
+        if rel_s.endswith("entity/render/FallingTreeRenderer.java") or rel_s.endswith("entity/render/LingeringEffectorRenderer.java"):
+            continue
         out = dest / rel
         out.parent.mkdir(parents=True, exist_ok=True)
         text = java.read_text(encoding="utf-8")

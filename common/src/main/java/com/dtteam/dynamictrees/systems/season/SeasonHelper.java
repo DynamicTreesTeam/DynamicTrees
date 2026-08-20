@@ -52,7 +52,11 @@ public class SeasonHelper {
      * in the world.
      */
     static public Float getSeasonValue(LevelContext levelContext, BlockPos pos) {
-        return SeasonCompatibilityHandler.getSeasonManager().getSeasonValue(levelContext.level(), pos);
+        return getSeasonValue(levelContext.level(), pos);
+    }
+
+    static public Float getSeasonValue(Level level, BlockPos pos) {
+        return SeasonCompatibilityHandler.getSeasonManager().getSeasonValue(level, pos);
     }
 
     /**

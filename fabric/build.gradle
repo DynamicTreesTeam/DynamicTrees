@@ -98,6 +98,17 @@ tasks.register('transformCommonFor26', Exec) {
 sourceSets.main.java.srcDir(common26Dir)
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
+processResources {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    filesMatching('pack.mcmeta') {
+        filter { String line ->
+            line.contains('"pack_format": 8')
+                    ? '        "min_format": [88, 0],\n        "max_format": [107, 1]'
+                    : line
+        }
+    }
+}
+
 tasks.named('compileJava', JavaCompile) {
     dependsOn('transformCommonFor26')
     options.compilerArgs << '-Xmaxerrs' << '10000'

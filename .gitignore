@@ -27,6 +27,7 @@ eclipse
 run
 runs
 /neoforge/mcmodsrepo
+.cursor/
 
 # Port scratch — isolated from the original fork. Never commit.
 .port/

@@ -4,15 +4,21 @@ import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.block.branch.BasicRootsBlock;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.branch.SurfaceRootBlock;
+import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.model.baked.BasicBranchBlockBakedModel;
 import com.dtteam.dynamictrees.model.baked.BasicRootsBlockBakedModel;
 import com.dtteam.dynamictrees.model.baked.SurfaceRootBlockBakedModel;
 import com.dtteam.dynamictrees.model.baked.ThickBranchBlockBakedModel;
+import com.dtteam.dynamictrees.model.baked.WinterLeavesBlockStateModel;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.family.UndergroundRootsFamily;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelModifier;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.ModelState;
+import net.minecraft.client.resources.model.ResolvedModel;
+import net.minecraft.client.resources.model.SimpleModelWrapper;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.ModelDebugName;
 import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -27,10 +33,12 @@ import java.util.concurrent.atomic.AtomicReference;
 public class DTModelLoadingPlugin implements ModelLoadingPlugin {
 
     public static final Identifier POTTED_SAPLING_MODEL = DynamicTrees.location("potted_sapling");
+    public static final Identifier WINTER_LEAVES_MODEL = DynamicTrees.location("block/winter_leaves");
     private static final Map<Identifier, BlockStateModel> BRANCH_MODEL_CACHE = new HashMap<>();
     private static final Map<Identifier, BlockStateModel> ROOT_MODEL_CACHE = new HashMap<>();
     private static final Map<Identifier, BlockStateModel> UNDERGROUND_ROOTS_MODEL_CACHE = new HashMap<>();
     private static boolean modelsInitialized = false;
+    private static SimpleModelWrapper winterLeavesPart;
 
     @Override
     public void initialize(Context pluginContext) {
@@ -38,6 +46,7 @@ public class DTModelLoadingPlugin implements ModelLoadingPlugin {
         BRANCH_MODEL_CACHE.clear();
         ROOT_MODEL_CACHE.clear();
         UNDERGROUND_ROOTS_MODEL_CACHE.clear();
+        winterLeavesPart = null;
         pluginContext.modifyBlockModelAfterBake().register(ModelModifier.WRAP_PHASE, this::modifyModelAfterBake);
     }
 
@@ -131,12 +140,15 @@ public class DTModelLoadingPlugin implements ModelLoadingPlugin {
         }
     }
 
+    private static final Identifier FALLBACK_BARK = Identifier.withDefaultNamespace("block/oak_log");
+    private static final Identifier FALLBACK_RINGS = Identifier.withDefaultNamespace("block/oak_log_top");
+
     private BlockStateModel createBranchModel(net.minecraft.client.resources.model.ModelBaker baker, ModelDebugName debugName,
                                               Identifier barkTexture, Identifier ringsTexture, boolean isThick) {
-        Material.Baked bark = baker.materials().get(new Material(barkTexture), debugName);
-        Material.Baked rings = baker.materials().get(new Material(ringsTexture), debugName);
+        Material.Baked bark = materialOrFallback(baker, debugName, barkTexture, FALLBACK_BARK);
+        Material.Baked rings = materialOrFallback(baker, debugName, ringsTexture, FALLBACK_RINGS);
         if (isThick) {
-            Material.Baked thickRings = baker.materials().get(new Material(ringsTexture.withSuffix("_thick")), debugName);
+            Material.Baked thickRings = materialOrFallback(baker, debugName, ringsTexture.withSuffix("_thick"), FALLBACK_RINGS);
             return new ThickBranchBlockBakedModel(baker, bark, rings, thickRings);
         }
         return new BasicBranchBlockBakedModel(baker, bark, rings);
@@ -144,9 +156,23 @@ public class DTModelLoadingPlugin implements ModelLoadingPlugin {
 
     private BlockStateModel createRootsBlockModel(net.minecraft.client.resources.model.ModelBaker baker, ModelDebugName debugName,
                                                   Identifier barkTexture, Identifier ringsTexture) {
-        Material.Baked bark = baker.materials().get(new Material(barkTexture), debugName);
-        Material.Baked rings = baker.materials().get(new Material(ringsTexture), debugName);
+        Material.Baked bark = materialOrFallback(baker, debugName, barkTexture, FALLBACK_BARK);
+        Material.Baked rings = materialOrFallback(baker, debugName, ringsTexture, FALLBACK_RINGS);
         return new BasicRootsBlockBakedModel(baker, bark, rings);
+    }
+
+    private static Material.Baked materialOrFallback(net.minecraft.client.resources.model.ModelBaker baker, ModelDebugName debugName,
+                                                     Identifier texture, Identifier fallback) {
+        Material.Baked baked = baker.materials().get(new Material(texture), debugName);
+        if (baked != null && baked.sprite() != null && !isMissingSprite(baked.sprite())) {
+            return baked;
+        }
+        return baker.materials().get(new Material(fallback), debugName);
+    }
+
+    private static boolean isMissingSprite(TextureAtlasSprite sprite) {
+        Identifier id = sprite.contents().name();
+        return id.getPath().contains("missingno") || id.getPath().equals("missingno");
     }
 
     private BlockStateModel modifyModelAfterBake(BlockStateModel model, ModelModifier.AfterBakeBlock.Context context) {
@@ -188,6 +214,33 @@ public class DTModelLoadingPlugin implements ModelLoadingPlugin {
             }
         }
 
+        if (block instanceof DynamicLeavesBlock leaves && leaves.getLeavesProperties().leavesPerishInWinter()) {
+            SimpleModelWrapper winter = bakeWinterLeaves(context.baker());
+            if (winter != null) {
+                return new WinterLeavesBlockStateModel(model, winter);
+            }
+        }
+
         return model;
+    }
+
+    private static SimpleModelWrapper bakeWinterLeaves(net.minecraft.client.resources.model.ModelBaker baker) {
+        if (winterLeavesPart != null) {
+            return winterLeavesPart;
+        }
+        try {
+            ResolvedModel winter = baker.getModel(WINTER_LEAVES_MODEL);
+            var textures = winter.getTopTextureSlots();
+            Material.Baked particle = winter.resolveParticleMaterial(textures, baker);
+            winterLeavesPart = new SimpleModelWrapper(
+                    winter.bakeTopGeometry(textures, baker, new ModelState() {}),
+                    winter.getTopAmbientOcclusion(),
+                    particle
+            );
+            return winterLeavesPart;
+        } catch (Exception e) {
+            DynamicTrees.LOG.warn("Failed to bake winter leaves model: {}", e.getMessage());
+            return null;
+        }
     }
 }

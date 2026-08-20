@@ -75,10 +75,16 @@ public final class FabricClientColors {
                 .collect(Collectors.toSet())) {
             BlockColorRegistry.register((state, level, pos, tintValues) -> {
                 int color = 0x00FF00FF;
+                int bark = 0xB3A979;
                 if (level != null && pos != null && TreeHelper.isLeaves(state.getBlock())) {
-                    color = ((DynamicLeavesBlock) state.getBlock()).getLeavesProperties().foliageColorMultiplier(state, level, pos);
+                    LeavesProperties properties = ((DynamicLeavesBlock) state.getBlock()).getLeavesProperties();
+                    color = properties.foliageColorMultiplier(state, level, pos);
+                    bark = properties.getFamily().woodBarkColor;
                 }
-                tintValues.add(color);
+                tintValues.size(3);
+                tintValues.set(0, color);
+                tintValues.set(1, 0xFFFFFFFF);
+                tintValues.set(2, bark);
             }, leaves);
         }
     }

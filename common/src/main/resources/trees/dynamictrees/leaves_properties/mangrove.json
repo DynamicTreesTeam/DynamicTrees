@@ -1,5 +1,6 @@
 {
   "type": "scruffy",
   "primitive_leaves": "mangrove_leaves",
-  "smother": 6
+  "smother": 6,
+  "perishability": "evergreen"
 }

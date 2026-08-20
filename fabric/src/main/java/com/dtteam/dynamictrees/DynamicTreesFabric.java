@@ -48,6 +48,7 @@ public class DynamicTreesFabric implements ModInitializer {
         FabricBiomeModifications.register();
 
         ServerLifecycleEvents.SERVER_STARTING.register(server -> {
+            com.dtteam.dynamictrees.compat.DeferredItemStacks.flush();
             VanillaSaplingEventHandler.updateEnabled();
             FabricMiscHelper.debugSpeciesRegistry();
         });

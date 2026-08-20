@@ -42,7 +42,8 @@ public final class LeavesPropertiesResourceLoader extends JsonRegistryResourceLo
                 .registerMapApplier("texture_overrides", ResourceLocation.class, LeavesProperties::setTextureOverrides)
                 .registerMapApplier("model_overrides", ResourceLocation.class, LeavesProperties::setModelOverrides)
                 .register("frond_model_loader", PalmLeavesProperties.class, ResourceLocation.class, PalmLeavesProperties::setFrondLoader)
-                .registerMapApplier("lang_overrides", String.class, LeavesProperties::setLangOverrides);
+                .registerMapApplier("lang_overrides", String.class, LeavesProperties::setLangOverrides)
+                .register("perishability", LeavesProperties.Perishability.class, LeavesProperties::setPerishability);
 
         // Primitive leaves are needed both client and server (so cannot be done on load).
         this.setupAppliers.register("primitive_leaves", Block.class, LeavesProperties::setPrimitiveLeaves)
@@ -69,6 +70,7 @@ public final class LeavesPropertiesResourceLoader extends JsonRegistryResourceLo
                 .register("can_grow_on_ground", Boolean.class, LeavesProperties::setCanGrowOnGround)
                 .register("has_tick_particles", Boolean.class, LeavesProperties::setHasTickParticles)
                 .register("water_resistant", Boolean.class, LeavesProperties::setWaterResistant)
+                .register("perishability", LeavesProperties.Perishability.class, LeavesProperties::setPerishability)
                 .register("scruffy_leaf_chance", ScruffyLeavesProperties.class, Float.class, ScruffyLeavesProperties::setLeafChance)
                 .register("scruffy_max_hydro", ScruffyLeavesProperties.class, Integer.class, ScruffyLeavesProperties::setMaxHydro);
 

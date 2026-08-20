@@ -1,0 +1,37 @@
+{
+	"ambientocclusion": false,
+	"credit": "Made with Blockbench",
+	"textures": {
+		"leaves": "dynamictrees:block/winter_leaves_1",
+		"particle": "#leaves"
+	},
+	"elements": [
+		{
+			"from": [8, 0, 0],
+			"to": [8, 16, 16],
+			"rotation": {"angle": 0, "axis": "z", "origin": [8, 8, 8]},
+			"faces": {
+				"east": {"uv": [0, 0, 16, 16], "rotation": 90, "texture": "#leaves", "tintindex": 2},
+				"west": {"uv": [0, 0, 16, 16], "rotation": 270, "texture": "#leaves", "tintindex": 2}
+			}
+		},
+		{
+			"from": [0, 8, 0],
+			"to": [16, 8, 16],
+			"rotation": {"angle": 0, "axis": "x", "origin": [8, 8, 8]},
+			"faces": {
+				"up": {"uv": [0, 0, 16, 16], "rotation": 90, "texture": "#leaves", "tintindex": 2},
+				"down": {"uv": [0, 0, 16, 16], "rotation": 90, "texture": "#leaves", "tintindex": 2}
+			}
+		},
+		{
+			"from": [0, 0, 8],
+			"to": [16, 16, 8],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 8, 8]},
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "rotation": 90, "texture": "#leaves", "tintindex": 2},
+				"south": {"uv": [0, 0, 16, 16], "rotation": 270, "texture": "#leaves", "tintindex": 2}
+			}
+		}
+	]
+}
