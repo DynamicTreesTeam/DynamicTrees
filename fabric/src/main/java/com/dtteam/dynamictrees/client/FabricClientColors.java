@@ -5,20 +5,28 @@ import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.block.sapling.PottedSaplingBlock;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.block.soil.SoilProperties;
+import com.dtteam.dynamictrees.client.tint.FunctionalBlockTintSource;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockColorRegistry;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.color.block.BlockColors;
+import net.minecraft.client.color.block.BlockTintSource;
 import net.minecraft.client.color.block.BlockTintSources;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.FoliageColor;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 public final class FabricClientColors {
@@ -87,6 +95,80 @@ public final class FabricClientColors {
                 tintValues.set(2, bark);
             }, leaves);
         }
+    }
+
+    /**
+     * Falling-leaf particles and Physics-style fractures read {@link BlockColors#getTintSource}, not Fabric's
+     * chunk-mesh color callback.
+     */
+    public static void registerVanillaTintSources() {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft == null) {
+            return;
+        }
+        BlockColors colors = minecraft.getBlockColors();
+
+        for (SoilProperties soil : SoilProperties.REGISTRY) {
+            if (soil.getBlock().isEmpty()) {
+                continue;
+            }
+            SoilBlock roots = soil.getBlock().get();
+            colors.register(List.of(
+                    BlockTintSources.grass(),
+                    new FunctionalBlockTintSource(0xFFFFFF, (state, level, pos) -> roots.rootColor(state, level, pos))
+            ), roots);
+        }
+
+        PottedSaplingBlock potted = DTRegistries.POTTED_SAPLING.get();
+        colors.register(List.of(
+                new FunctionalBlockTintSource(0xFFFFFF, (state, level, pos) ->
+                        potted.getSpecies(level, pos).saplingColorMultiplier(state, level, pos, 0))
+        ), potted);
+
+        for (Species species : Species.REGISTRY) {
+            species.getSapling().ifPresent(sapling -> colors.register(List.of(
+                    new FunctionalBlockTintSource(0xFFFFFF, (state, level, pos) ->
+                            species.saplingColorMultiplier(state, level, pos, 0)),
+                    new FunctionalBlockTintSource(0xFFFFFF, (state, level, pos) ->
+                            species.saplingColorMultiplier(state, level, pos, 1))
+            ), sapling));
+        }
+
+        for (DynamicLeavesBlock leaves : LeavesProperties.REGISTRY.getAll().stream()
+                .filter(lp -> lp.getDynamicLeavesBlock().isPresent())
+                .map(lp -> lp.getDynamicLeavesBlock().get())
+                .collect(Collectors.toSet())) {
+            colors.register(List.of(
+                    new FunctionalBlockTintSource(0x48B518, FabricClientColors::leavesFoliageColor),
+                    BlockTintSources.constant(-1),
+                    new FunctionalBlockTintSource(0xB3A979, FabricClientColors::leavesBarkColor)
+            ), leaves);
+        }
+    }
+
+    public static int primitiveLeavesColor(BlockState primitiveLeaves, @Nullable BlockGetter level, @Nullable BlockPos pos) {
+        BlockTintSource source = Minecraft.getInstance().getBlockColors().getTintSource(primitiveLeaves, 0);
+        if (source == null) {
+            return 0x48B518;
+        }
+        if (level instanceof BlockAndTintGetter tintLevel && pos != null) {
+            return source.colorInWorld(primitiveLeaves, tintLevel, pos);
+        }
+        return source.color(primitiveLeaves);
+    }
+
+    private static int leavesFoliageColor(BlockState state, BlockAndTintGetter level, BlockPos pos) {
+        if (state.getBlock() instanceof DynamicLeavesBlock leaves) {
+            return leaves.getLeavesProperties().foliageColorMultiplier(state, level, pos);
+        }
+        return 0x48B518;
+    }
+
+    private static int leavesBarkColor(BlockState state, BlockAndTintGetter level, BlockPos pos) {
+        if (state.getBlock() instanceof DynamicLeavesBlock leaves) {
+            return leaves.getLeavesProperties().getFamily().woodBarkColor;
+        }
+        return 0xB3A979;
     }
 
     public static void discoverWoodColors() {

@@ -571,7 +571,7 @@ public class FallingTreeEntityModel {
     if "Minecraft.getInstance().getBlockColors().getColor" in s:
         s = s.replace(
             "this.colorMultiplier = (s, w, p, t) -> c == -1 ? Minecraft.getInstance().getBlockColors().getColor(getPrimitiveLeaves(), w, p, 0) : c;",
-            "this.colorMultiplier = (s, w, p, t) -> c == -1 ? 0x48B518 : c;",
+            "this.colorMultiplier = (s, w, p, t) -> c == -1 ? com.dtteam.dynamictrees.client.FabricClientColors.primitiveLeavesColor(getPrimitiveLeaves(), w, p) : c;",
         )
 
     if "LootContextParamSets.REGISTRY" in s:

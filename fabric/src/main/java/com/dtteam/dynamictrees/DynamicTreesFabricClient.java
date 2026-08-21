@@ -49,6 +49,7 @@ public class DynamicTreesFabricClient implements ClientModInitializer {
         ClientTickEvents.START_CLIENT_TICK.register(client -> {
             if (!initialized && client.level != null) {
                 LeavesProperties.postInitClient();
+                FabricClientColors.registerVanillaTintSources();
                 FabricClientColors.discoverWoodColors();
                 BlockColorMultipliers.cleanUp();
                 initialized = true;
