@@ -50,9 +50,7 @@ loom {
     }
 }
 
-tasks.withType(JavaCompile).configureEach {
-    options.compilerArgs << '-Xmaxerrs' << '100000'
-}
+sourceSets.main.resources { srcDir project(':common').file('src/generated/resources') }
 
 // Implement mcgradleconventions loader attribute
 def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
