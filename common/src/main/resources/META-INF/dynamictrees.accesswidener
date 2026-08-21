@@ -7,27 +7,22 @@ accessible field net/minecraft/world/level/storage/loot/parameters/LootContextPa
 accessible method net/minecraft/world/level/levelgen/feature/stateproviders/BlockStateProviderType <init> (Lcom/mojang/serialization/MapCodec;)V
 accessible field net/minecraft/world/level/levelgen/structure/pools/StructureTemplatePool rawTemplates Ljava/util/List;
 accessible field net/minecraft/world/level/levelgen/structure/pools/StructureTemplatePool templates Lit/unimi/dsi/fastutil/objects/ObjectArrayList;
-accessible field net/minecraft/world/item/crafting/RecipeManager byType Lcom/google/common/collect/Multimap;
 
 accessible field net/minecraft/world/item/Item craftingRemainingItem Lnet/minecraft/world/item/ItemStackTemplate;
 mutable field net/minecraft/world/item/Item craftingRemainingItem Lnet/minecraft/world/item/ItemStackTemplate;
 extendable method net/minecraft/world/item/Item getCraftingRemainder ()Lnet/minecraft/world/item/ItemStackTemplate;
 
 accessible field net/minecraft/world/level/chunk/LevelChunk loaded Z
-accessible field net/minecraft/world/level/levelgen/feature/stateproviders/WeightedStateProvider weightedList Lnet/minecraft/util/random/SimpleWeightedRandomList;
 
 accessible field net/minecraft/commands/synchronization/ArgumentTypeInfos BY_CLASS Ljava/util/Map;
 
 accessible class net/minecraft/world/inventory/BrewingStandMenu$PotionSlot
-accessible class net/minecraft/data/tags/IntrinsicHolderTagsProvider$IntrinsicTagAppender
-accessible method net/minecraft/client/renderer/texture/SpriteContents metadata ()Lnet/minecraft/server/packs/resources/ResourceMetadata;
 accessible field net/minecraft/client/renderer/texture/SpriteContents originalImage Lcom/mojang/blaze3d/platform/NativeImage;
 accessible field net/minecraft/client/renderer/texture/SpriteContents additionalMetadata Ljava/util/List;
 accessible field net/minecraft/client/renderer/block/dispatch/multipart/MultiPartModel models Ljava/util/List;
 accessible field net/minecraft/world/level/block/entity/CreakingHeartBlockEntity ticksExisted J
 extendable method net/minecraft/world/level/block/entity/CreakingHeartBlockEntity spreadResin (Lnet/minecraft/server/level/ServerLevel;)Ljava/util/Optional;
 accessible method net/minecraft/world/level/block/entity/BlockEntityType <init> (Lnet/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier;Ljava/util/Set;)V
-accessible method net/minecraft/client/renderer/texture/atlas/SpriteSources register (Ljava/lang/String;Lcom/mojang/serialization/MapCodec;)Lnet/minecraft/client/renderer/texture/atlas/SpriteSourceType;
 
 accessible method net/minecraft/client/data/models/model/TextureSlot create (Ljava/lang/String;)Lnet/minecraft/client/data/models/model/TextureSlot;
 
