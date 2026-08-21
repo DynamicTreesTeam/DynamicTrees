@@ -24,7 +24,7 @@ public class MixinVegetationBlock {
         BlockState belowBlockState = level.getBlockState(blockpos);
         if (belowBlockState.getBlock() instanceof BasicRootsBlock roots){
             if (belowBlockState.getValue(BasicRootsBlock.LAYER) == BasicRootsBlock.Layer.COVERED){
-                Block block = BasicRootsBlock.Layer.COVERED.getPrimitive(roots.getFamily()).orElse(null);
+                Block block = BasicRootsBlock.Layer.COVERED.getPrimitive(roots.getAerialFamily()).orElse(null);
                 if (block == null) return;
                 cir.setReturnValue(mayPlaceOn(block.defaultBlockState(), level, blockpos));
             }
