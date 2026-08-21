@@ -59,6 +59,11 @@ public class DelayedHolderSet<T> implements HolderSet<T> {
     }
 
     @Override
+    public boolean isBound() {
+        return this.holderSetSupplier.get().isBound();
+    }
+
+    @Override
     public Optional<TagKey<T>> unwrapKey() {
         return this.holderSetSupplier.get().unwrapKey();
     }

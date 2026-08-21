@@ -24,4 +24,9 @@ public class OrHolderSet<T> extends StreamBackedHolderSet<T> {
     public boolean canSerializeIn(HolderOwner<T> owner) {
         return this.values.stream().allMatch(set -> set.canSerializeIn(owner));
     }
+
+    @Override
+    public boolean isBound() {
+        return this.values.stream().allMatch(HolderSet::isBound);
+    }
 }

@@ -103,6 +103,11 @@ public class DTBiomeHolderSet implements IDTBiomeHolderSet {
     }
 
     @Override
+    public boolean isBound() {
+        return true;
+    }
+
+    @Override
     public Optional<TagKey<Biome>> unwrapKey() {
         return Optional.empty();
     }
