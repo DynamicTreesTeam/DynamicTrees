@@ -1,5 +1,7 @@
 {
-    "textures": {},
+    "textures": {
+        "particle": "minecraft:block/oak_log"
+    },
     "elements": [],
     "render_type": "cutout"
 }

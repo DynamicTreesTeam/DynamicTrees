@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_25",
   "mixins": [
     "MixinBlock",
+    "MixinBlockItem",
     "MixinBrewingStandBlockEntity",
     "MixinBrewingStandMenu",
     "MixinBushBlock",
@@ -15,6 +16,8 @@
     "MixinSaplingBlock"
   ],
   "client": [
+    "MixinItemTintSources",
+    "MixinLevelExtractor"
   ],
   "server": [],
   "injectors": {

@@ -194,6 +194,15 @@ public class SurfaceRootBlockBakedModel extends DynamicTreesBlockStateModel {
         }
     }
 
+    public List<BakedQuad> collectBreakingQuads(BlockState state) {
+        int coreRadius = getRadius(state);
+        if (baker == null || coreRadius < 1 || coreRadius > 8) {
+            return List.of();
+        }
+        List<BakedQuad> core = cores[0][coreRadius - 1];
+        return core != null ? core : List.of();
+    }
+
     protected Direction getSourceDir(int coreRadius, int[] connections) {
         int largestConnection = 0;
         Direction sourceDir = null;

@@ -7,6 +7,7 @@ import com.dtteam.dynamictrees.block.branch.SurfaceRootBlock;
 import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.model.baked.BasicBranchBlockBakedModel;
 import com.dtteam.dynamictrees.model.baked.BasicRootsBlockBakedModel;
+import com.dtteam.dynamictrees.model.baked.BreakingOverlayModel;
 import com.dtteam.dynamictrees.model.baked.SurfaceRootBlockBakedModel;
 import com.dtteam.dynamictrees.model.baked.ThickBranchBlockBakedModel;
 import com.dtteam.dynamictrees.model.baked.WinterLeavesBlockStateModel;
@@ -17,6 +18,8 @@ import net.fabricmc.fabric.api.client.model.loading.v1.ModelModifier;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.ModelState;
 import net.minecraft.client.resources.model.ResolvedModel;
+import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.client.resources.model.sprite.TextureSlots;
 import net.minecraft.client.resources.model.SimpleModelWrapper;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.ModelDebugName;
@@ -47,6 +50,7 @@ public class DTModelLoadingPlugin implements ModelLoadingPlugin {
         ROOT_MODEL_CACHE.clear();
         UNDERGROUND_ROOTS_MODEL_CACHE.clear();
         winterLeavesPart = null;
+        pluginContext.modifyModelOnLoad().register(ModelModifier.WRAP_PHASE, DTModelLoadingPlugin::assignMissingParticle);
         pluginContext.modifyBlockModelAfterBake().register(ModelModifier.WRAP_PHASE, this::modifyModelAfterBake);
     }
 
@@ -175,6 +179,26 @@ public class DTModelLoadingPlugin implements ModelLoadingPlugin {
         return id.getPath().contains("missingno") || id.getPath().equals("missingno");
     }
 
+    private static UnbakedModel assignMissingParticle(UnbakedModel model, ModelModifier.OnLoad.Context context) {
+        TextureSlots.Data data = model.textureSlots();
+        Map<String, TextureSlots.SlotContents> values = data.values();
+        if (values.containsKey(UnbakedModel.PARTICLE_TEXTURE_REFERENCE)) {
+            return model;
+        }
+        TextureSlots.Data.Builder extra = new TextureSlots.Data.Builder();
+        if (values.containsKey("bark")) {
+            extra.addReference(UnbakedModel.PARTICLE_TEXTURE_REFERENCE, "bark");
+        } else if (values.containsKey("leaves")) {
+            extra.addReference(UnbakedModel.PARTICLE_TEXTURE_REFERENCE, "leaves");
+        } else {
+            extra.addTexture(UnbakedModel.PARTICLE_TEXTURE_REFERENCE, new net.minecraft.client.resources.model.sprite.Material(
+                    Identifier.withDefaultNamespace("block/oak_log")));
+        }
+        Map<String, TextureSlots.SlotContents> merged = new HashMap<>(values);
+        merged.putAll(extra.build().values());
+        return new ParticleFallbackUnbakedModel(model, new TextureSlots.Data(merged));
+    }
+
     private BlockStateModel modifyModelAfterBake(BlockStateModel model, ModelModifier.AfterBakeBlock.Context context) {
         BlockState state = context.state();
         Block block = state.getBlock();
@@ -193,8 +217,8 @@ public class DTModelLoadingPlugin implements ModelLoadingPlugin {
                 }
                 Identifier cacheKey = blockId.withSuffix(layer == BasicRootsBlock.Layer.FILLED ? "_filled" : "_exposed");
                 BlockStateModel rootsModel = UNDERGROUND_ROOTS_MODEL_CACHE.get(cacheKey);
-                if (rootsModel != null) {
-                    return rootsModel;
+                if (rootsModel instanceof BasicBranchBlockBakedModel baked) {
+                    return new BreakingOverlayModel(baked, baked.collectQuads(state, new int[6], null));
                 }
             }
             return model;
@@ -203,14 +227,17 @@ public class DTModelLoadingPlugin implements ModelLoadingPlugin {
         if (block instanceof SurfaceRootBlock) {
             initBranchModels(context.baker());
             BlockStateModel rootModel = ROOT_MODEL_CACHE.get(blockId);
+            if (rootModel instanceof SurfaceRootBlockBakedModel baked) {
+                return new BreakingOverlayModel(baked, baked.collectBreakingQuads(state));
+            }
             return rootModel != null ? rootModel : model;
         }
 
         if (block instanceof BranchBlock) {
             initBranchModels(context.baker());
             BlockStateModel branchModel = BRANCH_MODEL_CACHE.get(blockId);
-            if (branchModel != null) {
-                return branchModel;
+            if (branchModel instanceof BasicBranchBlockBakedModel baked) {
+                return new BreakingOverlayModel(baked, baked.collectQuads(state, new int[6], null));
             }
         }
 

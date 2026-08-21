@@ -1,6 +1,9 @@
 {
 	"credit": "Made with Blockbench",
 	"parent": "block/block",
+	"textures": {
+		"particle": "#bark"
+	},
 	"elements": [
 		{
 			"name": "Trunk",

@@ -83,6 +83,7 @@ loom {
 }
 
 def common26Dir = layout.buildDirectory.dir("generated/sources/common26")
+def itemDefsDir = layout.buildDirectory.dir("generated/resources/itemdefs")
 
 tasks.register('transformCommonFor26', Exec) {
     def srcDir = project(':common').file('src/main/java')
@@ -95,11 +96,25 @@ tasks.register('transformCommonFor26', Exec) {
     commandLine 'python', script.absolutePath, srcDir.absolutePath, destDir.get().asFile.absolutePath
 }
 
+tasks.register('generateItemDefsFor26', Exec) {
+    def script = file('scripts/generate_item_defs_26.py')
+    def commonMain = project(':common').file('src/main/resources')
+    def commonGenerated = project(':common').file('src/generated/resources')
+    inputs.file(script)
+    inputs.dir(commonMain)
+    inputs.dir(commonGenerated)
+    outputs.dir(itemDefsDir)
+    workingDir = project.projectDir
+    commandLine 'python', script.absolutePath, commonMain.absolutePath, commonGenerated.absolutePath, itemDefsDir.get().asFile.absolutePath
+}
+
 sourceSets.main.java.srcDir(common26Dir)
 sourceSets.main.resources { srcDir 'src/generated/resources' }
+sourceSets.main.resources.srcDir(itemDefsDir)
 
 processResources {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    dependsOn('generateItemDefsFor26')
     filesMatching('pack.mcmeta') {
         filter { String line ->
             line.contains('"pack_format": 8')

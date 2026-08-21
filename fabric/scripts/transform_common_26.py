@@ -276,6 +276,15 @@ def transform(s: str, rel: str) -> str:
             )
 
     norm = rel.replace("\\", "/")
+    if norm.endswith("item/DendroPotion.java"):
+        s = s.replace(
+            "    public String getDescriptionId(ItemStack stack) {\n"
+            "        return this.getDescriptionId() + \".\" + getPotionType(stack).getName();\n"
+            "    }",
+            "    public Component getName(ItemStack stack) {\n"
+            "        return Component.translatable(this.getDescriptionId() + \".\" + getPotionType(stack).getName());\n"
+            "    }",
+        )
     if norm.endswith("client/RetexturedBakedQuad.java"):
         s = """package com.dtteam.dynamictrees.client;
 
