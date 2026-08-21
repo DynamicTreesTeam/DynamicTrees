@@ -28,8 +28,8 @@ import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
-import snownee.jade.api.ui.IElement;
-import snownee.jade.impl.ui.ElementHelper;
+import snownee.jade.api.ui.Element;
+import snownee.jade.api.ui.JadeUI;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -57,7 +57,7 @@ public class WailaBranchHandler implements IBlockComponentProvider {
 
         //Attempt to get species from server via NBT data
         if (nbtData.contains("species")) {
-            species = Species.findSpecies(Identifier.parse(nbtData.getString("species")));
+            species = Species.findSpecies(Identifier.parse(nbtData.getString("species").orElseThrow()));
         }
 
         //Attempt to get species by checking if we're still looking at the same block
@@ -93,7 +93,7 @@ public class WailaBranchHandler implements IBlockComponentProvider {
 
             ItemStack seedStack = species.getSeedStack(1);
 
-            List<IElement> elements = new LinkedList<>();
+            List<Element> elements = new LinkedList<>();
             elements.add(getElement(seedStack)); //adds seed;
 
             if (species.hasFruits()){
@@ -131,7 +131,7 @@ public class WailaBranchHandler implements IBlockComponentProvider {
 
             tooltip.add(elements.removeFirst());
             elements.forEach(tooltip::append);
-            tooltip.add(ElementHelper.INSTANCE.spacer(0, 2));
+            tooltip.add(JadeUI.spacer(0, 2));
         }
     }
 
@@ -167,11 +167,11 @@ public class WailaBranchHandler implements IBlockComponentProvider {
         return TreeHelper.getBestGuessSpecies(level, pos);
     }
 
-    private static IElement getElement(ItemStack stack) {
+    private static Element getElement(ItemStack stack) {
         if (!stack.isEmpty()) {
-            return ElementHelper.INSTANCE.item(stack);
+            return JadeUI.item(stack);
         } else {
-            return ElementHelper.INSTANCE.spacer(0, 0);
+            return JadeUI.spacer(0, 0);
         }
     }
 
