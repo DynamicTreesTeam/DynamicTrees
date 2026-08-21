@@ -69,6 +69,7 @@ public class DTConfigs {
     public ModConfigSpec.BooleanValue canBoneMealFruit;
     public ModConfigSpec.BooleanValue canBoneMealPods;
     public ModConfigSpec.BooleanValue dynamicSaplingDrops;
+    public ModConfigSpec.BooleanValue hideCreakingHeart;
 
     public ModConfigSpec.BooleanValue replaceVanillaSaplings;
     public ModConfigSpec.BooleanValue replaceNyliumFungi;
@@ -174,6 +175,8 @@ public class DTConfigs {
                 .define("canBoneMealPods", true);
         config.dynamicSaplingDrops = builder.comment("If enabled, dynamic sapling blocks will drop their seed when broken.")
                 .define("dynamicSaplingDrops", true);
+        config.hideCreakingHeart = builder.comment("If enabled, creaking hearts will camouflage themselves as regular branches until they are stripped by the player.")
+                .define("hideCreakingHeart", true);
         builder.pop();
 
         builder.comment("World Generation Settings").push("world");

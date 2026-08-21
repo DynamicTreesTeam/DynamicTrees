@@ -99,14 +99,20 @@ public class DynamicSaplingBlock extends Block implements BonemealableBlock {
     }
 
     public void performBonemeal(@NotNull ServerLevel level, @NotNull RandomSource rand, @NotNull BlockPos pos, @NotNull BlockState state) {
+        performBonemeal(level, pos, state);
+    }
+
+    public boolean performBonemeal(Level level, BlockPos pos, BlockState state) {
         if (this.canSurvive(state, level, pos)) {
-            final Species species = this.getSpecies().selfOrLocationOverride(level, pos);;
+            final Species species = this.getSpecies().selfOrLocationOverride(level, pos);
             if (species.canSaplingGrow(level, pos)) {
                 species.transitionToTree(level, pos);
+                return true;
             }
         } else {
             this.dropBlock(level, state, pos);
         }
+        return false;
     }
 
     protected SoundType getSoundType(BlockState state) {

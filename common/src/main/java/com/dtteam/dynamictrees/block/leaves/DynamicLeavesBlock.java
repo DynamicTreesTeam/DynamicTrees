@@ -631,6 +631,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
 
             entity.setSprinting(false); // One cannot sprint upon tree tops
             entity.setDeltaMovement(entity.getDeltaMovement().x * 0.25D, entity.getDeltaMovement().y, entity.getDeltaMovement().z * 0.25D); // Make travel slow and laborious
+            super.entityInside(state, level, pos, entity, applier, moved);
         }
     }
 

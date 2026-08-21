@@ -1,0 +1,7 @@
+{
+  "loader": "dynamictrees:branch",
+  "textures": {
+    "bark": "minecraft:block/resin_clump",
+    "rings": "dynamictrees:block/air"
+  }
+}

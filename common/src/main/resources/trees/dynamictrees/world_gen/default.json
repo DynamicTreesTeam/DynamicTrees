@@ -151,6 +151,16 @@
     }
   },
   {
+    "select": {
+      "name": "minecraft:pale_garden"
+    },
+    "apply": {
+      "species": "pale_oak",
+      "density": "noise() / 3",
+      "multipass": true
+    }
+  },
+  {
     "_comment": "Birch forest is 100% birch.",
     "select": {
       "name": "minecraft:birch_forest"

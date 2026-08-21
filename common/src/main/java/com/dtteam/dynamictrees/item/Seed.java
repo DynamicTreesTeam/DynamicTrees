@@ -140,44 +140,22 @@ public class Seed extends Item {//implements IPlantable {
     }
 
     public boolean hasForcePlant(ItemStack seedStack) {
-        boolean forcePlant = false;
-//        if (seedStack.hasTag()) {
-//            CompoundTag nbtData = seedStack.getTag();
-//            assert nbtData != null;
-//            forcePlant = nbtData.getBoolean(FORCE_PLANT_KEY);
-//        }
-        return forcePlant;
+        Boolean value = seedStack.get(DTRegistries.FORCE_PLANT_COMPONENT.get());
+        return value != null && value;
     }
 
     public int getTimeToLive(ItemStack seedStack) {
         int lifespan = DTConfigs.SERVER.seedTimeToLive.get();
-//        if (seedStack.hasTag()) {
-//            CompoundTag nbtData = seedStack.getTag();
-//            assert nbtData != null;
-//            if (nbtData.contains(LIFESPAN_KEY)) {
-//                lifespan = nbtData.getInt(LIFESPAN_KEY);
-//            }
-//        }
+        Integer value = seedStack.get(DTRegistries.LIFESPAN_COMPONENT.get());
+        if (value != null) {
+            lifespan = value;
+        }
         return lifespan;
     }
 
     public String getCode(ItemStack seedStack, RandomSource random) {
-        String joCode = "";
-//        if (seedStack.hasTag()) {
-//            CompoundTag tag = seedStack.getTag();
-//            assert tag != null;
-//            if (tag.contains(CODE_KEY)) {
-//                if (tag.getTagType(CODE_KEY) == Tag.TAG_STRING) {
-//                    joCode = tag.getString(CODE_KEY);
-//                } else if (tag.getTagType(CODE_KEY) == Tag.TAG_INT) {
-//                    final JoCode code = getJoCodeForRadius(random, tag.getInt(CODE_KEY));
-//                    if (code != null) {
-//                        joCode = code.toString();
-//                    }
-//                }
-//            }
-//        }
-        return joCode;
+        String joCode = seedStack.get(DTRegistries.JOCODE_DATA_COMPONENT.get());
+        return joCode != null ? joCode : "";
     }
 
     @Nullable
@@ -274,6 +252,23 @@ public class Seed extends Item {//implements IPlantable {
         }
 
         return InteractionResult.PASS;
+    }
+
+    public void addComponentTooltips(ItemStack stack, java.util.List<net.minecraft.network.chat.Component> tooltip, RandomSource random) {
+        String joCode = this.getCode(stack, random);
+        if (!joCode.isEmpty()) {
+            tooltip.add(net.minecraft.network.chat.Component.translatable("tooltip.dynamictrees.jo_code", new JoCode(joCode).getTextComponent()));
+        }
+        if (this.hasForcePlant(stack)) {
+            tooltip.add(net.minecraft.network.chat.Component.translatable("tooltip.dynamictrees.force_planting",
+                    net.minecraft.network.chat.Component.translatable("tooltip.dynamictrees.enabled")
+                            .withStyle(style -> style.withColor(net.minecraft.ChatFormatting.DARK_AQUA))));
+        }
+        if (stack.has(DTRegistries.LIFESPAN_COMPONENT.get())) {
+            tooltip.add(net.minecraft.network.chat.Component.translatable("tooltip.dynamictrees.seed_life_span",
+                    net.minecraft.network.chat.Component.literal(String.valueOf(getTimeToLive(stack)))
+                            .withStyle(style -> style.withColor(net.minecraft.ChatFormatting.DARK_AQUA))));
+        }
     }
 
 ////    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {

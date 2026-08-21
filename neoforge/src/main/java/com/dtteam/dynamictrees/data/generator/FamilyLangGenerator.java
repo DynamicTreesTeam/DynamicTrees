@@ -26,7 +26,9 @@ public class FamilyLangGenerator implements Generator<DTDataProvider.Language, F
 //        }
             if(input instanceof UndergroundRootsFamily mgf){
                 mgf.getRoots().ifPresent(root -> treeLang(root, input, input.getLangOverride("roots")));
-                //mgf.getDefaultSoil().getBlock().ifPresent(soil -> blockLang(soil, input.getLangOverride("soil")));
+                if (input instanceof com.dtteam.dynamictrees.tree.family.MossyAerialRootsFamily mossy) {
+                    mossy.getMossyRoots().ifPresent(root -> blockLang(root, input.getLangOverride("mossy_roots")));
+                }
             }
         }
     }

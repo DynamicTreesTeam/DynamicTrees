@@ -127,8 +127,12 @@ public class ClientModEventHandler {
 
         for (Species species : Species.REGISTRY) {
             species.getSapling().ifPresent(sapling ->
-                    event.register(List.of(new FunctionalBlockTintSource(0xFFFFFF,
-                            (state, level, pos) -> species.saplingColorMultiplier(state, level, pos, 0))), sapling));
+                    event.register(List.of(
+                            new FunctionalBlockTintSource(0xFFFFFF,
+                                    (state, level, pos) -> species.saplingColorMultiplier(state, level, pos, 0)),
+                            new FunctionalBlockTintSource(0xFFFFFF,
+                                    (state, level, pos) -> species.saplingColorMultiplier(state, level, pos, 1))
+                    ), sapling));
         }
 
         for (DynamicLeavesBlock leaves : LeavesProperties.REGISTRY.getAll().stream()

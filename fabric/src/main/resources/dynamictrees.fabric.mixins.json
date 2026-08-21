@@ -5,11 +5,13 @@
   "compatibilityLevel": "JAVA_25",
   "mixins": [
     "MixinBlock",
+    "MixinBlockEntityTypeRebind",
     "MixinBlockItem",
     "MixinBrewingStandBlockEntity",
     "MixinBrewingStandMenu",
     "MixinBushBlock",
     "MixinChunkSerializer",
+    "MixinCreakingHeartBlock",
     "MixinItem",
     "MixinMinecraftServer",
     "MixinPotionBrewing",

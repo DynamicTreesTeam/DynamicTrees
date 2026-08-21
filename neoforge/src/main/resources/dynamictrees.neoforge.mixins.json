@@ -5,9 +5,11 @@
   "compatibilityLevel": "JAVA_25",
   "mixins": [
     "MixinBlock",
+    "MixinBlockEntityTypeRebind",
     "MixinBlockItem",
     "MixinBushBlock",
     "MixinChunkSerializer",
+    "MixinCreakingHeartBlock",
     "MixinItem"
   ],
   "client": [

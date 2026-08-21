@@ -1,0 +1,39 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "dynamictrees:block/pale_oak_creaking_heart_branch_hidden"
+      },
+      "when": {
+        "hidden": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "dynamictrees:block/pale_oak_creaking_heart_branch_awake"
+      },
+      "when": {
+        "creaking_heart_state": "awake",
+        "hidden": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "dynamictrees:block/pale_oak_creaking_heart_branch_dormant"
+      },
+      "when": {
+        "creaking_heart_state": "dormant",
+        "hidden": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "dynamictrees:block/pale_oak_creaking_heart_branch"
+      },
+      "when": {
+        "creaking_heart_state": "uprooted",
+        "hidden": "false"
+      }
+    }
+  ]
+}

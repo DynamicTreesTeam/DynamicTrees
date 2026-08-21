@@ -7,6 +7,9 @@
     "dynamictrees:jungle_branch",
     "dynamictrees:mangrove_branch",
     "dynamictrees:oak_branch",
+    "dynamictrees:pale_oak_branch",
+    "dynamictrees:pale_oak_creaking_heart_branch",
+    "dynamictrees:resin_pale_oak_branch",
     "dynamictrees:spruce_branch"
   ]
 }

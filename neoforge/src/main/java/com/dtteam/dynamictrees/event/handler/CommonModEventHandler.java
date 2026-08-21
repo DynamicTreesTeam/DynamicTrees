@@ -19,7 +19,9 @@ import com.dtteam.dynamictrees.systems.genfeature.GenFeature;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeatures;
 import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKit;
 import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKits;
+import com.dtteam.dynamictrees.tree.family.CreakingHeartFamily;
 import com.dtteam.dynamictrees.tree.family.Family;
+import com.dtteam.dynamictrees.tree.family.MossyAerialRootsFamily;
 import com.dtteam.dynamictrees.tree.family.NetherFungusFamily;
 import com.dtteam.dynamictrees.tree.family.PalmFamily;
 import com.dtteam.dynamictrees.tree.family.UndergroundRootsFamily;
@@ -52,7 +54,9 @@ public class CommonModEventHandler {
         if (!event.isEntryOfType(Family.class)) return;
         event.registerType(DynamicTrees.location("nether_fungus"), NetherFungusFamily.TYPE);
         event.registerType(DynamicTrees.location("underground_roots"), UndergroundRootsFamily.TYPE);
+        event.registerType(DynamicTrees.location("mossy_aerial_roots"), MossyAerialRootsFamily.TYPE);
         event.registerType(DynamicTrees.location("palm"), PalmFamily.TYPE);
+        event.registerType(DynamicTrees.location("creaking_heart"), CreakingHeartFamily.TYPE);
     }
 
     @SubscribeEvent

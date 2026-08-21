@@ -2,7 +2,7 @@
   "type": "underground_roots",
   "family": "mangrove",
   "tapering": 0.25,
-  "root_tapering": 0.2,
+  "root_tapering": 0.3,
   "signal_energy": 20.0,
   "root_signal_energy": 20.0,
   "up_probability": 8,

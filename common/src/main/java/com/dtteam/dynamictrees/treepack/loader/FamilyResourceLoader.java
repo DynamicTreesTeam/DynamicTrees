@@ -7,7 +7,9 @@ import com.dtteam.dynamictrees.block.soil.SoilProperties;
 import com.dtteam.dynamictrees.deserialization.JsonHelper;
 import com.dtteam.dynamictrees.deserialization.applier.Applier;
 import com.dtteam.dynamictrees.deserialization.applier.PropertyApplierResult;
+import com.dtteam.dynamictrees.tree.family.CreakingHeartFamily;
 import com.dtteam.dynamictrees.tree.family.Family;
+import com.dtteam.dynamictrees.tree.family.MossyAerialRootsFamily;
 import com.dtteam.dynamictrees.tree.family.UndergroundRootsFamily;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
@@ -71,6 +73,7 @@ public final class FamilyResourceLoader extends JsonRegistryResourceLoader<Famil
                 .register("reduce_radius_when_stripping", Boolean.class, Family::setReduceRadiusWhenStripping);
 
         registerMangroveAppliers();
+        registerPaleOakAppliers();
 
         super.registerAppliers();
     }
@@ -81,18 +84,30 @@ public final class FamilyResourceLoader extends JsonRegistryResourceLoader<Famil
                 .register("primitive_filled_root", UndergroundRootsFamily.class, Block.class, UndergroundRootsFamily::setPrimitiveRootsFilled)
                 .register("primitive_covered_root", UndergroundRootsFamily.class, Block.class, UndergroundRootsFamily::setPrimitiveRootsCovered)
                 //to-do: put in soil properties instead
-                .register("default_soil", UndergroundRootsFamily.class, SoilProperties.class, UndergroundRootsFamily::setDefaultSoil);
+                .register("default_soil", UndergroundRootsFamily.class, SoilProperties.class, UndergroundRootsFamily::setDefaultSoil)
+                .register("moss_carpet", MossyAerialRootsFamily.class, Item.class, MossyAerialRootsFamily::setMossCarpet);
         this.setupAppliers
                 .register("primitive_root", UndergroundRootsFamily.class, Block.class, UndergroundRootsFamily::setPrimitiveRoots)
                 .register("primitive_filled_root", UndergroundRootsFamily.class, Block.class, UndergroundRootsFamily::setPrimitiveRootsFilled)
                 .register("primitive_covered_root", UndergroundRootsFamily.class, Block.class, UndergroundRootsFamily::setPrimitiveRootsCovered)
-                //.register("replaceable_by_roots", MangroveFamily.class , ,)
-        ;
+                .register("moss_carpet", MossyAerialRootsFamily.class, Item.class, MossyAerialRootsFamily::setMossCarpet);
         this.reloadAppliers
                 .register("default_soil", UndergroundRootsFamily.class, SoilProperties.class, UndergroundRootsFamily::setDefaultSoil)
-                .registerArrayApplier("root_system_acceptable_soils", UndergroundRootsFamily.class, String.class, (Applier<UndergroundRootsFamily, String>) this::addAcceptableSoilForRootSystem);
-        ;
+                .registerArrayApplier("root_system_acceptable_soils", UndergroundRootsFamily.class, String.class, (Applier<UndergroundRootsFamily, String>) this::addAcceptableSoilForRootSystem)
+                .register("mossy_roots_chance", MossyAerialRootsFamily.class, Float.class, MossyAerialRootsFamily::setMossyRootsChance);
 
+    }
+
+    private void registerPaleOakAppliers(){
+        this.gatherDataAppliers
+                .register("primitive_heart", CreakingHeartFamily.class, Block.class, CreakingHeartFamily::setPrimitiveHeartLog)
+                .register("resin_item", CreakingHeartFamily.class, Item.class, CreakingHeartFamily::setResinItem)
+                .register("resin_block", CreakingHeartFamily.class, Block.class, CreakingHeartFamily::setResinBlock);
+        this.setupAppliers
+                .register("primitive_heart", CreakingHeartFamily.class, Block.class, CreakingHeartFamily::setPrimitiveHeartLog);
+        this.reloadAppliers
+                .register("tree_heart_hardness_multiplier", CreakingHeartFamily.class, Float.class, CreakingHeartFamily::setTreeHeartHardnessMultiplier)
+                .register("hidden_heart_hardness_multiplier", CreakingHeartFamily.class, Float.class, CreakingHeartFamily::setHiddenHeartHardnessMultiplier);
     }
 
     /**

@@ -3,6 +3,7 @@ package com.dtteam.dynamictrees.model;
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.block.branch.BasicRootsBlock;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
+import com.dtteam.dynamictrees.block.branch.CreakingHeartBranchBlock;
 import com.dtteam.dynamictrees.block.branch.SurfaceRootBlock;
 import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.model.baked.BasicBranchBlockBakedModel;
@@ -174,6 +175,15 @@ public final class NeoForgeModelPlugin {
             return rootModel != null ? rootModel : model;
         }
 
+        if (block instanceof CreakingHeartBranchBlock) {
+            initBranchModels(baker);
+            Identifier cacheKey = creakingCacheKey(blockId, state);
+            BlockStateModel branchModel = BRANCH_MODEL_CACHE.get(cacheKey);
+            if (branchModel instanceof BasicBranchBlockBakedModel baked) {
+                return new BreakingOverlayModel(baked, baked.collectQuads(state, new int[6], null));
+            }
+        }
+
         if (block instanceof BranchBlock) {
             initBranchModels(baker);
             BlockStateModel branchModel = BRANCH_MODEL_CACHE.get(blockId);
@@ -239,6 +249,10 @@ public final class NeoForgeModelPlugin {
                 });
             });
 
+            if (family instanceof com.dtteam.dynamictrees.tree.family.CreakingHeartFamily heartFamily) {
+                cacheCreakingModels(baker, debugName, heartFamily);
+            }
+
             family.getSurfaceRoot().ifPresent(surfaceRoot -> family.getPrimitiveLog().ifPresent(primitiveLog -> {
                 Identifier primitiveLogId = BuiltInRegistries.BLOCK.getKey(primitiveLog);
                 Identifier barkTexture = Identifier.fromNamespaceAndPath(primitiveLogId.getNamespace(), "block/" + primitiveLogId.getPath());
@@ -271,8 +285,72 @@ public final class NeoForgeModelPlugin {
                                 createRootsBlockModel(baker, debugName, barkTexture, ringsTexture));
                     });
                 });
+                if (undergroundFamily instanceof com.dtteam.dynamictrees.tree.family.MossyAerialRootsFamily mossyFamily) {
+                    mossyFamily.getMossyRoots().ifPresent(roots -> {
+                        Identifier blockId = BuiltInRegistries.BLOCK.getKey(roots);
+                        undergroundFamily.getPrimitiveRoots().ifPresent(primitiveRoots -> {
+                            Identifier primitiveRootsId = BuiltInRegistries.BLOCK.getKey(primitiveRoots);
+                            Identifier barkTexture = Identifier.fromNamespaceAndPath(primitiveRootsId.getNamespace(), "block/" + primitiveRootsId.getPath() + "_side");
+                            Identifier ringsTexture = Identifier.fromNamespaceAndPath(primitiveRootsId.getNamespace(), "block/" + primitiveRootsId.getPath() + "_top");
+                            AtomicReference<Identifier> barkRef = new AtomicReference<>(barkTexture);
+                            AtomicReference<Identifier> ringsRef = new AtomicReference<>(ringsTexture);
+                            family.getTexturePath(Family.ROOTS_SIDE).ifPresent(barkRef::set);
+                            family.getTexturePath(Family.ROOTS_TOP).ifPresent(ringsRef::set);
+                            UNDERGROUND_ROOTS_MODEL_CACHE.put(blockId.withSuffix("_exposed"),
+                                    createRootsBlockModel(baker, debugName, barkRef.get(), ringsRef.get()));
+                        });
+                        undergroundFamily.getPrimitiveFilledRoots().ifPresent(primitiveFilledRoots -> {
+                            Identifier primitiveFilledRootsId = BuiltInRegistries.BLOCK.getKey(primitiveFilledRoots);
+                            Identifier barkTexture = Identifier.fromNamespaceAndPath(primitiveFilledRootsId.getNamespace(), "block/" + primitiveFilledRootsId.getPath() + "_side");
+                            Identifier ringsTexture = Identifier.fromNamespaceAndPath(primitiveFilledRootsId.getNamespace(), "block/" + primitiveFilledRootsId.getPath() + "_top");
+                            UNDERGROUND_ROOTS_MODEL_CACHE.put(blockId.withSuffix("_filled"),
+                                    createRootsBlockModel(baker, debugName, barkTexture, ringsTexture));
+                        });
+                    });
+                }
             }
         }
+    }
+
+    private static Identifier creakingCacheKey(Identifier blockId, BlockState state) {
+        if (state.hasProperty(CreakingHeartBranchBlock.HIDDEN) && state.getValue(CreakingHeartBranchBlock.HIDDEN)) {
+            return blockId.withSuffix("_hidden");
+        }
+        if (state.hasProperty(CreakingHeartBranchBlock.STATE)) {
+            return blockId.withSuffix("_" + state.getValue(CreakingHeartBranchBlock.STATE));
+        }
+        return blockId;
+    }
+
+    private static void cacheCreakingModels(ModelBaker baker, ModelDebugName debugName,
+                                            com.dtteam.dynamictrees.tree.family.CreakingHeartFamily family) {
+        boolean isThick = family.isThick();
+        family.getHeartBranch().ifPresent(heart -> {
+            Identifier blockId = BuiltInRegistries.BLOCK.getKey(heart);
+            family.getPrimitiveLog().ifPresent(primitiveLog -> {
+                Identifier primitiveLogId = BuiltInRegistries.BLOCK.getKey(primitiveLog);
+                Identifier bark = Identifier.fromNamespaceAndPath(primitiveLogId.getNamespace(), "block/" + primitiveLogId.getPath());
+                Identifier rings = bark.withSuffix("_top");
+                BRANCH_MODEL_CACHE.put(blockId.withSuffix("_hidden"), createBranchModel(baker, debugName, bark, rings, isThick));
+            });
+            family.getPrimitiveHeartLog().ifPresent(primitiveHeart -> {
+                Identifier heartId = BuiltInRegistries.BLOCK.getKey(primitiveHeart);
+                Identifier base = Identifier.fromNamespaceAndPath(heartId.getNamespace(), "block/" + heartId.getPath());
+                BRANCH_MODEL_CACHE.put(blockId.withSuffix("_awake"),
+                        createBranchModel(baker, debugName, base.withSuffix("_awake"), base.withSuffix("_awake_top"), isThick));
+                BRANCH_MODEL_CACHE.put(blockId.withSuffix("_dormant"),
+                        createBranchModel(baker, debugName, base.withSuffix("_dormant"), base.withSuffix("_dormant_top"), isThick));
+                BRANCH_MODEL_CACHE.put(blockId.withSuffix("_uprooted"),
+                        createBranchModel(baker, debugName, base, base.withSuffix("_top"), isThick));
+                BRANCH_MODEL_CACHE.put(blockId, createBranchModel(baker, debugName, base, base.withSuffix("_top"), isThick));
+            });
+        });
+        family.getResinBranch().ifPresent(resin -> {
+            Identifier blockId = BuiltInRegistries.BLOCK.getKey(resin);
+            Identifier resinId = BuiltInRegistries.BLOCK.getKey(family.getResinBlock());
+            Identifier bark = Identifier.fromNamespaceAndPath(resinId.getNamespace(), "block/" + resinId.getPath());
+            BRANCH_MODEL_CACHE.put(blockId, createBranchModel(baker, debugName, bark, bark, isThick));
+        });
     }
 
     private static BlockStateModel createBranchModel(ModelBaker baker, ModelDebugName debugName,

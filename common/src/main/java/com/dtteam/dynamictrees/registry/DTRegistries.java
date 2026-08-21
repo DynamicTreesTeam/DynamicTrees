@@ -6,6 +6,7 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
+import com.dtteam.dynamictrees.block.branch.CreakingHeartBranchBlockEntity;
 import com.dtteam.dynamictrees.block.branch.TrunkShellBlock;
 import com.dtteam.dynamictrees.block.sapling.PottedSaplingBlock;
 import com.dtteam.dynamictrees.block.sapling.PottedSaplingBlockEntity;
@@ -25,11 +26,14 @@ import com.dtteam.dynamictrees.loot.entry.SeedItemLootPoolEntry;
 import com.dtteam.dynamictrees.loot.entry.WeightedItemLootPoolEntry;
 import com.dtteam.dynamictrees.loot.function.MultiplyByLogsCount;
 import com.dtteam.dynamictrees.loot.function.MultiplyBySticksCount;
+import com.dtteam.dynamictrees.loot.function.MultiplyByTotalVolume;
 import com.dtteam.dynamictrees.loot.function.MultiplyCount;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.recipe.*;
 import com.dtteam.dynamictrees.systems.BranchConnectables;
 import com.dtteam.dynamictrees.tree.TreeHelper;
+import com.dtteam.dynamictrees.tree.family.CreakingHeartFamily;
+import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.worldgen.feature.CaveRootedTreeFeature;
 import com.dtteam.dynamictrees.worldgen.feature.CaveRootedTreePlacement;
@@ -175,10 +179,22 @@ public class DTRegistries {
             .registerBlockEntity("tile_entity_species", SpeciesBlockEntity::new, getAllRootyBlocks());
     public static Supplier<BlockEntityType<PottedSaplingBlockEntity>> POTTED_SAPLING_BLOCK_ENTITY = Services.REGISTRY.getRegistryLoader()
             .registerBlockEntity("potted_sapling", Services.REGISTRY.getPottedSaplingBlockEntity(), ()->Set.of(POTTED_SAPLING.get()));
+    public static Supplier<BlockEntityType<CreakingHeartBranchBlockEntity>> CREAKING_HEART_BLOCK_ENTITY = Services.REGISTRY.getRegistryLoader()
+            .registerBlockEntity("creaking_heart", CreakingHeartBranchBlockEntity::new, getCreakingHeartBlocks());
 
     public static Supplier<Set<Block>> getAllRootyBlocks(){
         return ()->SoilProperties.REGISTRY.getAll().stream()
                 .map(SoilProperties::getBlock)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toSet());
+    }
+
+    public static Supplier<Set<Block>> getCreakingHeartBlocks(){
+        return ()-> Family.REGISTRY.getAll().stream()
+                .filter(f -> f instanceof CreakingHeartFamily chf && chf.registerDefaultBlockEntity())
+                .map(f -> (CreakingHeartFamily) f)
+                .map(CreakingHeartFamily::getHeartBranch)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toSet());
@@ -216,6 +232,10 @@ public class DTRegistries {
             registerDataComponentType("read_only", builder -> builder.persistent(Unit.CODEC).networkSynchronized(StreamCodec.unit(Unit.INSTANCE)));
     public static final Supplier<DataComponentType<String>> SPECIES_DATA_COMPONENT = Services.REGISTRY.getRegistryLoader().
             registerDataComponentType("species", builder -> builder.persistent(Codec.STRING).networkSynchronized(ByteBufCodecs.STRING_UTF8));
+    public static final Supplier<DataComponentType<Boolean>> FORCE_PLANT_COMPONENT = Services.REGISTRY.getRegistryLoader().
+            registerDataComponentType("force_plant", builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
+    public static final Supplier<DataComponentType<Integer>> LIFESPAN_COMPONENT = Services.REGISTRY.getRegistryLoader().
+            registerDataComponentType("lifespan", builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.INT));
     public static final Supplier<DataComponentType<Integer>> DENDRO_POTION_INDEX_DATA_COMPONENT = Services.REGISTRY.getRegistryLoader().
             registerDataComponentType("potion_index", builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.INT));
 
@@ -250,6 +270,8 @@ public class DTRegistries {
             .registerLootFunctionType("multiply_logs_count", MultiplyByLogsCount.CODEC);
     public static final Supplier<MapCodec<MultiplyBySticksCount>> MULTIPLY_STICKS_COUNT = Services.REGISTRY.getRegistryLoader()
             .registerLootFunctionType("multiply_sticks_count", MultiplyBySticksCount.CODEC);
+    public static final Supplier<MapCodec<MultiplyByTotalVolume>> MULTIPLY_TOTAL_VOLUME = Services.REGISTRY.getRegistryLoader()
+            .registerLootFunctionType("multiply_total_volume", MultiplyByTotalVolume.CODEC);
 
     ///////////////////////////////////////////
     // WORLDGEN

@@ -1,0 +1,7 @@
+{
+  "loader": "dynamictrees:branch",
+  "textures": {
+    "bark": "minecraft:block/creaking_heart_awake",
+    "rings": "minecraft:block/creaking_heart_awake_top"
+  }
+}

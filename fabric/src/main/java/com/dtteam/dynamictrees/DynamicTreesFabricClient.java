@@ -83,6 +83,9 @@ public class DynamicTreesFabricClient implements ClientModInitializer {
             if (!species.isValid()) {
                 return;
             }
+
+            seed.addComponentTooltips(stack, lines, player.level().getRandom());
+
             if (SeasonHelper.getSeasonValue(levelContext, BlockPos.ZERO) == null) {
                 return;
             }

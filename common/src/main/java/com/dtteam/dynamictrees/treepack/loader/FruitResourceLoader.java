@@ -69,7 +69,7 @@ public final class FruitResourceLoader extends JsonRegistryResourceLoader<Fruit>
     }
 
     private void createBlock(Fruit fruit, JsonObject json) {
-        fruit.createBlock(getBlockRegistryName(fruit, json), fruit.getDefaultBlockProperties());
+        fruit.generateBlock(getBlockRegistryName(fruit, json), fruit.getDefaultBlockProperties());
     }
 
     private void createBlock(Fruit fruit, JsonObject json, JsonObject propertiesJson) {
@@ -79,7 +79,7 @@ public final class FruitResourceLoader extends JsonRegistryResourceLoader<Fruit>
                 error -> this.logError(fruit.getRegistryName(), error),
                 warning -> this.logWarning(fruit.getRegistryName(), warning)
         );
-        fruit.createBlock(getBlockRegistryName(fruit, json), blockProperties);
+        fruit.generateBlock(getBlockRegistryName(fruit, json), blockProperties);
     }
 
     /**

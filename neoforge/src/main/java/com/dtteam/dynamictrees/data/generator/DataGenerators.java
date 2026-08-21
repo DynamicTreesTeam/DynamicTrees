@@ -16,6 +16,10 @@ public class DataGenerators {
         Family.languageGenerators.put(DynamicTrees.location("family_lang"), FamilyLangGenerator::new);
         Family.blockStateGenerators.put(DynamicTrees.location("roots"), RootsStateGenerator::new);
         Family.itemModelGenerators.put(DynamicTrees.location("roots_item"), RootsItemModelGenerator::new);
+        Family.blockStateGenerators.put(DynamicTrees.location("mossy_roots"), MossyRootsStateGenerator::new);
+        Family.itemModelGenerators.put(DynamicTrees.location("mossy_roots_item"), MossyRootsItemModelGenerator::new);
+        Family.blockStateGenerators.put(DynamicTrees.location("creaking_heart"), CreakingHeartStateGenerator::new);
+        Family.blockStateGenerators.put(DynamicTrees.location("resin_branch"), ResinBranchStateGenerator::new);
 
         Species.blockStateGenerators.put(DynamicTrees.location("sapling"), SaplingStateGenerator::new);
         Species.itemModelGenerators.put(DynamicTrees.location("seed_item"), SeedItemModelGenerator::new);

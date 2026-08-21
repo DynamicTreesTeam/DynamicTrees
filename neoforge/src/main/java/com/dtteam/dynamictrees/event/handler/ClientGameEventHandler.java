@@ -41,8 +41,13 @@ public class ClientGameEventHandler {
 
         LevelContext levelContext = LevelContext.create(player.level());
         Species species = seed.getSpecies();
+        if (!species.isValid()) {
+            return;
+        }
 
-        if (SeasonHelper.getSeasonValue(levelContext, BlockPos.ZERO) == null || !species.isValid()) {
+        seed.addComponentTooltips(stack, event.getToolTip(), player.level().getRandom());
+
+        if (SeasonHelper.getSeasonValue(levelContext, BlockPos.ZERO) == null) {
             return;
         }
 

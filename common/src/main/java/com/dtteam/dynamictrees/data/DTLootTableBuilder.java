@@ -193,6 +193,39 @@ public class DTLootTableBuilder {
         ).setParamSet(DTLootParameterSets.BRANCHES);
     }
 
+    public static LootTable.Builder createCreakingHeartDrops(Block primitiveLogBlock, Item resinItem, int minResin, int maxResin, HolderLookup.Provider registries) {
+        return createSelfDropDispatchTable(
+                primitiveLogBlock,
+                hasSilkTouch(registries),
+                LootItem.lootTableItem(resinItem)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(minResin, maxResin)))
+                        .apply(com.dtteam.dynamictrees.loot.function.MultiplyByTotalVolume.multiplyByTotalVolume())
+                        .apply(ApplyExplosionDecay.explosionDecay())
+        ).setParamSet(DTLootParameterSets.BRANCHES);
+    }
+
+    public static LootTable.Builder createResinBranchDrops(Block primitiveLogBlock, Item stickItem, Item resinItem, int minResin, int maxResin, HolderLookup.Provider registries) {
+        return LootTable.lootTable().withPool(
+                LootPool.lootPool().setRolls(ConstantValue.exactly(1)).add(
+                        LootItem.lootTableItem(primitiveLogBlock)
+                                .apply(MultiplyByLogsCount.multiplyByLogsCount())
+                                .apply(ApplyExplosionDecay.explosionDecay())
+                )
+        ).withPool(
+                LootPool.lootPool().setRolls(UniformGenerator.between(minResin, maxResin)).add(
+                        LootItem.lootTableItem(resinItem)
+                                .apply(com.dtteam.dynamictrees.loot.function.MultiplyByTotalVolume.multiplyByTotalVolume())
+                                .apply(ApplyExplosionDecay.explosionDecay())
+                )
+        ).withPool(
+                LootPool.lootPool().setRolls(ConstantValue.exactly(1)).add(
+                        LootItem.lootTableItem(lootItemOrStick(stickItem))
+                                .apply(MultiplyBySticksCount.multiplyBySticksCount())
+                                .apply(ApplyExplosionDecay.explosionDecay())
+                )
+        ).setParamSet(DTLootParameterSets.BRANCHES);
+    }
+
     public static LootTable.Builder createFruitPodDrops(Block fruitBlock, Item fruitItem, IntegerProperty ageProperty, int matureAge, int count, HolderLookup.Provider registries) {
         return createFruitPodDrops(fruitBlock, fruitItem, ageProperty, matureAge, count, count, registries);
     }
