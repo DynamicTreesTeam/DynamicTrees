@@ -21,7 +21,6 @@ public class FreezerNode implements NodeInspector {
         this.species = species;
     }
 
-    @Override
     public boolean run(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
         final BranchBlock branch = TreeHelper.getBranch(state);
         if (branch != null) {
@@ -34,7 +33,6 @@ public class FreezerNode implements NodeInspector {
         return true;
     }
 
-    @Override
     public boolean returnRun(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
         return false;
     }

@@ -16,11 +16,10 @@ import java.util.stream.Stream;
 
 public class MegaSeedRecipe extends CustomRecipe {
 
-    public MegaSeedRecipe(CraftingBookCategory pCategory) {
-        super(pCategory);
+    public MegaSeedRecipe() {
+        super();
     }
 
-    @Override
     public boolean matches(CraftingInput craftingInput, Level level) {
         if(DTConfigs.COMMON.generateMegaSeedRecipe.get() && atLeastHasSeed(craftingInput)){
             for(Species species : Species.REGISTRY) {
@@ -32,8 +31,7 @@ public class MegaSeedRecipe extends CustomRecipe {
         return false;
     }
 
-    @Override
-    public ItemStack assemble(CraftingInput craftingInput, HolderLookup.Provider registryAccess) {
+    public ItemStack assemble(CraftingInput craftingInput) {
         for (Species species : Species.REGISTRY) {
             if (recipeMatchCondition(craftingInput, species)) {
                 return new ItemStack(species.getSeed().get());
@@ -60,13 +58,11 @@ public class MegaSeedRecipe extends CustomRecipe {
         return craftingInput.items().stream().filter(stack -> !stack.isEmpty());
     }
 
-    @Override
     public boolean canCraftInDimensions(int i, int i1) {
         return true;
     }
 
-    @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<? extends CustomRecipe> getSerializer() {
         return DTRegistries.MEGA_SEED_RECIPE_TYPE.get();
     }
 

@@ -16,12 +16,11 @@ public class FertilizeSubstance implements SubstanceEffect {
     private boolean grow;
     private Supplier<Integer> pulses = () -> 1;
 
-    @Override
     public boolean apply(Level level, BlockPos rootPos) {
         final SoilBlock dirt = TreeHelper.getRooty(level.getBlockState(rootPos));
 
         if (dirt != null && dirt.fertilize(level, rootPos, this.amount) || this.grow) {
-            if (displayParticles && level.isClientSide) {
+            if (displayParticles && level.isClientSide()) {
                 TreeHelper.treeParticles(level, rootPos, ParticleTypes.HAPPY_VILLAGER, 8);
             } else {
                 if (this.grow) {
@@ -38,7 +37,6 @@ public class FertilizeSubstance implements SubstanceEffect {
         return false;
     }
 
-    @Override
     public String getName() {
         return "fertilize";
     }
@@ -74,7 +72,6 @@ public class FertilizeSubstance implements SubstanceEffect {
         return this;
     }
 
-    @Override
     public boolean isLingering() {
         return false;
     }

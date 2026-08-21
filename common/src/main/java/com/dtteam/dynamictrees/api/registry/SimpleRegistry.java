@@ -1,6 +1,6 @@
 package com.dtteam.dynamictrees.api.registry;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -71,8 +71,8 @@ public class SimpleRegistry<V extends RegistryEntry<V>> extends AbstractRegistry
      * Registers the given {@link RegistryEntry} to this {@link SimpleRegistry}.
      *
      * <p>Note that this will throw a runtime exception if this {@link SimpleRegistry} is locked, or if
-     * the {@link ResourceLocation} already has a value registered, therefore {@link #isLocked()} or/and {@link
-     * #has(ResourceLocation)} should be checked before calling if either conditions are uncertain.</p>
+     * the {@link Identifier} already has a value registered, therefore {@link #isLocked()} or/and {@link
+     * #has(Identifier)} should be checked before calling if either conditions are uncertain.</p>
      *
      * <p>If you're thinking of using this you should probably be doing it from a
      * Registry Event, in which case you don't have to worry about locking.</p>
@@ -80,7 +80,6 @@ public class SimpleRegistry<V extends RegistryEntry<V>> extends AbstractRegistry
      * @param value The {@link RegistryEntry} to register.
      * @return This {@link SimpleRegistry} object for chaining.
      */
-    @Override
     public SimpleRegistry<V> register(final V value) {
         this.assertValid(value);
         this.entries.add(value);
@@ -94,12 +93,10 @@ public class SimpleRegistry<V extends RegistryEntry<V>> extends AbstractRegistry
      *
      * @return All {@link RegistryEntry} objects currently registered.
      */
-    @Override
     public final Set<V> getAll() {
         return Collections.unmodifiableSet(this.entries);
     }
 
-    @Override
     protected void clearAll() {
         this.entries.clear();
     }

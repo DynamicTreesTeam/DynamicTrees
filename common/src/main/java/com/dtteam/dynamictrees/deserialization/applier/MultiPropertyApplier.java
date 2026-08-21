@@ -29,7 +29,6 @@ public class MultiPropertyApplier<T, I> extends PropertyApplier<T, Object, I> {
     }
 
     @Nullable
-    @Override
     protected PropertyApplierResult applyIfShould(T object, I input, Applier<T, Object> applier) {
         final Iterator<PropertyApplier<T, Object, I>> iterator = appliers.iterator();
         PropertyApplierResult applierResult;

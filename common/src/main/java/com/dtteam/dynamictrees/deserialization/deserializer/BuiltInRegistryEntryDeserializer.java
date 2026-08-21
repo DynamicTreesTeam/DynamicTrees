@@ -36,7 +36,6 @@ public final class BuiltInRegistryEntryDeserializer<T> implements JsonDeserializ
         this.validator = value -> value != nullValue;
     }
 
-    @Override
     public Result<T, JsonElement> deserialize(JsonElement jsonElement) {
         final AtomicBoolean intentionallyNull = new AtomicBoolean();
         return JsonDeserializers.RESOURCE_LOCATION.deserialize(jsonElement).map(registryName -> {
@@ -46,7 +45,7 @@ public final class BuiltInRegistryEntryDeserializer<T> implements JsonDeserializ
                         return this.nullValue;
                     }
 
-                    return this.registry.get(registryName);
+                    return this.registry.getValue(registryName);
                 }, value -> intentionallyNull.get() || this.validator.test(value),
                 "Could not find " + this.registryDisplayName + " for registry name '{}'.");
     }

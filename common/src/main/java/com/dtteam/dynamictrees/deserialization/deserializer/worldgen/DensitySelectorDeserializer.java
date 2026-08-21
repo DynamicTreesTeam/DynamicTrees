@@ -24,7 +24,6 @@ import java.util.function.Consumer;
  */
 public final class DensitySelectorDeserializer implements JsonBiomeDatabaseDeserializer<BiomePropertySelectors.DensitySelector> {
 
-    @Override
     public Result<BiomePropertySelectors.DensitySelector, JsonElement> deserialize(JsonElement input) {
         return JsonResult.forInput(input)
                 .mapIfType(JsonObject.class, this::readDensitySelector) // Deprecated

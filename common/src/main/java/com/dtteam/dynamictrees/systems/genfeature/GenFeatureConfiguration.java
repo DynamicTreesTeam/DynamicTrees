@@ -29,7 +29,6 @@ public class GenFeatureConfiguration extends Configuration<GenFeatureConfigurati
      *
      * @return The copy of this {@link GenFeatureConfiguration}.
      */
-    @Override
     public GenFeatureConfiguration copy() {
         final GenFeatureConfiguration duplicateGenFeature = new GenFeatureConfiguration(this.configurable);
         duplicateGenFeature.properties.putAll(this.properties);

@@ -12,7 +12,6 @@ import java.util.List;
 public class BlockPosBounds implements Iterable<BlockPos> {
 
     public static final BlockPosBounds INVALID = new BlockPosBounds() {
-        @Override
         public boolean inBounds(BlockPos pos) {
             return false;
         }
@@ -49,11 +48,11 @@ public class BlockPosBounds implements Iterable<BlockPos> {
 
     public BlockPosBounds(LevelAccessor level, ChunkPos cPos) {
         minX = cPos.getMinBlockX();
-        minY = level.getMinBuildHeight();
+        minY = level.getMinY();
         minZ = cPos.getMinBlockZ();
 
         maxX = cPos.getMaxBlockX();
-        maxY = level.getMaxBuildHeight();
+        maxY = level.getMaxY();
         maxZ = cPos.getMaxBlockZ();
     }
 
@@ -171,7 +170,6 @@ public class BlockPosBounds implements Iterable<BlockPos> {
         return expand(-amount);
     }
 
-    @Override
     public Iterator<BlockPos> iterator() {
         return BlockPos.betweenClosed(this.minX, this.minY, this.minZ, this.maxX, this.maxY, this.maxZ).iterator();
     }
@@ -192,7 +190,6 @@ public class BlockPosBounds implements Iterable<BlockPos> {
         return new AABB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-    @Override
     public String toString() {
         return this != INVALID ? "Bounds{x1=" + this.minX + ", y1=" + this.minY + ", z1=" + this.minZ + " -> x2=" + this.maxX + ", y2=" + this.maxY + ", z2=" + this.maxZ + "}" : "Invalid";
     }

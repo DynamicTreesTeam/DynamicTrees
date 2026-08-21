@@ -10,7 +10,7 @@ import com.dtteam.dynamictrees.deserialization.result.Result;
 import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
@@ -33,7 +33,6 @@ public final class ConfiguredDeserializer<T extends Configuration<T, C>, C exten
     }
 
     @SuppressWarnings("unchecked")
-    @Override
     public Result<T, JsonElement> deserialize(final JsonElement jsonElement) {
         return JsonResult.forInput(jsonElement)
                 .mapIfType(String.class, (name, warningConsumer) -> {
@@ -66,12 +65,12 @@ public final class ConfiguredDeserializer<T extends Configuration<T, C>, C exten
                 ((ConfigurableRegistryEntry<?, ?>) config.getConfigurable()).isValid());
     }
 
-    private ConfigurationTemplate<T> getTemplate(ResourceLocation templateName) throws DeserializationException {
+    private ConfigurationTemplate<T> getTemplate(Identifier templateName) throws DeserializationException {
         return this.templates.get(templateName)
                 .orElseThrow(() -> new DeserializationException("No such template \"" + templateName + "\" for \"" + configurableName + "\"."));
     }
 
-    private ResourceLocation getTemplateName(JsonObject json) throws DeserializationException {
+    private Identifier getTemplateName(JsonObject json) throws DeserializationException {
         return JsonHelper.getAsOptional(json, "name", JsonDeserializers.DT_RESOURCE_LOCATION)
                 .orElseThrow(() -> new DeserializationException("Configurable must state name of template to use."));
     }

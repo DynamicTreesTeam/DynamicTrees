@@ -18,12 +18,10 @@ import java.util.stream.Stream;
 
 public final class GrowPulseCommand extends SubCommand {
 
-    @Override
     protected String getName() {
         return CommandConstants.GROW_PULSE;
     }
 
-    @Override
     protected int getPermissionLevel() {
         return 2;
     }
@@ -31,7 +29,6 @@ public final class GrowPulseCommand extends SubCommand {
     private static final String NUMBER = "number";
     private static final Collection<String> NUMBER_SUGGESTIONS = Stream.of(1, 4, 8, 16, 32, 64).map(String::valueOf).collect(Collectors.toList());
 
-    @Override
     public ArgumentBuilder<CommandSourceStack, ?> registerArgument() {
         return blockPosArgument().executes(context -> executesSuccess(() -> this.sendGrowPulse(context.getSource(), rootPosArgument(context), 1)))
                 .then(Commands.argument(NUMBER, IntegerArgumentType.integer(1)).suggests(((context, builder) -> SharedSuggestionProvider.suggest(NUMBER_SUGGESTIONS, builder)))

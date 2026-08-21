@@ -16,12 +16,10 @@ public class NormalCell implements Cell {
         this.value = value;
     }
 
-    @Override
     public int getValue() {
         return value;
     }
 
-    @Override
     public int getValueFromSide(Direction side) {
         return value;
     }

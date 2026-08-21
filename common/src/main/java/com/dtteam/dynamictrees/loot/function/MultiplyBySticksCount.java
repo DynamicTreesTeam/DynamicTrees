@@ -9,7 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
-import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 
 import java.util.List;
@@ -27,14 +27,12 @@ public final class MultiplyBySticksCount extends LootItemConditionalFunction {
         super(conditions);
     }
 
-    @Override
-    public LootItemFunctionType<? extends LootItemConditionalFunction> getType() {
-        return DTRegistries.MULTIPLY_STICKS_COUNT.get();
+    public MapCodec<? extends LootItemConditionalFunction> codec() {
+        return CODEC;
     }
 
-    @Override
     protected ItemStack run(ItemStack stack, LootContext context) {
-        final Integer volume = context.getParamOrNull(DTLootContextParams.VOLUME);
+        final Integer volume = context.getOptionalParameter(DTLootContextParams.VOLUME);
         assert volume != null;
         stack.setCount(stack.getCount() * 8 * (volume % NetVolumeNode.Volume.VOXELSPERLOG) /
                 NetVolumeNode.Volume.VOXELSPERLOG);

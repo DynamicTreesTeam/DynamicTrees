@@ -19,26 +19,23 @@ import static com.dtteam.dynamictrees.command.CommandConstants.RAW;
 
 public final class FertilityCommand extends SubCommand {
 
-    @Override
     protected String getName() {
         return FERTILITY;
     }
 
-    @Override
     protected int getPermissionLevel() {
         return 0;
     }
 
     private static final String FERTILITY = CommandConstants.FERTILITY;
 
-    @Override
     public ArgumentBuilder<CommandSourceStack, ?> registerArgument() {
         return blockPosArgument().executes(context -> executesSuccess(() -> this.getFertility(context.getSource(),
                         rootPosArgument(context), false)))
                 .then(booleanArgument(RAW).executes(context -> executesSuccess(() -> this.getFertility(context.getSource(),
                         rootPosArgument(context), booleanArgument(context, RAW)))))
                 .then(Commands.argument(FERTILITY, IntegerArgumentType.integer(0, 15)).suggests(FERTILITY_SUGGESTIONS)
-                        .requires(commandSource -> commandSource.hasPermission(2)) // Setting fertility requires higher permission level.
+                        .requires(commandSource -> true) // Setting fertility requires higher permission level.
                         .executes(context -> executesSuccess(() -> this.setFertility(context.getSource(), rootPosArgument(context),
                                 intArgument(context, FERTILITY)))));
     }

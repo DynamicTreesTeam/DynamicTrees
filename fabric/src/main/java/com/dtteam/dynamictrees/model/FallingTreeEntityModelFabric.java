@@ -32,10 +32,6 @@ public class FallingTreeEntityModelFabric extends FallingTreeEntityModel {
         super(entity);
     }
 
-    public Species getSpecies() {
-        return species;
-    }
-
     @Override
     public List<TreeQuadData> generateTreeQuads(FallingTreeEntity entity) {
         BranchDestructionData destructionData = entity.getDestroyData();

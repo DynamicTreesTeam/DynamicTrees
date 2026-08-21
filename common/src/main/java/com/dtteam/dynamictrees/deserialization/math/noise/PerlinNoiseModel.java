@@ -13,7 +13,6 @@ public class PerlinNoiseModel implements NoiseModel {
 		this.noise = PerlinNoise.create(randomSource, octaves);
 	}
 	
-	@Override
 	public double sample(double x, double y, double z) {
 		return noise.getValue(x, y, z);
 	}

@@ -1,4 +1,2 @@
-@MethodsReturnNonnullByDefault
 package com.dtteam.dynamictrees.deserialization;
 
-import net.minecraft.MethodsReturnNonnullByDefault;

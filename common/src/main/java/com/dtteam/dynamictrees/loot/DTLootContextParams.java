@@ -2,20 +2,20 @@ package com.dtteam.dynamictrees.loot;
 
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.tree.species.Species;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
+import net.minecraft.util.context.ContextKey;
 
 /**
  * @author Harley O'Connor
  */
 public final class DTLootContextParams {
 
-    public static final LootContextParam<Species> SPECIES = create("species");
-    public static final LootContextParam<Integer> FERTILITY = create("fertility");
-    public static final LootContextParam<Float> SEASONAL_SEED_DROP_FACTOR = create("seasonal_seed_drop_factor");
-    public static final LootContextParam<Integer> VOLUME = create("volume");
+    public static final ContextKey<Species> SPECIES = create("species");
+    public static final ContextKey<Integer> FERTILITY = create("fertility");
+    public static final ContextKey<Float> SEASONAL_SEED_DROP_FACTOR = create("seasonal_seed_drop_factor");
+    public static final ContextKey<Integer> VOLUME = create("volume");
 
-    private static <T> LootContextParam<T> create(String path) {
-        return new LootContextParam<>(DynamicTrees.location(path));
+    private static <T> ContextKey<T> create(String path) {
+        return new ContextKey<>(DynamicTrees.location(path));
     }
 
     /** Invoked to initialise static fields. */

@@ -20,7 +20,6 @@ public final class EnumDeserializer<T extends Enum<T>> implements JsonDeserializ
         this.enumType = enumType;
     }
 
-    @Override
     public Result<T, JsonElement> deserialize(JsonElement jsonElement) {
         return JsonDeserializers.STRING.deserialize(jsonElement).map(enumStr -> Enum.valueOf(enumType, enumStr.toUpperCase(Locale.ENGLISH)),
                 "Couldn't get enum " + this.enumType + " from value '{previous_value}'.");

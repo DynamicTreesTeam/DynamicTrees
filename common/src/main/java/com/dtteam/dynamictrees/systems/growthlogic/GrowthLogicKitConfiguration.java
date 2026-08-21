@@ -18,7 +18,6 @@ public final class GrowthLogicKitConfiguration extends Configuration<GrowthLogic
         super(configurable);
     }
 
-    @Override
     public GrowthLogicKitConfiguration copy() {
         final GrowthLogicKitConfiguration duplicateLogicKit = new GrowthLogicKitConfiguration(this.configurable);
         duplicateLogicKit.properties.putAll(this.properties);

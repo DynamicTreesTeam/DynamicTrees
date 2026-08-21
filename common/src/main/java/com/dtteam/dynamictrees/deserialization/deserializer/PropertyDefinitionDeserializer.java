@@ -14,7 +14,6 @@ import java.util.function.Consumer;
  */
 public final class PropertyDefinitionDeserializer implements JsonDeserializer<PropertyDefinition<?>> {
 
-    @Override
     public Result<PropertyDefinition<?>, JsonElement> deserialize(JsonElement input) {
         return JsonDeserializers.JSON_OBJECT.deserialize(input)
                 .map(this::deserializeDefinition);

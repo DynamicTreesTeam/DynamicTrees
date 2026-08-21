@@ -29,27 +29,22 @@ public class CellKits {
 
         private final BasicSolver deciduousSolver = new BasicSolver(new short[]{0x0514, 0x0423, 0x0322, 0x0411, 0x0311, 0x0211});
 
-        @Override
         public Cell getCellForLeaves(int hydro) {
             return normalCells[hydro];
         }
 
-        @Override
         public Cell getCellForBranch(int radius, int meta) {
             return radius == 1 ? branchCell : CellNull.NULL_CELL;
         }
 
-        @Override
         public SimpleVoxmap getLeafCluster() {
             return LeafClusters.DECIDUOUS;
         }
 
-        @Override
         public CellSolver getCellSolver() {
             return deciduousSolver;
         }
 
-        @Override
         public int getDefaultHydration() {
             return 4;
         }
@@ -74,12 +69,10 @@ public class CellKits {
 
         private final BasicSolver coniferSolver = new BasicSolver(new short[]{0x0514, 0x0413, 0x0312, 0x0211});
 
-        @Override
         public Cell getCellForLeaves(int hydro) {
             return coniferLeafCells[hydro];
         }
 
-        @Override
         public Cell getCellForBranch(int radius, int meta) {
             if (meta == MetadataCell.TOP_BRANCH) {
                 return coniferTopBranch;
@@ -90,17 +83,14 @@ public class CellKits {
             }
         }
 
-        @Override
         public SimpleVoxmap getLeafCluster() {
             return LeafClusters.CONIFER;
         }
 
-        @Override
         public CellSolver getCellSolver() {
             return coniferSolver;
         }
 
-        @Override
         public int getDefaultHydration() {
             return 4;
         }
@@ -110,14 +100,12 @@ public class CellKits {
     public static final CellKit ACACIA = new CellKit(DynamicTrees.location("acacia")) {
 
         private final Cell acaciaBranch = new Cell() {
-            @Override
             public int getValue() {
                 return 5;
             }
 
             final int[] map = {0, 3, 5, 5, 5, 5};
 
-            @Override
             public int getValueFromSide(Direction side) {
                 return map[side.ordinal()];
             }
@@ -137,27 +125,22 @@ public class CellKits {
 
         private final BasicSolver acaciaSolver = new BasicSolver(new short[]{0x0514, 0x0423, 0x0412, 0x0312, 0x0211});
 
-        @Override
         public Cell getCellForLeaves(int hydro) {
             return acaciaLeafCells[hydro];
         }
 
-        @Override
         public Cell getCellForBranch(int radius, int meta) {
             return radius == 1 ? acaciaBranch : CellNull.NULL_CELL;
         }
 
-        @Override
         public SimpleVoxmap getLeafCluster() {
             return LeafClusters.ACACIA;
         }
 
-        @Override
         public CellSolver getCellSolver() {
             return acaciaSolver;
         }
 
-        @Override
         public int getDefaultHydration() {
             return 4;
         }
@@ -182,27 +165,22 @@ public class CellKits {
 
         private final BasicSolver darkOakSolver = new BasicSolver(new short[]{0x0514, 0x0423, 0x0412, 0x0312, 0x0211});
 
-        @Override
         public Cell getCellForLeaves(int hydro) {
             return darkOakLeafCells[hydro];
         }
 
-        @Override
         public Cell getCellForBranch(int radius, int meta) {
             return radius == 1 ? branchCell : CellNull.NULL_CELL;
         }
 
-        @Override
         public SimpleVoxmap getLeafCluster() {
             return LeafClusters.DARK_OAK;
         }
 
-        @Override
         public CellSolver getCellSolver() {
             return darkOakSolver;
         }
 
-        @Override
         public int getDefaultHydration() {
             return 4;
         }
@@ -213,27 +191,22 @@ public class CellKits {
 
         private final CellSolver solver = new BasicSolver(new short[]{});
 
-        @Override
         public Cell getCellForLeaves(int hydro) {
             return CellNull.NULL_CELL;
         }
 
-        @Override
         public Cell getCellForBranch(int radius, int meta) {
             return CellNull.NULL_CELL;
         }
 
-        @Override
         public SimpleVoxmap getLeafCluster() {
             return LeafClusters.BARE;
         }
 
-        @Override
         public CellSolver getCellSolver() {
             return solver;
         }
 
-        @Override
         public int getDefaultHydration() {
             return 0;
         }
@@ -243,12 +216,10 @@ public class CellKits {
     public static final CellKit PALM = new CellKit(DynamicTrees.location("palm")) {
 
         private final Cell palmBranch = new Cell() {
-            @Override
             public int getValue() {
                 return 5;
             }
 
-            @Override
             public int getValueFromSide(Direction side) {
                 return side == Direction.UP ? getValue() : 0;
             }
@@ -268,27 +239,22 @@ public class CellKits {
 
         private final BasicSolver palmSolver = new BasicSolver(new short[]{0x0514, 0x0413, 0x0312, 0x0221});
 
-        @Override
         public Cell getCellForLeaves(int hydro) {
             return palmFrondCells[hydro];
         }
 
-        @Override
         public Cell getCellForBranch(int radius, int meta) {
             return palmBranch;
         }
 
-        @Override
         public SimpleVoxmap getLeafCluster() {
             return LeafClusters.PALM;
         }
 
-        @Override
         public CellSolver getCellSolver() {
             return palmSolver;
         }
 
-        @Override
         public int getDefaultHydration() {
             return 4;
         }
@@ -315,12 +281,10 @@ public class CellKits {
 
         private final BasicSolver netherFungusSolver = new BasicSolver(new short[]{0x0817, 0x0726, 0x0635, 0x0513, 0x0312, 0x0211});
 
-        @Override
         public Cell getCellForLeaves(int hydro) {
             return netherCells[hydro];
         }
 
-        @Override
         public Cell getCellForBranch(int radius, int meta) {
             if (radius == 3) {
                 return branchCell;
@@ -330,17 +294,14 @@ public class CellKits {
             return CellNull.NULL_CELL;
         }
 
-        @Override
         public SimpleVoxmap getLeafCluster() {
             return LeafClusters.NETHER_FUNGUS;
         }
 
-        @Override
         public CellSolver getCellSolver() {
             return netherFungusSolver;
         }
 
-        @Override
         public int getDefaultHydration() {
             return 7;
         }
@@ -365,27 +326,22 @@ public class CellKits {
 
         private final BasicSolver deciduousSolver = new BasicSolver(new short[]{0x0513, 0x0322, 0x0311, 0x0211});
 
-        @Override
         public Cell getCellForLeaves(int hydro) {
             return normalCells[hydro];
         }
 
-        @Override
         public Cell getCellForBranch(int radius, int meta) {
             return radius == 1 ? branchCell : CellNull.NULL_CELL;
         }
 
-        @Override
         public SimpleVoxmap getLeafCluster() {
             return LeafClusters.AZALEA;
         }
 
-        @Override
         public CellSolver getCellSolver() {
             return deciduousSolver;
         }
 
-        @Override
         public int getDefaultHydration() {
             return 3;
         }
@@ -426,7 +382,6 @@ public class CellKits {
             this.codes = codes;
         }
 
-        @Override
         public int solve(Cell[] cells) {
             int[] nv = new int[16];//neighbor hydration values
 

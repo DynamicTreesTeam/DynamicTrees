@@ -14,7 +14,7 @@ import com.dtteam.dynamictrees.utility.MathUtils;
 import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
@@ -30,7 +30,6 @@ public abstract class GrowthLogicKit extends ConfigurableRegistryEntry<GrowthLog
             ConfigurationProperty.integer("height_variation");
 
     public static final GrowthLogicKit DEFAULT = new GrowthLogicKit(DynamicTrees.NULL) {
-        @Override
         public GrowthLogicKitConfiguration getDefaultConfiguration() {
             return this.defaultConfiguration;
         }
@@ -42,16 +41,14 @@ public abstract class GrowthLogicKit extends ConfigurableRegistryEntry<GrowthLog
     public static final ConfigurableRegistry<GrowthLogicKit, GrowthLogicKitConfiguration> REGISTRY =
             new ConfigurableRegistry<>(GrowthLogicKit.class, DEFAULT, GrowthLogicKitConfiguration.TEMPLATES);
 
-    public GrowthLogicKit(final ResourceLocation registryName) {
+    public GrowthLogicKit(final Identifier registryName) {
         super(registryName);
     }
 
-    @Override
     protected GrowthLogicKitConfiguration createDefaultConfiguration() {
         return new GrowthLogicKitConfiguration(this);
     }
 
-    @Override
     protected void registerProperties() {
     }
 
@@ -162,7 +159,7 @@ public abstract class GrowthLogicKit extends ConfigurableRegistryEntry<GrowthLog
         return findGrowthLogicKit(ResourceLocationUtils.parseDTLocation(name));
     }
 
-    public static GrowthLogicKit findGrowthLogicKit(final ResourceLocation name) {
+    public static GrowthLogicKit findGrowthLogicKit(final Identifier name) {
         return GrowthLogicKit.REGISTRY.get(name);
     }
 

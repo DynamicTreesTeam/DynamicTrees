@@ -28,12 +28,10 @@ public class FindEndsNode implements NodeInspector {
         last = BlockPos.ZERO;
     }
 
-    @Override
     public boolean run(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
         return true;
     }
 
-    @Override
     public boolean returnRun(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
 
         //Okay.. so.. a little explanation. If we are only one block away from the last block we returned from then we can't be on an end

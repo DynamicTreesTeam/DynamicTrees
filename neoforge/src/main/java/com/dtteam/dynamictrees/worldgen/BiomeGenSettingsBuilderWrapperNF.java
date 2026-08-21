@@ -3,13 +3,12 @@ package com.dtteam.dynamictrees.worldgen;
 import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.levelgen.GenerationStep;
-import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.neoforged.neoforge.common.world.BiomeGenerationSettingsBuilder;
 
 import java.util.List;
 
-public class BiomeGenSettingsBuilderWrapperNF extends BiomeGenSettingsBuilderWrapper{
+public class BiomeGenSettingsBuilderWrapperNF extends BiomeGenSettingsBuilderWrapper {
 
     private final BiomeGenerationSettingsBuilder settingsBuilder;
 
@@ -27,8 +26,4 @@ public class BiomeGenSettingsBuilderWrapperNF extends BiomeGenSettingsBuilderWra
         return settingsBuilder.getFeatures(stage);
     }
 
-    @Override
-    public List<Holder<ConfiguredWorldCarver<?>>> getCarvers(GenerationStep.Carving stage) {
-        return settingsBuilder.getCarvers(stage);
-    }
 }

@@ -6,6 +6,7 @@ import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.Generator;
 import com.dtteam.dynamictrees.data.provider.DTBlockStateProvider;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 
 import java.util.Objects;
@@ -20,18 +21,21 @@ public class SoilStateGenerator implements Generator<DTDataProvider.BlockState, 
 
     @Override
     public void generate(DTDataProvider.BlockState prov, SoilProperties input, Dependencies dependencies) {
-        if (prov instanceof DTBlockStateProvider provider){
-            provider.getMultipartBuilder(dependencies.get(SOIL))
-                    .part().modelFile(provider.models().getExistingFile(
-                            input.getModelPath(SoilProperties.SOIL_BLOCK).orElse(provider.block(Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(dependencies.get(PRIMITIVE_SOIL)))))
-                    )).addModel().end()
-                    .part().modelFile(provider.models().getExistingFile(input.getRootsOverlayModelLocation())).addModel().end();
+        if (!(prov instanceof DTBlockStateProvider provider)) {
+            return;
         }
+        Identifier soilModel = input.getModelPath(SoilProperties.SOIL_BLOCK).orElse(
+                provider.block(Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(dependencies.get(PRIMITIVE_SOIL))))
+        );
+        provider.multipart(dependencies.get(SOIL))
+                .part(soilModel).end()
+                .part(input.getRootsOverlayModelLocation()).end()
+                .finish();
     }
 
     @Override
     public boolean verifyInput(SoilProperties input) {
-        return input.shouldGenerateBlock(); // Don't create states for substitutes as they use another soil's block.
+        return input.shouldGenerateBlock();
     }
 
     @Override

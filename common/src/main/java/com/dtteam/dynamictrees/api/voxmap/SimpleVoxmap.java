@@ -321,7 +321,6 @@ public class SimpleVoxmap {
     public Iterable<VoxmapCell> getAllNonZeroCells(final byte mask) {
 
         return new Iterable<VoxmapCell>() {
-            @Override
             public Iterator<VoxmapCell> iterator() {
                 return new AbstractIterator<VoxmapCell>() {
                     private int x = -1;
@@ -331,7 +330,6 @@ public class SimpleVoxmap {
                     private final VoxmapCell workingCell = new VoxmapCell();
                     private final BlockPos.MutableBlockPos dPos = workingCell.getPos();
 
-                    @Override
                     protected VoxmapCell computeNext() {
 
                         main:
@@ -384,7 +382,6 @@ public class SimpleVoxmap {
     public Iterable<BlockPos.MutableBlockPos> getAllNonZero(final byte mask) {
 
         return new Iterable<BlockPos.MutableBlockPos>() {
-            @Override
             public Iterator<BlockPos.MutableBlockPos> iterator() {
                 return new AbstractIterator<BlockPos.MutableBlockPos>() {
                     private int x = -1;
@@ -394,7 +391,6 @@ public class SimpleVoxmap {
                     private boolean yclean;
                     private final BlockPos.MutableBlockPos dPos = new BlockPos.MutableBlockPos();
 
-                    @Override
                     protected BlockPos.MutableBlockPos computeNext() {
 
                         main:
@@ -449,7 +445,6 @@ public class SimpleVoxmap {
     public Iterable<BlockPos.MutableBlockPos> getTops() {
 
         return new Iterable<>() {
-            @Override
             public Iterator<BlockPos.MutableBlockPos> iterator() {
                 return new AbstractIterator<>() {
                     private int x = -1;
@@ -465,7 +460,6 @@ public class SimpleVoxmap {
                         return yi;
                     }
 
-                    @Override
                     protected BlockPos.MutableBlockPos computeNext() {
 
                         while (true) {

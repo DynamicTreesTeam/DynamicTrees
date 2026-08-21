@@ -14,7 +14,7 @@ import com.dtteam.dynamictrees.deserialization.JsonPropertyAppliers;
 import com.dtteam.dynamictrees.treepack.Resettable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 
 import static com.dtteam.dynamictrees.deserialization.JsonHelper.throwIfNotJsonObject;
@@ -50,7 +50,6 @@ public abstract class JsonRegistryResourceLoader<R extends RegistryEntry<R> & Re
     // LOAD
     //////////////////////////////
 
-    @Override
     public void applyOnLoad(ResourceAccessor<JsonElement> resourceAccessor, ResourceManager resourceManager) {
         resourceAccessor.forEach(resource -> {
             try {
@@ -63,7 +62,7 @@ public abstract class JsonRegistryResourceLoader<R extends RegistryEntry<R> & Re
         });
     }
 
-    protected LoadData loadResourceOnLoad(ResourceLocation name, JsonObject json) throws IgnoreThrowable {
+    protected LoadData loadResourceOnLoad(Identifier name, JsonObject json) throws IgnoreThrowable {
         final LoadData loadData = new LoadData(this.loadNewResource(name, json));
         this.applyLoadAppliers(loadData, json);
         return loadData;
@@ -75,7 +74,7 @@ public abstract class JsonRegistryResourceLoader<R extends RegistryEntry<R> & Re
     }
 
     protected void applyLoadAppliers(LoadData loadData, JsonObject json) {
-        final ResourceLocation resourceName = loadData.getResourceName();
+        final Identifier resourceName = loadData.getResourceName();
         this.loadAppliers.applyAll(new JsonMapWrapper(json), loadData.resource)
                 .forEachError(error -> this.logError(resourceName, error))
                 .forEachWarning(warning -> this.logWarning(resourceName, warning));
@@ -85,7 +84,6 @@ public abstract class JsonRegistryResourceLoader<R extends RegistryEntry<R> & Re
     // GATHER DATA
     //////////////////////////////
 
-    @Override
     public void applyOnGatherData(ResourceAccessor<JsonElement> resourceAccessor,
                                   ResourceManager resourceManager) {
         resourceAccessor.forEach(resource -> {
@@ -108,7 +106,7 @@ public abstract class JsonRegistryResourceLoader<R extends RegistryEntry<R> & Re
     }
 
     protected void applyGatherDataAppliers(LoadData loadData, JsonObject json) {
-        final ResourceLocation resourceName = loadData.getResourceName();
+        final Identifier resourceName = loadData.getResourceName();
         this.gatherDataAppliers.applyAll(new JsonMapWrapper(json), loadData.resource)
                 .forEachError(error -> this.logError(resourceName, error))
                 .forEachWarning(warning -> this.logWarning(resourceName, warning));
@@ -118,7 +116,6 @@ public abstract class JsonRegistryResourceLoader<R extends RegistryEntry<R> & Re
     // SETUP
     //////////////////////////////
 
-    @Override
     public void applyOnSetup(ResourceAccessor<JsonElement> resourceAccessor, ResourceManager resourceManager) {
         resourceAccessor.forEach(resource -> {
             try {
@@ -131,7 +128,7 @@ public abstract class JsonRegistryResourceLoader<R extends RegistryEntry<R> & Re
         });
     }
 
-    private LoadData loadResourceOnSetup(ResourceLocation name) throws IgnoreThrowable {
+    private LoadData loadResourceOnSetup(Identifier name) throws IgnoreThrowable {
         final LoadData loadData = new LoadData();
         loadData.wasAlreadyRegistered = this.registry.has(name);
         if (!loadData.wasAlreadyRegistered) {
@@ -142,7 +139,7 @@ public abstract class JsonRegistryResourceLoader<R extends RegistryEntry<R> & Re
     }
 
     protected void applySetupAppliers(JsonObject json, LoadData loadData) {
-        final ResourceLocation resourceName = loadData.getResourceName();
+        final Identifier resourceName = loadData.getResourceName();
         this.setupAppliers.applyAll(new JsonMapWrapper(json), loadData.resource)
                 .forEachError(error -> this.logError(resourceName, error))
                 .forEachWarning(warning -> this.logWarning(resourceName, warning));
@@ -152,7 +149,6 @@ public abstract class JsonRegistryResourceLoader<R extends RegistryEntry<R> & Re
     // RELOAD
     //////////////////////////////
 
-    @Override
     public void applyOnReload(ResourceAccessor<JsonElement> resourceAccessor, ResourceManager resourceManager) {
         this.registry.unlock();
         resourceAccessor.forEach(resource -> {
@@ -167,7 +163,7 @@ public abstract class JsonRegistryResourceLoader<R extends RegistryEntry<R> & Re
         this.registry.lock();
     }
 
-    private LoadData loadResourceOnReload(ResourceLocation name, JsonObject json) throws IgnoreThrowable {
+    private LoadData loadResourceOnReload(Identifier name, JsonObject json) throws IgnoreThrowable {
         final LoadData loadData = this.loadResource(name, json);
         if (loadData.wasAlreadyRegistered) {
             loadData.resource.reset().setPreReloadDefaults();
@@ -185,7 +181,7 @@ public abstract class JsonRegistryResourceLoader<R extends RegistryEntry<R> & Re
     }
 
     private void applyReloadAppliers(LoadData loadData, JsonObject json) {
-        final ResourceLocation resourceName = loadData.getResourceName();
+        final Identifier resourceName = loadData.getResourceName();
         this.reloadAppliers.applyAll(new JsonMapWrapper(json), loadData.resource)
                 .forEachError(error -> this.logError(resourceName, error))
                 .forEachWarning(warning -> this.logWarning(resourceName, warning));
@@ -205,7 +201,7 @@ public abstract class JsonRegistryResourceLoader<R extends RegistryEntry<R> & Re
         return object;
     }
 
-    private LoadData loadResource(ResourceLocation name, JsonObject json) throws IgnoreThrowable {
+    private LoadData loadResource(Identifier name, JsonObject json) throws IgnoreThrowable {
         final LoadData loadData = new LoadData();
         loadData.wasAlreadyRegistered = this.registry.has(name);
 
@@ -217,7 +213,7 @@ public abstract class JsonRegistryResourceLoader<R extends RegistryEntry<R> & Re
         return loadData;
     }
 
-    private R loadNewResource(ResourceLocation name, JsonObject json) throws IgnoreThrowable {
+    private R loadNewResource(Identifier name, JsonObject json) throws IgnoreThrowable {
         final R resource = this.registry.getType(json, name).decode(json);
         // Stop loading this entry (error should have been logged already).
         if (resource == null) {
@@ -235,22 +231,22 @@ public abstract class JsonRegistryResourceLoader<R extends RegistryEntry<R> & Re
         }
     }
 
-    private void logException(ResourceLocation name, ApplicationException e) {
+    private void logException(Identifier name, ApplicationException e) {
         DynamicTrees.LOG.error("Error whilst loading type \"{}\" with name \"{}\".", this.registryName, name, e);
     }
 
     protected void applyCommonAppliers(LoadData loadData, JsonObject json) {
-        final ResourceLocation resourceName = loadData.getResourceName();
+        final Identifier resourceName = loadData.getResourceName();
         this.commonAppliers.applyAll(new JsonMapWrapper(json), loadData.resource)
                 .forEachError(error -> this.logError(resourceName, error))
                 .forEachWarning(warning -> this.logWarning(resourceName, warning));
     }
 
-    protected void logError(ResourceLocation name, String error) {
+    protected void logError(Identifier name, String error) {
         DynamicTrees.LOG.error("Error whilst loading type \"{}\" with name \"{}\": {}", this.registryName, name, error);
     }
 
-    protected void logWarning(ResourceLocation name, String warning) {
+    protected void logWarning(Identifier name, String warning) {
         DynamicTrees.LOG.warn("Warning whilst loading type \"{}\" with name \"{}\": {}", this.registryName, name, warning);
     }
 
@@ -265,7 +261,7 @@ public abstract class JsonRegistryResourceLoader<R extends RegistryEntry<R> & Re
             this.resource = resource;
         }
 
-        public ResourceLocation getResourceName() {
+        public Identifier getResourceName() {
             return this.resource.getRegistryName();
         }
 

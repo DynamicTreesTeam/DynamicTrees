@@ -8,7 +8,6 @@ package com.dtteam.dynamictrees.deserialization.applier;
  */
 public interface VoidApplier<O, V> extends Applier<O, V> {
 
-    @Override
     default PropertyApplierResult apply(final O object, final V value) {
         this.applySuccessful(object, value);
         return PropertyApplierResult.success();

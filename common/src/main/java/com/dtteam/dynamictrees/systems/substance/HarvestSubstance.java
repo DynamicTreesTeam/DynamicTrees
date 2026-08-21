@@ -49,7 +49,6 @@ public class HarvestSubstance implements SubstanceEffect {
         this.ticksPerSpawnAttempt = ticksPerSpawnAttempt;
     }
 
-    @Override
     public boolean apply(Level level, BlockPos rootPos) {
         final BlockState rootState = level.getBlockState(rootPos);
         final SoilBlock soilBlock = TreeHelper.getRooty(rootState);
@@ -98,7 +97,6 @@ public class HarvestSubstance implements SubstanceEffect {
                 this.species.getFruits().stream().map(Fruit::getBlock).anyMatch(block::equals);
     }
 
-    @Override
     public boolean update(Level level, BlockPos rootPos, int deltaTicks, int fertility) {
         if (deltaTicks > this.duration) {
             return false;
@@ -110,13 +108,13 @@ public class HarvestSubstance implements SubstanceEffect {
             return false;
         }
 
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             if (deltaTicks % this.ticksPerParticlePulse == 0) {
                 // Recalculate fruit positions every time in case new fruit spawned.
                 this.recalculateFruitPositions(level, rootPos, soilBlock);
 
                 this.fruitPositions.forEach(fruitPos ->
-                        ParticleHelper.spawnParticles(level, ParticleTypes.EFFECT, fruitPos.getX(), fruitPos.getY(),
+                        ParticleHelper.spawnParticles(level, ParticleTypes.HAPPY_VILLAGER, fruitPos.getX(), fruitPos.getY(),
                                 fruitPos.getZ(), 3, level.getRandom())
                 );
             }
@@ -140,7 +138,7 @@ public class HarvestSubstance implements SubstanceEffect {
 
                     // Force tick for each fruit block - effectively multiplies growth speed.
                     for (int i = 0; i < this.growthPulses; i++) {
-                        ((FruitBlock) block).doTick(state, level, fruitPos, level.random);
+                        ((FruitBlock) block).doTick(state, level, fruitPos, level.getRandom());
                     }
                     return false;
                 });
@@ -168,12 +166,10 @@ public class HarvestSubstance implements SubstanceEffect {
         return true;
     }
 
-    @Override
     public String getName() {
         return "harvest";
     }
 
-    @Override
     public boolean isLingering() {
         return true;
     }

@@ -15,7 +15,6 @@ public class FunctionOperator implements MathOperator {
 		this.function = function;
 	}
 
-	@Override
 	public double apply(MathContext mc) {
 		double a = value.apply(mc);
 		return function.apply(a);

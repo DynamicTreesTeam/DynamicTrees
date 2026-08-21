@@ -11,7 +11,6 @@ public class SimplexNoiseModel implements NoiseModel {
 		this.noise = new SimplexNoise(randomSource);
 	}
 	
-	@Override
 	public double sample(double x, double y, double z) {
 		return noise.getValue(x, y, z);
 	}

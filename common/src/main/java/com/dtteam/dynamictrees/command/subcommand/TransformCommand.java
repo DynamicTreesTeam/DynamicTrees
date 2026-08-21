@@ -24,18 +24,15 @@
 //
 //    private static final Dynamic2CommandExceptionType SPECIES_EQUAL = new Dynamic2CommandExceptionType((toSpecies, fromSpecies) -> Component.translatable("commands.dynamictrees.error.species_equal", darkRed(toSpecies), darkRed(fromSpecies)));
 //
-//    @Override
-//    protected String getName() {
+////    protected String getName() {
 //        return CommandConstants.TRANSFORM;
 //    }
 //
-//    @Override
-//    protected int getPermissionLevel() {
+////    protected int getPermissionLevel() {
 //        return 2;
 //    }
 //
-//    @Override
-//    public ArgumentBuilder<CommandSourceStack, ?> registerArgument() {
+////    public ArgumentBuilder<CommandSourceStack, ?> registerArgument() {
 //        return blockPosArgument().then(transformableSpeciesArgument().executes(context -> executesSuccess(() ->
 //                this.transformSpecies(context.getSource(), rootPosArgument(context), speciesArgument(context)))));
 //    }

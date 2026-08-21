@@ -28,7 +28,8 @@ public class DynamicTreesNeoForge {
     public DynamicTreesNeoForge(IEventBus eventBus, ModContainer container) {
         eventBus.addListener(this::clientSetup);
         eventBus.addListener(this::onCommonSetup);
-        eventBus.addListener(this::gatherData);
+        eventBus.addListener(this::gatherServerData);
+        eventBus.addListener(this::gatherClientData);
 
         container.registerConfig(ModConfig.Type.SERVER, DTConfigs.SERVER_CONFIG);
         container.registerConfig(ModConfig.Type.COMMON, DTConfigs.COMMON_CONFIG);
@@ -52,12 +53,17 @@ public class DynamicTreesNeoForge {
 
     private void onCommonSetup(final FMLCommonSetupEvent event) {
         DynamicTrees.commonSetup();
+        com.dtteam.dynamictrees.compat.DeferredItemStacks.flush();
     }
 
-    private void gatherData(final GatherDataEvent event) {
-        //Generate the tree block and item data
-        Resources.MANAGER.gatherData();
-        GatherDataHelper.gatherAllData(
+    private void gatherServerData(final GatherDataEvent.Server event) {
+        Resources.prepareDatagen();
+        GatherDataHelper.gatherServerData(DynamicTrees.MOD_ID, event);
+    }
+
+    private void gatherClientData(final GatherDataEvent.Client event) {
+        Resources.prepareDatagen();
+        GatherDataHelper.gatherClientData(
                 DynamicTrees.MOD_ID, event,
                 new DTExtraLangGenerator(),
                 SoilProperties.REGISTRY,
@@ -65,11 +71,6 @@ public class DynamicTreesNeoForge {
                 Species.REGISTRY,
                 LeavesProperties.REGISTRY
         );
-        //Generate the feature replacement data
-//        DataGenerator dataGen = event.getGenerator();
-//        dataGen.addProvider(event.includeServer(), new DTDatapackBuiltinEntriesProvider(
-//                dataGen.getPackOutput(), event.getLookupProvider(), Set.of(DynamicTrees.MOD_ID, DynamicTrees.MINECRAFT)
-//        ));
     }
 
 }

@@ -80,6 +80,11 @@ public class DelayedHolderSet<T> implements HolderSet<T> {
         return this.holderSetSupplier.get().spliterator();
     }
 
+    @Override
+    public boolean isBound() {
+        return this.holderSetSupplier.get().isBound();
+    }
+
 //    @Override
 //    public void addInvalidationListener(Runnable runnable) {
 //        this.holderSetSupplier.get().addInvalidationListener(runnable);

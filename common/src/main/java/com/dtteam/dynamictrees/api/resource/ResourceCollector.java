@@ -1,7 +1,7 @@
 package com.dtteam.dynamictrees.api.resource;
 
 import com.google.common.collect.Maps;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -14,7 +14,7 @@ public interface ResourceCollector<R> {
 
     DTResource<R> put(DTResource<R> resource);
 
-    DTResource<R> computeIfAbsent(ResourceLocation key, Supplier<DTResource<R>> resourceSupplier);
+    DTResource<R> computeIfAbsent(Identifier key, Supplier<DTResource<R>> resourceSupplier);
 
     ResourceAccessor<R> createAccessor();
 

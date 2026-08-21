@@ -18,7 +18,6 @@ public class NullJsonResult<T> extends JsonResult<T> {
         super(input, value, error, warnings);
     }
 
-    @Override
     public boolean success() {
         return true;
     }

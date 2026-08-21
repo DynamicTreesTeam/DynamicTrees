@@ -3,17 +3,14 @@ package com.dtteam.dynamictrees.model;
 import com.dtteam.dynamictrees.api.network.BranchDestructionData;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class FallingTreeEntityModel extends EntityModel<FallingTreeEntity> {
+public class FallingTreeEntityModel {
 
     protected final List<TreeQuadData> quads;
     protected final int entityId;
@@ -21,11 +18,9 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeEntity> {
 
     public FallingTreeEntityModel(FallingTreeEntity entity) {
         BranchDestructionData destructionData = entity.getDestroyData();
-        Species species = destructionData.species;
-
-        quads = generateTreeQuads(entity);
-        this.species = species;
-        entityId = entity.getId();
+        this.species = destructionData.species;
+        this.quads = generateTreeQuads(entity);
+        this.entityId = entity.getId();
     }
 
     public List<TreeQuadData> getQuads() {
@@ -36,6 +31,10 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeEntity> {
         return entityId;
     }
 
+    public Species getSpecies() {
+        return species;
+    }
+
     public static int getBrightness(FallingTreeEntity entity) {
         final BranchDestructionData destructionData = entity.getDestroyData();
         final Level world = entity.level();
@@ -44,34 +43,6 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeEntity> {
 
     public List<TreeQuadData> generateTreeQuads(FallingTreeEntity entity) {
         return List.of();
-    }
-
-    @Override
-    public void setupAnim(FallingTreeEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-    }
-
-    @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
-        float r, g, b;
-        for (TreeQuadData treeQuad : getQuads()) {
-            r = 1;
-            g = 1;
-            b = 1;
-            BakedQuad bakedQuad = treeQuad.bakedQuad;
-            if (bakedQuad.isTinted()) {
-                color = (species == null) ? treeQuad.color : species.colorTreeQuads(treeQuad.color, treeQuad);
-                r = (float) (color >> 16 & 255) / 255.0F;
-                g = (float) (color >> 8 & 255) / 255.0F;
-                b = (float) (color & 255) / 255.0F;
-            }
-            if (bakedQuad.isShade()) {
-                float diffuse = 0.8f;
-                r *= diffuse;
-                g *= diffuse;
-                b *= diffuse;
-            }
-            buffer.putBulkData(poseStack.last(), bakedQuad, r, g, b, 1, packedLight, packedOverlay);
-        }
     }
 
     public static List<TreeQuadData> toTreeQuadData(List<BakedQuad> bakedQuads, BlockState state) {

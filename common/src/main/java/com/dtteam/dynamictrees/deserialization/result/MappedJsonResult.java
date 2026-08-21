@@ -32,7 +32,6 @@ public class MappedJsonResult<T> extends JsonResult<T> implements MappedResult<T
      * @return the mapped result
      * @throws NoSuchDeserializerException if the specified {@code type} did not have a registered deserialiser
      */
-    @Override
     public <V> MappedResult<T, JsonElement> elseMapIfType(Class<V> type, Mapper<V, T> mapper) {
         return this.value != null ? map(this.value, this) : super.mapIfType(type, mapper);
     }
@@ -46,7 +45,6 @@ public class MappedJsonResult<T> extends JsonResult<T> implements MappedResult<T
      * @param <V>    the type to map the deserialised value to
      * @return the mapped result
      */
-    @Override
     public <V> MappedResult<T, JsonElement> elseMapIfContains(String key, Class<V> type, Mapper<V, T> mapper) {
         return this.value != null ? map(this.value, this) : super.mapIfContains(key, type, mapper);
     }
@@ -61,7 +59,6 @@ public class MappedJsonResult<T> extends JsonResult<T> implements MappedResult<T
      * @param <V>          the type to map the deserialised value to
      * @return the mapped result
      */
-    @Override
     public <V> MappedResult<T, JsonElement> elseMapIfContains(String key, Class<V> type, Mapper<V, T> mapper,
                                                               T defaultValue) {
         return this.value != null ? map(this.value, this) :
@@ -75,7 +72,6 @@ public class MappedJsonResult<T> extends JsonResult<T> implements MappedResult<T
      * @param invalidError the error message to set if the {@code validator} is not passed
      * @return the mapped result
      */
-    @Override
     public MappedResult<T, JsonElement> elseError(Predicate<T> validator, String invalidError) {
         return validator.test(this.value) ? this : errorneousMap(invalidError.replace("{}", String.valueOf(this.input)), this);
     }

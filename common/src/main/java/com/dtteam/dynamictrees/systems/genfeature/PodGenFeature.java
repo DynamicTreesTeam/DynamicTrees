@@ -12,7 +12,7 @@ import com.dtteam.dynamictrees.systems.season.SeasonHelper;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
@@ -25,16 +25,14 @@ public class PodGenFeature extends GenFeature {
     public static final ConfigurationProperty<Integer> BLOCKS_PER_POD = ConfigurationProperty.integer("blocks_per_pod");
     public static final ConfigurationProperty<Integer> LOWEST_TRUNK_HEIGHT = ConfigurationProperty.integer("lowest_trunk_height");
 
-    public PodGenFeature(ResourceLocation registryName) {
+    public PodGenFeature(Identifier registryName) {
         super(registryName);
     }
 
-    @Override
     protected void registerProperties() {
         this.register(POD, PLACE_CHANCE, FRUITING_RADIUS, BLOCKS_PER_POD, LOWEST_TRUNK_HEIGHT);
     }
 
-    @Override
     protected GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(POD, Pod.NULL)
@@ -44,7 +42,6 @@ public class PodGenFeature extends GenFeature {
                 .with(LOWEST_TRUNK_HEIGHT, 0);
     }
 
-    @Override
     protected boolean postGrow(GenFeatureConfiguration configuration, PostGrowContext context) {
         final LevelAccessor level = context.level();
         final BlockState blockState = level.getBlockState(context.treePos());
@@ -66,7 +63,6 @@ public class PodGenFeature extends GenFeature {
                 && random.nextFloat() <= configuration.get(PLACE_CHANCE);
     }
 
-    @Override
     protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
         if (shouldGenerate(configuration, context.random())) {
             Pod pod = configuration.get(POD);

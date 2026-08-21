@@ -3,13 +3,14 @@ package com.dtteam.dynamictrees.data.generator;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.Generator;
-import com.dtteam.dynamictrees.data.builder.BranchLoaderBuilder;
 import com.dtteam.dynamictrees.data.provider.DTBlockStateProvider;
 import com.dtteam.dynamictrees.tree.family.Family;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @author Harley O'Connor
@@ -21,15 +22,16 @@ public class BranchStateGenerator implements Generator<DTDataProvider.BlockState
 
     @Override
     public void generate(DTDataProvider.BlockState prov, Family input, Dependencies dependencies) {
-        if (prov instanceof DTBlockStateProvider provider) {
-            final BranchBlock branch = dependencies.get(BRANCH);
-            final BranchLoaderBuilder builder = provider.models().getBuilder(
-                    Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(branch)).getPath()
-            ).customLoader(BranchLoaderBuilder.branchBuilders.get(input.getBranchLoader()));
-            Block block = dependencies.get(PRIMITIVE_LOG);
-            input.addBranchTextures(builder::texture, provider.block(BuiltInRegistries.BLOCK.getKey(block)), block);
-            provider.simpleBlock(branch, builder.end());
+        if (!(prov instanceof DTBlockStateProvider provider)) {
+            return;
         }
+        final BranchBlock branch = dependencies.get(BRANCH);
+        final Identifier modelId = provider.blockModelLocation(branch);
+        final Map<String, Identifier> textures = new LinkedHashMap<>();
+        Block block = dependencies.get(PRIMITIVE_LOG);
+        input.addBranchTextures(textures::put, provider.block(BuiltInRegistries.BLOCK.getKey(block)), block);
+        provider.customLoaderModel(modelId, input.getBranchLoader(), textures);
+        provider.simpleBlock(branch, modelId);
     }
 
     @Override

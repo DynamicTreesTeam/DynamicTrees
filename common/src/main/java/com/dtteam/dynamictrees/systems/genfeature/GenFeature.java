@@ -11,7 +11,7 @@ import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
 import com.dtteam.dynamictrees.worldgen.JoCode;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.LevelAccessor;
 import org.apache.commons.lang3.function.TriFunction;
 
@@ -59,11 +59,9 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, G
     ///////////////////////////////////////////
 
     public static final GenFeature NULL = new GenFeature(DynamicTrees.NULL) {
-        @Override
         protected void registerProperties() {
         }
 
-        @Override
         public GenFeatureConfiguration getDefaultConfiguration() {
             return this.defaultConfiguration;
         }
@@ -75,7 +73,7 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, G
     public static final ConfigurableRegistry<GenFeature, GenFeatureConfiguration> REGISTRY =
             new ConfigurableRegistry<>(GenFeature.class, NULL, GenFeatureConfiguration.TEMPLATES);
 
-    public GenFeature(final ResourceLocation registryName) {
+    public GenFeature(final Identifier registryName) {
         super(registryName);
     }
 
@@ -83,7 +81,6 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, G
     // CONFIGURATION                         //
     ///////////////////////////////////////////
 
-    @Override
     protected GenFeatureConfiguration createDefaultConfiguration() {
         return new GenFeatureConfiguration(this);
     }

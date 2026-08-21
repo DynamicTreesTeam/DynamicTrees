@@ -13,3 +13,6 @@ accessible field net/minecraft/commands/synchronization/ArgumentTypeInfos BY_CLA
 
 accessible class net/minecraft/world/inventory/BrewingStandMenu$PotionSlot
 accessible field net/minecraft/client/renderer/texture/SpriteContents originalImage Lcom/mojang/blaze3d/platform/NativeImage;
+accessible class net/minecraft/world/item/CreativeModeTab$Output
+accessible class net/minecraft/world/item/CreativeModeTab$ItemDisplayParameters
+accessible class net/minecraft/world/item/CreativeModeTab$DisplayItemsGenerator

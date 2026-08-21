@@ -3,7 +3,7 @@ package com.dtteam.dynamictrees.block.leaves;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 
@@ -11,7 +11,7 @@ public class ScruffyLeavesProperties extends LeavesProperties {
 
     public static final TypedRegistry.EntryType<LeavesProperties> TYPE = TypedRegistry.newType(ScruffyLeavesProperties::new);
 
-    public ScruffyLeavesProperties(ResourceLocation registryName) {
+    public ScruffyLeavesProperties(Identifier registryName) {
         super(registryName);
     }
 
@@ -25,7 +25,6 @@ public class ScruffyLeavesProperties extends LeavesProperties {
         this.maxHydro = maxHydro;
     }
 
-    @Override
     protected DynamicLeavesBlock createDynamicLeaves(final Block.Properties properties) {
         return new DynamicLeavesBlock(this, properties){
             public int getHydrationLevelFromNeighbors(LevelAccessor level, BlockPos pos, LeavesProperties leavesProperties) {

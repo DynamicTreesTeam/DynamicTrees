@@ -14,7 +14,6 @@ public class IfSpecies implements MathOperator {
 		this.functions = functionArray;
 	}
 	
-	@Override
 	public double apply(MathContext mc) {
 		return mc.species().equals(species) ? functions[0].apply(mc) : functions[1].apply(mc);
 	}

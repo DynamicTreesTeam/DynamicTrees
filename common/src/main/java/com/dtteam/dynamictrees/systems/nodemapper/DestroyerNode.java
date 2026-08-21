@@ -34,7 +34,6 @@ public class DestroyerNode extends FindEndsNode {
         this.player = player;
         return this;
     }
-    @Override
     public boolean run(BlockState state, LevelAccessor accessor, BlockPos pos, @Nullable Direction fromDir) {
         if (BranchConnectables.getConnectionRadiusForBlock(state, accessor, pos, fromDir == null ? null : fromDir.getOpposite()) > 0) {
             if (player != null && accessor instanceof Level level) {
@@ -53,7 +52,6 @@ public class DestroyerNode extends FindEndsNode {
         return super.run(state, accessor, pos, fromDir);
     }
 
-    @Override
     public boolean returnRun(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
         return super.returnRun(state, level, pos, fromDir);
     }

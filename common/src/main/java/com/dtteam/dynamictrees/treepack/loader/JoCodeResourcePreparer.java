@@ -18,7 +18,6 @@ public final class JoCodeResourcePreparer extends TextResourcePreparer {
         super(folder);
     }
 
-    @Override
     protected void offerLine(List<String> lines, String line) {
         if (this.shouldAddLine(line)) {
             lines.add(this.processLine(line));

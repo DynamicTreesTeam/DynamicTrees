@@ -18,13 +18,13 @@ public class LeavesStateGenerator implements Generator<DTDataProvider.BlockState
 
     @Override
     public void generate(DTDataProvider.BlockState prov, LeavesProperties input, Dependencies dependencies) {
-        if (prov instanceof DTBlockStateProvider provider){
-            provider.simpleBlock(dependencies.get(LEAVES), provider.models().getExistingFile(
-                    input.getModelPath(LeavesProperties.LEAVES).orElse(
-                            provider.block(BuiltInRegistries.BLOCK.getKey(dependencies.get(PRIMITIVE_LEAVES)))
-                    )
-            ));
+        if (!(prov instanceof DTBlockStateProvider provider)) {
+            return;
         }
+        provider.simpleBlock(dependencies.get(LEAVES),
+                input.getModelPath(LeavesProperties.LEAVES).orElse(
+                        provider.block(BuiltInRegistries.BLOCK.getKey(dependencies.get(PRIMITIVE_LEAVES)))
+                ));
     }
 
     @Override

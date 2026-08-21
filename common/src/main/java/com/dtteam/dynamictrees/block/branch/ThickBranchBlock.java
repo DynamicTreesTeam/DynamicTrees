@@ -10,7 +10,7 @@ import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -34,7 +34,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
 
     protected static final VoxelShape[] trunkShapes = new VoxelShape[MAX_RADIUS_THICK];
 
-    public ThickBranchBlock(ResourceLocation name, Properties properties) {
+    public ThickBranchBlock(Identifier name, Properties properties) {
         super(name, properties, RADIUS_DOUBLE, MAX_RADIUS_THICK);
         precomputeTrunkShapes();
     }
@@ -52,7 +52,6 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
         return DTRegistries.TRUNK_SHELL.get();
     }
 
-    @Override
     public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(RADIUS_DOUBLE).add(WATERLOGGED);
     }
@@ -61,7 +60,6 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
     // GROWTH
     ///////////////////////////////////////////
 
-    @Override
     public int getRadius(BlockState state) {
         if (!(state.getBlock() instanceof ThickBranchBlock)) {
             return super.getRadius(state);
@@ -69,7 +67,6 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
         return isSameTree(state) ? Mth.clamp(state.getValue(RADIUS_DOUBLE), 1, getMaxRadius()) : 0;
     }
 
-    @Override
     public int setRadius(LevelAccessor level, BlockPos pos, int radius, @Nullable Direction originDir, int flags) {
         if (this.updateTrunkShells(level, pos, radius, flags)) {
             return super.setRadius(level, pos, radius, originDir, flags);
@@ -77,10 +74,11 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
         return super.setRadius(level, pos, MAX_RADIUS, originDir, flags);
     }
 
-    @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block blockIn, net.minecraft.world.level.redstone.Orientation orientation, boolean isMoving) {
+        BlockPos neighborPos = pos;
+        BlockPos fromPos = pos;
         updateTrunkShells(level, pos, getRadius(state), 6);
-        super.neighborChanged(state, level, pos, blockIn, fromPos, isMoving);
+        super.neighborChanged(state, level, pos, blockIn, orientation, isMoving);
     }
 
     private boolean updateTrunkShells(LevelAccessor level, BlockPos pos, int radius, int flags) {
@@ -121,7 +119,6 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
         return false;
     }
 
-    @Override
     public int getRadiusForConnection(BlockState state, BlockGetter level, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
         if (from instanceof ThickBranchBlock) {
             return getRadius(state);
@@ -129,7 +126,6 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
         return Math.min(getRadius(state), MAX_RADIUS);
     }
 
-    @Override
     protected int getSideConnectionRadius(BlockGetter level, BlockPos pos, int radius, Direction side) {
         final BlockPos deltaPos = pos.relative(side);
         final BlockState blockState = ChunkTreeHelper.getStateSafe(level, deltaPos);
@@ -188,7 +184,6 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
         TREEPART        // This indicates that the block is part of a tree, will NOT be erase, and will NOT prevent the tree from growing.
     }
 
-    @Override
     public int getMaxRadius() {
         return MAX_RADIUS_THICK;
     }
@@ -198,7 +193,6 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
     // PHYSICAL BOUNDS
     ///////////////////////////////////////////
 
-    @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         final int radius = getRadius(state);
         if (radius <= MAX_RADIUS) {
@@ -207,7 +201,6 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
         return trunkShapes[radius-1];
     }
 
-    @Override
     public boolean isMusable(BlockGetter level, BlockState state, BlockPos pos) {
         return getRadius(state) > 8;
     }

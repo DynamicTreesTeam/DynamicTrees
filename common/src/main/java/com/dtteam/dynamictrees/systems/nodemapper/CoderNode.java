@@ -29,7 +29,6 @@ public class CoderNode implements NodeInspector {
         links = new ArrayList<>();
     }
 
-    @Override
     public boolean run(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
         //Branch connectables should not be mapped
         if (BranchConnectables.isBlockConnectable(level.getBlockState(pos).getBlock())) {
@@ -57,7 +56,6 @@ public class CoderNode implements NodeInspector {
         return false;
     }
 
-    @Override
     public boolean returnRun(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
         return false;
     }

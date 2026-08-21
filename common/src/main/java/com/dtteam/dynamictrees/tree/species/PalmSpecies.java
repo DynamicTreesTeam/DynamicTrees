@@ -16,7 +16,7 @@ import com.dtteam.dynamictrees.tree.family.PalmFamily;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.LeavesBlock;
@@ -32,7 +32,7 @@ import java.util.Set;
 public class PalmSpecies extends Species {
     public static final TypedRegistry.EntryType<Species> TYPE = createDefaultType(PalmSpecies::new);
 
-    public PalmSpecies(ResourceLocation name, Family family, LeavesProperties leavesProperties) {
+    public PalmSpecies(Identifier name, Family family, LeavesProperties leavesProperties) {
         super(name, family, leavesProperties);
         if (!(family instanceof PalmFamily)) {
             LogManager.getLogger().warn("Family {} for palm species {} is not of type {}", family.getRegistryName(), getRegistryName(), PalmFamily.class);
@@ -42,7 +42,6 @@ public class PalmSpecies extends Species {
         setGrowthLogicKit(GrowthLogicKits.PALM); //palm growth logic kit by default
     }
 
-    @Override
     public boolean postGrow(Level level, BlockPos rootPos, BlockPos treePos, int fertility, boolean natural) {
         BlockState trunkBlockState = level.getBlockState(treePos);
         BranchBlock branch = TreeHelper.getBranch(trunkBlockState);
@@ -67,7 +66,6 @@ public class PalmSpecies extends Species {
         return super.postGrow(level, rootPos, treePos, fertility, natural);
     }
 
-    @Override
     protected boolean transitionToTree(Level level, BlockPos pos, Family family) {
         family.getBranch().ifPresent(branch -> branch.setRadius(level, pos, family.getPrimaryThickness(), null));
         level.setBlockAndUpdate(pos.above(), getLeavesProperties().getDynamicLeavesState().setValue(DynamicLeavesBlock.DISTANCE, 4));//Place 2 leaf blocks on top
@@ -76,7 +74,6 @@ public class PalmSpecies extends Species {
         return true;
     }
 
-    @Override
     public void postGeneration(PostGenerationContext context) {
         final LevelAccessor level = context.level();
 
@@ -98,7 +95,6 @@ public class PalmSpecies extends Species {
     }
 
     @Nullable
-    @Override
     public HashMap<BlockPos, BlockState> getFellingLeavesClusters(BranchDestructionData destructionData) {
 
         int endPointsNum = destructionData.getNumEndpoints();

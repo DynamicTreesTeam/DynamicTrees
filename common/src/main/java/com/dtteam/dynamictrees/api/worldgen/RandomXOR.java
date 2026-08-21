@@ -29,7 +29,6 @@ public class RandomXOR extends ThreadSafeLegacyRandomSource implements Serializa
         this.xor = xor;
     }
 
-    @Override
     public int next(int bits) {
         return super.next(bits) ^ (xor & ((1 << bits) - 1));
     }

@@ -6,7 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -32,34 +32,25 @@ public class SpeciesBlockEntity extends BlockEntity {
         this.setChanged();
     }
 
-    @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        if (tag.contains("species")) {
-            ResourceLocation speciesName = ResourceLocation.parse(tag.getString("species"));
-            species = Species.findSpecies(speciesName);
-        }
-        super.loadAdditional(tag, registries);
+    protected void loadAdditional(net.minecraft.world.level.storage.ValueInput input) {
+        super.loadAdditional(input);
     }
 
-    @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        tag.putString("species", species.getRegistryName().toString());
+    protected void saveAdditional(net.minecraft.world.level.storage.ValueOutput output) {
+        super.saveAdditional(output);
     }
 
-    @Override
     public ClientboundBlockEntityDataPacket getUpdatePacket() {
         return ClientboundBlockEntityDataPacket.create(this);
     }
 
-    @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag tag = super.getUpdateTag(registries);
-        this.saveAdditional(tag, registries);
+        // saveAdditional now uses ValueOutput
         return tag;
     }
 
-    //    @Override
-//    public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet) {
+    ////    public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet) {
 //        load(packet.getTag());
 //    }
 //

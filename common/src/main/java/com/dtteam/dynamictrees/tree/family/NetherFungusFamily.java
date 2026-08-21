@@ -8,7 +8,7 @@ import com.dtteam.dynamictrees.data.tags.DTItemTags;
 import com.dtteam.dynamictrees.tree.species.NetherFungusSpecies;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -25,11 +25,10 @@ public class NetherFungusFamily extends Family {
 
     public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(NetherFungusFamily::new);
 
-    public NetherFungusFamily(ResourceLocation name) {
+    public NetherFungusFamily(Identifier name) {
         super(name);
     }
 
-    @Override
     public void setCommonSpecies(Species species) {
         super.setCommonSpecies(species);
         if (!(species instanceof NetherFungusSpecies)) {
@@ -37,14 +36,12 @@ public class NetherFungusFamily extends Family {
         }
     }
 
-    @Override
     public Family setPreReloadDefaults() {
         this.setPrimaryThickness(3);
         this.setSecondaryThickness(4);
         return this;
     }
 
-    @Override
     public boolean isFireProof() {
         return true;
     }
@@ -53,17 +50,14 @@ public class NetherFungusFamily extends Family {
         return bounds.expand(1).expand(Direction.DOWN, 3);
     }
 
-    @Override
     public List<TagKey<Block>> defaultBranchTags() {
         return Collections.singletonList(DTBlockTags.FUNGUS_BRANCHES);
     }
 
-    @Override
     public List<TagKey<Item>> defaultBranchItemTags() {
         return Collections.singletonList(DTItemTags.FUNGUS_BRANCHES);
     }
 
-    @Override
     public List<TagKey<Block>> defaultStrippedBranchTags() {
         return Collections.singletonList(DTBlockTags.STRIPPED_FUNGUS_BRANCHES);
     }

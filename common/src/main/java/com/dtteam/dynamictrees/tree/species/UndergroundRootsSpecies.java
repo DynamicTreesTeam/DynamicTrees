@@ -19,7 +19,7 @@ import com.dtteam.dynamictrees.worldgen.JoCode;
 import com.dtteam.dynamictrees.worldgen.JoCodeRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -59,7 +59,7 @@ public class UndergroundRootsSpecies extends Species {
         this.updateSoilOnWaterRadius = updateSoilOnWaterRadius;
     }
 
-    public UndergroundRootsSpecies(ResourceLocation name, Family family, LeavesProperties leavesProperties) {
+    public UndergroundRootsSpecies(Identifier name, Family family, LeavesProperties leavesProperties) {
         super(name, family, leavesProperties);
         if (!(family instanceof UndergroundRootsFamily)) {
             throw new RuntimeException("Family " + family.getRegistryName() + " for Underground Roots Species " + getRegistryName() + " is not of type "+ UndergroundRootsFamily.class);
@@ -109,7 +109,6 @@ public class UndergroundRootsSpecies extends Species {
         return false;
     }
 
-    @Override
     public boolean postGrow(Level level, BlockPos soilPos, BlockPos treePos, int fertility, boolean natural) {
         int radius = TreeHelper.getRadius(level, treePos);
         BlockState soilState = level.getBlockState(soilPos);
@@ -162,7 +161,6 @@ public class UndergroundRootsSpecies extends Species {
     // GENERATION
     //////////////////////
 
-    @Override
     public boolean generate(DynamicTreeGenerationContext context) {
         int yOffset = context.random().nextIntBetweenInclusive(minWorldGenHeightOffset, maxWorldGenHeightOffset)
                 - countWaterBlocksBelow(context.level(), context.rootPos(), getAllowedWaterHeightForWorldgen());
@@ -198,7 +196,6 @@ public class UndergroundRootsSpecies extends Species {
         this.rootTapering = rootTapering;
     }
 
-    @Override
     protected GrowSignal sendGrowthSignal(TreePart treeBase, Level level, BlockPos treePos, BlockPos rootPos, Direction defaultDir) {
         GrowSignal treeSignal = super.sendGrowthSignal(treeBase, level, treePos, rootPos, defaultDir);
 
@@ -206,7 +203,7 @@ public class UndergroundRootsSpecies extends Species {
             BlockPos belowPos = rootPos.below();
             BlockState belowState = level.getBlockState(belowPos);
             if (TreeHelper.isBranch(belowState)){
-                GrowSignal rootGrowSignal = new GrowSignal(this, rootPos, getRootEnergy(level, rootPos), level.random, defaultDir.getOpposite());
+                GrowSignal rootGrowSignal = new GrowSignal(this, rootPos, getRootEnergy(level, rootPos), level.getRandom(), defaultDir.getOpposite());
                 return TreeHelper.getTreePart(belowState).growSignal(level, belowPos, rootGrowSignal);
             } else if (isAcceptableSoil(belowState)) {
                 getFamily().getRoots().ifPresent(branch -> branch.setRadius(level, belowPos, family.getPrimaryThickness(), null));

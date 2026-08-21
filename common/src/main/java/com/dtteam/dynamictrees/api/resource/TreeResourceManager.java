@@ -34,7 +34,6 @@ public interface TreeResourceManager extends net.minecraft.server.packs.resource
 
     void addPack(TreeResourcePack pack);
 
-    @Override
     Stream<PackResources> listPacks();
 
 }

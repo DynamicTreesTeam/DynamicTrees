@@ -8,7 +8,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
-import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
+import com.mojang.serialization.MapCodec;
 
 /**
  * @author Harley O'Connor
@@ -26,14 +26,12 @@ public final class SpeciesMatches implements LootItemCondition {
         this.regex = regex;
     }
 
-    @Override
-    public LootItemConditionType getType() {
+    public MapCodec<? extends LootItemCondition> codec() {
         return DTRegistries.SPECIES_MATCHES.get();
     }
 
-    @Override
     public boolean test(LootContext context) {
-        final Species species = context.getParamOrNull(DTLootContextParams.SPECIES);
+        final Species species = context.getOptionalParameter(DTLootContextParams.SPECIES);
         assert species != null;
         return String.valueOf(species.getRegistryName()).matches(regex);
     }

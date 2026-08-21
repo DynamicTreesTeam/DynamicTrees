@@ -22,7 +22,6 @@ import java.util.Locale;
  */
 public final class VoxelShapeDeserializer implements JsonDeserializer<VoxelShape> {
 
-    @Override
     public Result<VoxelShape, JsonElement> deserialize(JsonElement input) {
         return JsonResult.forInput(input)
                 .mapIfType(String.class, name ->

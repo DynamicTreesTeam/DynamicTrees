@@ -1,5 +1,7 @@
 package com.dtteam.dynamictrees.block.soil;
 
+import net.minecraft.world.level.LevelReader;
+
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.network.BranchDestructionData;
 import com.dtteam.dynamictrees.api.network.MapSignal;
@@ -23,7 +25,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
@@ -57,7 +59,7 @@ public class AerialRootsSoilProperties extends SoilProperties {
     public static final TypedRegistry.EntryType<SoilProperties> TYPE = TypedRegistry.newType(AerialRootsSoilProperties::new);
 
     protected UndergroundRootsFamily family;
-    public AerialRootsSoilProperties(final ResourceLocation registryName) {
+    public AerialRootsSoilProperties(final Identifier registryName) {
         super(registryName);
         this.soilStateGenerator.reset(blockStateGenerators.get(DynamicTrees.location("aerial_root_soil")));
     }
@@ -70,12 +72,10 @@ public class AerialRootsSoilProperties extends SoilProperties {
         return family;
     }
 
-    @Override
     protected SoilBlock createBlock(BlockBehaviour.Properties blockProperties) {
         return new RootSoilBlock(this, blockProperties);
     }
 
-    @Override
     public BlockState getSoilState(BlockState primitiveSoilState, int fertility, boolean requireTileEntity){
         BlockState rootyState = super.getSoilState(primitiveSoilState, fertility, requireTileEntity);
         if (rootyState.getBlock() instanceof RootSoilBlock){
@@ -98,43 +98,36 @@ public class AerialRootsSoilProperties extends SoilProperties {
             soilBlockDecayer = (level, rootPos, rootyState, species) -> true;
         }
 
-        @Override
         public BlockState GetStateFromIndex(int index){
             if (index <= MAX_RADIUS && index >= MIN_RADIUS)
                 return defaultBlockState().setValue(RADIUS, index);
             return defaultBlockState();
         }
 
-        @Override
         public int getStateIndex(BlockState state){
             if (!state.hasProperty(RADIUS)) return 0;
             return state.getValue(RADIUS);
         }
 
-        @Override
         public AerialRootsSoilProperties getSoilProperties() {
             return (AerialRootsSoilProperties) super.getSoilProperties();
         }
 
-        @Override
         protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
             super.createBlockStateDefinition(builder.add(RADIUS, WATERLOGGED));
         }
 
-        @Override
         public FluidState getFluidState(BlockState state) {
             return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
         }
 
-        @Override
-        public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor level, BlockPos currentPos, BlockPos facingPos) {
+        public BlockState updateShape(BlockState stateIn, LevelReader level, net.minecraft.world.level.ScheduledTickAccess ticks, BlockPos currentPos, Direction facing, BlockPos facingPos, BlockState facingState, RandomSource random) {
             if (stateIn.getValue(WATERLOGGED)) {
-                level.scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+                ticks.scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
             }
-            return super.updateShape(stateIn, facing, facingState, level, currentPos, facingPos);
+            return super.updateShape(stateIn, level, ticks, currentPos, facing, facingPos, facingState, random);
         }
 
-        @Override
         public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
             BlockState up = level.getBlockState(pos.above());
             float hardness = 2.0f;
@@ -144,28 +137,23 @@ public class AerialRootsSoilProperties extends SoilProperties {
             return (float)(hardness * DTConfigs.SERVER.rootyBlockHardnessMultiplier.get());
         }
 
-        @Override
         public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
             int radius = state.getValue(RADIUS);
             return Block.box(8-radius,0,8-radius,radius+8,16,radius+8);
         }
 
-        @Override
         protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
             return getShape(state, level, pos, context);
         }
 
-        @Override
         protected VoxelShape getVisualShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
             return getShape(state, level, pos, context);
         }
 
-        @Override
         protected VoxelShape getBlockSupportShape(BlockState state, BlockGetter level, BlockPos pos) {
             return getShape(state, level, pos, CollisionContext.empty());
         }
 
-        @Override
         public int getRadius(BlockState state) {
             return state.getValue(RADIUS);
         }
@@ -179,7 +167,6 @@ public class AerialRootsSoilProperties extends SoilProperties {
             return node.getStable().isEmpty();
         }
 
-        @Override
         public boolean fallWithTree(BlockState state, Level level, BlockPos pos, boolean hasRoots) {
             if (hasRoots){
                 //tick would set this to a branch so we set it to air before that happens.
@@ -189,7 +176,6 @@ public class AerialRootsSoilProperties extends SoilProperties {
             return false;
         }
 
-        @Override
         protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
             if (!state.is(this)) return;
 
@@ -202,13 +188,12 @@ public class AerialRootsSoilProperties extends SoilProperties {
             super.tick(level.getBlockState(pos), level, pos, random);
         }
 
-        @Override
         public void updateTree(BlockState rootyState, Level level, BlockPos rootPos, RandomSource random, boolean natural) {
-            int radOld = TreeHelper.getRadius(level, rootPos.offset(getTrunkDirection(level, rootPos).getNormal()));
+            int radOld = TreeHelper.getRadius(level, rootPos.offset(getTrunkDirection(level, rootPos).getUnitVec3i()));
 
             super.updateTree(rootyState, level, rootPos, random, natural);
 
-            int radNew = TreeHelper.getRadius(level, rootPos.offset(getTrunkDirection(level, rootPos).getNormal()));
+            int radNew = TreeHelper.getRadius(level, rootPos.offset(getTrunkDirection(level, rootPos).getUnitVec3i()));
             //If the radius was updated, tick the root block
             if (radOld != radNew) level.scheduleTick(rootPos, this, 1);
         }
@@ -221,7 +206,6 @@ public class AerialRootsSoilProperties extends SoilProperties {
             return Blocks.AIR.defaultBlockState();
         }
 
-        @Override
         public BlockState getDecayBlockState(BlockState state, BlockGetter level, BlockPos pos) {
             BranchBlock branch = getSoilProperties().getFamily().getBranch().orElse(null);
             if (branch == null) return super.getDecayBlockState(state, level, pos);
@@ -234,9 +218,8 @@ public class AerialRootsSoilProperties extends SoilProperties {
             return decay;
         }
 
-        @Override
         public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
-            if (!level.isClientSide)
+            if (!level.isClientSide())
                 this.dropWholeTree(level, pos, player, FallingTreeEntity.DestroyType.HARVEST);
             return level.isClientSide() ? level.setBlock(pos, fluid.createLegacyBlock(), 11) : level.removeBlock(pos, false);
         }
@@ -282,7 +265,6 @@ public class AerialRootsSoilProperties extends SoilProperties {
             }
         }
 
-        @Override
         public int updateRadius (LevelAccessor level, BlockState state, BlockPos pos, int flags, boolean force) {
             if (!(state.getBlock() instanceof RootSoilBlock)) return MAX_RADIUS;
             int upRad = TreeHelper.getRadius(level, pos.above());

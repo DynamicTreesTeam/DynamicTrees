@@ -12,13 +12,10 @@ public final class WaterRootSoilGenerator extends SoilStateGenerator {
 
     @Override
     public void generate(DTDataProvider.BlockState prov, SoilProperties input, Dependencies dependencies) {
-        if (prov instanceof DTBlockStateProvider provider){
-            // TODO: Smart model for water roots.
-            provider.simpleBlock(
-                    dependencies.get(SOIL),
-                    provider.models().getExistingFile(DynamicTrees.location("block/roots_water"))
-            );
+        if (!(prov instanceof DTBlockStateProvider provider)) {
+            return;
         }
+        provider.simpleBlock(dependencies.get(SOIL), DynamicTrees.location("block/roots_water"));
     }
 
     @Override

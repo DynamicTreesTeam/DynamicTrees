@@ -16,7 +16,6 @@ public class LerpOperator implements MathOperator {
 		this.end = functionArray[2];
 	}
 
-	@Override
 	public double apply(MathContext mc) {
 		double d = delta.apply(mc);
 		double s = start.apply(mc);

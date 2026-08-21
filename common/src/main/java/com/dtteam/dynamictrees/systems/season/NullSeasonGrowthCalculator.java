@@ -10,22 +10,18 @@ import com.dtteam.dynamictrees.api.season.SeasonGrowthCalculator;
  */
 public class NullSeasonGrowthCalculator implements SeasonGrowthCalculator {
 
-    @Override
     public float calcGrowthRate(Float seasonValue, ClimateZoneType type) {
         return 1.0f;
     }
 
-    @Override
     public float calcSeedDropRate(Float seasonValue, ClimateZoneType type) {
         return 1.0f;
     }
 
-    @Override
     public float calcFruitProductionRate(Float seasonValue, ClimateZoneType type) {
         return 1.0f;
     }
 
-    @Override
     public Float getPeakFruitProductionSeasonValue(ClimateZoneType type) {
         return null;
     }

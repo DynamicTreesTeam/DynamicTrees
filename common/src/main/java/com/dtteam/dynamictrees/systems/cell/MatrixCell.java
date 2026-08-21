@@ -13,12 +13,10 @@ public class MatrixCell implements Cell {
         this.valMap = valMap;
     }
 
-    @Override
     public int getValue() {
         return value;
     }
 
-    @Override
     public int getValueFromSide(Direction side) {
         return valMap[(side.ordinal() << 3) + value];
     }

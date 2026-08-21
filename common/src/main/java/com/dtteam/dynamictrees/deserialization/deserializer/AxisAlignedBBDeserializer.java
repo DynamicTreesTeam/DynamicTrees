@@ -11,7 +11,6 @@ import net.minecraft.world.phys.AABB;
  */
 public final class AxisAlignedBBDeserializer implements JsonDeserializer<AABB> {
 
-    @Override
     public Result<AABB, JsonElement> deserialize(JsonElement jsonElement) {
         return JsonDeserializers.JSON_ARRAY.deserialize(jsonElement).map((jsonArray, warningConsumer) -> {
             if (jsonArray.size() != 6) {

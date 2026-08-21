@@ -20,7 +20,6 @@ import java.util.function.Consumer;
  */
 public final class SpeciesSelectorDeserializer implements JsonBiomeDatabaseDeserializer<BiomePropertySelectors.SpeciesSelector> {
 
-    @Override
     public Result<BiomePropertySelectors.SpeciesSelector, JsonElement> deserialize(final JsonElement input) {
         return JsonResult.forInput(input)
                 .mapIfType(Species.class, this::readStatic)

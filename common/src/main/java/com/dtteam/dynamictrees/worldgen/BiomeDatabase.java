@@ -10,7 +10,7 @@ import com.google.gson.JsonObject;
 import com.mojang.serialization.DataResult;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.biome.Biome;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,7 +22,7 @@ import java.util.function.Function;
 
 public class BiomeDatabase {
     private final Map<IDTBiomeHolderSet, JsonEntry> jsonEntries = new LinkedHashMap<>();
-    private final Map<ResourceLocation, Entry> entries = new HashMap<>();
+    private final Map<Identifier, Entry> entries = new HashMap<>();
 
     public JsonEntry getJsonEntry(IDTBiomeHolderSet biomes) {
         return this.jsonEntries.computeIfAbsent(biomes, k -> new JsonEntry(this));
@@ -33,7 +33,7 @@ public class BiomeDatabase {
     }
 
     public Entry getEntry(ResourceKey<Biome> biomeKey) {
-        ResourceLocation biomeRegistryName = biomeKey.location();
+        Identifier biomeRegistryName = biomeKey.identifier();
 
         if (this.entries.containsKey(biomeRegistryName))
             return this.entries.get(biomeRegistryName);
@@ -51,7 +51,7 @@ public class BiomeDatabase {
         return entry;
     }
 
-    public Entry getEntry(ResourceLocation biomeResLoc) {
+    public Entry getEntry(Identifier biomeResLoc) {
         return this.entries.get(biomeResLoc);
     }
 
@@ -73,7 +73,7 @@ public class BiomeDatabase {
     }
 
     public interface EntryReader {
-        static DataResult<EntryReader> read(ResourceLocation biomeName) {
+        static DataResult<EntryReader> read(Identifier biomeName) {
             EntryReader entry = BiomeDatabases.getDefault().getEntry(biomeName);
             return DataResult.success(entry);
         }
@@ -123,22 +123,18 @@ public class BiomeDatabase {
         }
 
         @Nullable
-        @Override
         public ResourceKey<Biome> getBiomeKey() {
             return this.biomeKey;
         }
 
-        @Override
         public ChanceSelector getChanceSelector() {
             return chanceSelector;
         }
 
-        @Override
         public DensitySelector getDensitySelector() {
             return densitySelector;
         }
 
-        @Override
         public SpeciesSelector getSpeciesSelector() {
             return speciesSelector;
         }
@@ -200,7 +196,6 @@ public class BiomeDatabase {
             }
         }
 
-        @Override
         public FeatureCancellation getFeatureCancellation() {
             return featureCancellation;
         }
@@ -220,7 +215,6 @@ public class BiomeDatabase {
             this.blacklisted = blacklisted;
         }
 
-        @Override
         public boolean isBlacklisted() {
             return blacklisted;
         }
@@ -233,12 +227,10 @@ public class BiomeDatabase {
             this.heightmap = heightmap;
         }
 
-        @Override
         public float getForestness() {
             return forestness;
         }
 
-        @Override
         public String getHeightmap() {
             return heightmap;
         }
@@ -247,7 +239,6 @@ public class BiomeDatabase {
             this.multipass = multipass;
         }
 
-        @Override
         public Function<Integer, Integer> getMultipass() {
             return multipass;
         }
@@ -326,7 +317,6 @@ public class BiomeDatabase {
             this.caveRootedData = data;
         }
 
-        @Override
         public void reset() {
             super.reset();
             this.caveRootedData = null;
@@ -468,70 +458,59 @@ public class BiomeDatabase {
                 other.caveRootedData = this.caveRootedData;
         }
 
-        @Override
         public void setChanceSelector(ChanceSelector chanceSelector) {
             this.changedChanceSelector = true;
             super.setChanceSelector(chanceSelector);
         }
 
-        @Override
         public void setChanceSelector(ChanceSelector selector, Operation op) {
             this.changedChanceSelector = true;
             this.chanceSelectorOp = op;
             super.setChanceSelector(selector);
         }
 
-        @Override
         public void setDensitySelector(DensitySelector densitySelector) {
             this.changedDensitySelector = true;
             super.setDensitySelector(densitySelector);
         }
 
-        @Override
         public void setDensitySelector(DensitySelector selector, Operation op) {
             this.changedDensitySelector = true;
             this.densitySelectorOp = op;
             super.setDensitySelector(selector);
         }
 
-        @Override
         public void setSpeciesSelector(SpeciesSelector speciesSelector) {
             this.changedSpeciesSelector = true;
             super.setSpeciesSelector(speciesSelector);
         }
 
-        @Override
         public void setSpeciesSelector(SpeciesSelector selector, Operation op) {
             this.changedSpeciesSelector = true;
             this.speciesSelectorOp = op;
             super.setSpeciesSelector(selector);
         }
 
-        @Override
         public void setBlacklisted(boolean blacklisted) {
             this.changedBlacklisted = true;
             super.setBlacklisted(blacklisted);
         }
 
-        @Override
         public void setForestness(float forestness) {
             this.changedForestness = true;
             super.setForestness(forestness);
         }
 
-        @Override
         public void setHeightmap(String heightmap) {
             this.changedHeightmap = true;
             super.setHeightmap(heightmap);
         }
 
-        @Override
         public void setMultipass(Function<Integer, Integer> multipass) {
             this.changedMultipass = true;
             super.setMultipass(multipass);
         }
 
-        @Override
         public void setCustomMultipass(JsonObject json) {
             this.changedMultipass = true;
             super.setCustomMultipass(json);

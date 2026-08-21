@@ -18,7 +18,7 @@ import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.ChunkPos;
@@ -46,7 +46,7 @@ public class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> {
 
     public static void setup() {
         concreteBlocks = Arrays.stream(DyeColor.values())
-                .map(color -> BuiltInRegistries.BLOCK.get(ResourceLocation.parse(color.getName() + "_concrete")))
+                .map(color -> BuiltInRegistries.BLOCK.getValue(Identifier.parse(color.getName() + "_concrete")))
                 .toArray(Block[]::new);
     }
 
@@ -54,7 +54,6 @@ public class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> {
         super(NoneFeatureConfiguration.CODEC);
     }
 
-    @Override
     public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> context) {
         LevelContext levelContext = LevelContext.create(context.level());
 
@@ -63,7 +62,7 @@ public class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> {
         }
 
         BiomeDatabase biomeDatabase = BiomeDatabases.getDimensionalOrDefault(levelContext.dimensionName());
-        ChunkPos chunkPos = new ChunkPos(context.origin());
+        ChunkPos chunkPos = ChunkPos.containing(context.origin());
 
         DISC_PROVIDER.getPoissonDiscs(levelContext, chunkPos).forEach(disc ->
                 generateTrees(levelContext, biomeDatabase, disc, context.origin())

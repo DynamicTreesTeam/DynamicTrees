@@ -4,15 +4,14 @@ import com.dtteam.dynamictrees.systems.growthlogic.context.DirectionManipulation
 import com.dtteam.dynamictrees.systems.growthlogic.context.PositionalSpeciesContext;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class DarkOakLogic extends GrowthLogicKit {
 
-    public DarkOakLogic(final ResourceLocation registryName) {
+    public DarkOakLogic(final Identifier registryName) {
         super(registryName);
     }
 
-    @Override
     public int[] populateDirectionProbabilityMap(GrowthLogicKitConfiguration configuration, DirectionManipulationContext context) {
         final int[] probMap = super.populateDirectionProbabilityMap(configuration, context);
         probMap[Direction.UP.get3DDataValue()] = 4;
@@ -57,13 +56,11 @@ public class DarkOakLogic extends GrowthLogicKit {
         return probMap;
     }
 
-    @Override
     public float getEnergy(GrowthLogicKitConfiguration configuration, PositionalSpeciesContext context) {
         return super.getEnergy(configuration, context) *
                 context.species().biomeSuitability(context.level(), context.pos());
     }
 
-    @Override
     public int getLowestBranchHeight(GrowthLogicKitConfiguration configuration, PositionalSpeciesContext context) {
         return (int) (super.getLowestBranchHeight(configuration, context) *
                 context.species().biomeSuitability(context.level(), context.pos()));

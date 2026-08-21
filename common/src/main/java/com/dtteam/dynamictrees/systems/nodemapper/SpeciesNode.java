@@ -13,7 +13,6 @@ public class SpeciesNode implements NodeInspector {
 
     private Species determination = Species.NULL_SPECIES;
 
-    @Override
     public boolean run(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
 
         TreePart treePart = TreeHelper.getTreePart(state);
@@ -33,7 +32,6 @@ public class SpeciesNode implements NodeInspector {
         return true;
     }
 
-    @Override
     public boolean returnRun(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
         return false;
     }

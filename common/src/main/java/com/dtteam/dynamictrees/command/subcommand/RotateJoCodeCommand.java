@@ -13,17 +13,14 @@ import static com.dtteam.dynamictrees.command.CommandConstants.*;
 
 public final class RotateJoCodeCommand extends SubCommand {
 
-    @Override
     protected String getName() {
         return CommandConstants.ROTATE_JO_CODE;
     }
 
-    @Override
     protected int getPermissionLevel() {
         return 0;
     }
 
-    @Override
     public ArgumentBuilder<CommandSourceStack, ?> registerArgument() {
         return stringArgument(JO_CODE, Collections.singleton(DEFAULT_JO_CODE)).then(intArgument(TURNS).suggests(TURNS_SUGGESTIONS))
                 .executes(context -> executesSuccess(() ->

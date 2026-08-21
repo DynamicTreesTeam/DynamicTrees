@@ -10,7 +10,7 @@ import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
@@ -49,16 +49,14 @@ public class BeeNestGenFeature extends GenFeature {
     private static final double RARE_CHANCE = 0.0002D;
     private static final double GROW_CHANCE = 0.001D;
 
-    public BeeNestGenFeature(ResourceLocation registryName) {
+    public BeeNestGenFeature(Identifier registryName) {
         super(registryName);
     }
 
-    @Override
     protected void registerProperties() {
         this.register(NEST_BLOCK, MAX_HEIGHT, CAN_GROW_PREDICATE, WORLD_GEN_CHANCE_FUNCTION, MAX_COUNT);
     }
 
-    @Override
     public GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(NEST_BLOCK, Blocks.BEE_NEST)
@@ -96,7 +94,6 @@ public class BeeNestGenFeature extends GenFeature {
         return false;
     }
 
-    @Override
     protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
         final LevelAccessor world = context.level();
         final BlockPos rootPos = context.pos();
@@ -104,7 +101,6 @@ public class BeeNestGenFeature extends GenFeature {
                 this.placeBeeNestInValidPlace(configuration, world, rootPos, true, context.random());
     }
 
-    @Override
     protected boolean postGrow(GenFeatureConfiguration configuration, PostGrowContext context) {
         if (!context.natural() || !configuration.get(CAN_GROW_PREDICATE).test(context.level(), context.pos().above()) ||
                 context.fertility() == 0) {
@@ -145,7 +141,7 @@ public class BeeNestGenFeature extends GenFeature {
             nestState = nestState.setValue(BeehiveBlock.FACING, faceDir);
         }
         world.setBlock(pos, nestState, 3);
-        world.getBlockEntity(pos, BlockEntityType.BEEHIVE).ifPresent((blockEntity) -> {
+        java.util.Optional.ofNullable(world.getBlockEntity(pos)).filter(be -> be instanceof net.minecraft.world.level.block.entity.BeehiveBlockEntity).map(be -> (net.minecraft.world.level.block.entity.BeehiveBlockEntity) be).ifPresent((blockEntity) -> {
             int j = 2 + random.nextInt(2);
 
             for(int k = 0; k < j; ++k) {

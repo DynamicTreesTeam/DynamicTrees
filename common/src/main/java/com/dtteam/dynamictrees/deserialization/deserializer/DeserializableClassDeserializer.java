@@ -10,7 +10,6 @@ import com.google.gson.JsonElement;
  */
 public final class DeserializableClassDeserializer implements JsonDeserializer<Class<?>> {
 
-    @Override
     public Result<Class<?>, JsonElement> deserialize(JsonElement input) {
         return JsonDeserializers.STRING.deserialize(input)
                 .map(typeString -> JsonDeserializers.getDeserializableClasses().stream()

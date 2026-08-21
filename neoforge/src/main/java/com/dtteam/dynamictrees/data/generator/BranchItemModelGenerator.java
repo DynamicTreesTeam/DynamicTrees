@@ -5,9 +5,12 @@ import com.dtteam.dynamictrees.data.Generator;
 import com.dtteam.dynamictrees.data.provider.DTItemModelProvider;
 import com.dtteam.dynamictrees.tree.family.Family;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.neoforge.client.model.generators.ItemModelBuilder;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @author Harley O'Connor
@@ -19,18 +22,13 @@ public class BranchItemModelGenerator implements Generator<DTDataProvider.ItemMo
 
     @Override
     public void generate(DTDataProvider.ItemModel prov, Family input, Dependencies dependencies) {
-        if (prov instanceof DTItemModelProvider provider){
-            final ItemModelBuilder builder = provider.withExistingParent(
-                    String.valueOf(BuiltInRegistries.ITEM.getKey(dependencies.get(PRIMITIVE_LOG_ITEM))),
-                    input.getBranchItemParentLocation()
-            );
-            Block block = dependencies.get(PRIMITIVE_LOG_BLOCK);
-            input.addBranchTextures(
-                    builder::texture,
-                    provider.block(BuiltInRegistries.BLOCK.getKey(block)),
-                    block
-            );
+        if (!(prov instanceof DTItemModelProvider provider)) {
+            return;
         }
+        final Map<String, Identifier> textures = new LinkedHashMap<>();
+        Block block = dependencies.get(PRIMITIVE_LOG_BLOCK);
+        input.addBranchTextures(textures::put, provider.block(BuiltInRegistries.BLOCK.getKey(block)), block);
+        provider.parentedItemModel(dependencies.get(PRIMITIVE_LOG_ITEM), input.getBranchItemParentLocation(), textures);
     }
 
     @Override

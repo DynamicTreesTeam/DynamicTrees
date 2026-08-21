@@ -24,17 +24,14 @@ public final class RegistrySubCommand<V extends RegistryEntry<V>> extends SubCom
         this.registry = registry;
     }
 
-    @Override
     protected String getName() {
         return this.registry.getName().toLowerCase(Locale.ENGLISH);
     }
 
-    @Override
     protected int getPermissionLevel() {
         return 0;
     }
 
-    @Override
     public ArgumentBuilder<CommandSourceStack, ?> registerArgument() {
         return Commands.literal("list")
                 .executes(context -> executesSuccess(() -> this.listEntries(context.getSource(), false)))

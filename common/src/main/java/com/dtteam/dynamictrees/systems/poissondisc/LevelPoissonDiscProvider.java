@@ -47,7 +47,6 @@ public class LevelPoissonDiscProvider implements PoissonDiscProvider {
         this.debug = debug;
     }
 
-    @Override
     public List<PoissonDisc> getPoissonDiscs(int chunkX, int chunkY, int chunkZ) {
         synchronized (this) {
             this.random.setXOR(new BlockPos(chunkX, chunkY, chunkZ));
@@ -269,17 +268,14 @@ public class LevelPoissonDiscProvider implements PoissonDiscProvider {
         return cSet;
     }
 
-    @Override
     public byte[] getChunkPoissonData(int chunkX, int chunkY, int chunkZ) {
         return this.getChunkDiscSet(chunkX, chunkZ).getDiscData();
     }
 
-    @Override
     public void setChunkPoissonData(int chunkX, int chunkY, int chunkZ, byte[] circleData) {
         this.getChunkDiscSet(chunkX, chunkZ).setDiscData(circleData);
     }
 
-    @Override
     public void unloadChunkPoissonData(int chunkX, int chunkY, int chunkZ) {
         this.chunkDiscs.remove(new ChunkPos(chunkX, chunkZ));
     }

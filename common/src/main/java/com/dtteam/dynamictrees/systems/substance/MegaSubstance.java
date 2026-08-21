@@ -12,7 +12,6 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class MegaSubstance implements SubstanceEffect {
 
-    @Override
     public boolean apply(Level level, BlockPos rootPos) {
 
         BlockState blockState = level.getBlockState(rootPos);
@@ -28,7 +27,7 @@ public class MegaSubstance implements SubstanceEffect {
             dirt = TreeHelper.getRooty(blockState);
 
             if (dirt.getSpecies(blockState, level, rootPos) == megaSpecies) {
-                TreeHelper.treeParticles(level, rootPos, ParticleTypes.DRAGON_BREATH, 8);
+                TreeHelper.treeParticles(level, rootPos, ParticleTypes.HAPPY_VILLAGER, 8);
                 WailaHelper.invalidateWailaPosition();
                 return true;
             }
@@ -37,12 +36,10 @@ public class MegaSubstance implements SubstanceEffect {
         return false;
     }
 
-    @Override
     public String getName() {
         return "mega";
     }
 
-    @Override
     public boolean isLingering() {
         return false;
     }

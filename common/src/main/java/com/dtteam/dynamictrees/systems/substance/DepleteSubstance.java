@@ -11,7 +11,6 @@ public class DepleteSubstance implements SubstanceEffect {
 
     int amount;
 
-    @Override
     public boolean apply(Level level, BlockPos rootPos) {
         final SoilBlock dirt = TreeHelper.getRooty(level.getBlockState(rootPos));
 
@@ -23,7 +22,6 @@ public class DepleteSubstance implements SubstanceEffect {
         return false;
     }
 
-    @Override
     public String getName() {
         return "deplete";
     }
@@ -33,7 +31,6 @@ public class DepleteSubstance implements SubstanceEffect {
         return this;
     }
 
-    @Override
     public boolean isLingering() {
         return false;
     }

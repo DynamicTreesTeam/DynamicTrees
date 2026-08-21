@@ -35,7 +35,7 @@ public class NameRegexMatchHolderSet<T> extends RegexMatchHolderSet<T> {
 
     @Override
     protected Stream<String> getInput(Holder<T> holder) {
-        return holder.unwrapKey().stream().map(key -> key.location().toString());
+        return holder.unwrapKey().stream().map(key -> key.identifier().toString());
     }
 
     @Override

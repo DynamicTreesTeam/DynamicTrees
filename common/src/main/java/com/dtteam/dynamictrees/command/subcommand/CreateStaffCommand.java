@@ -26,12 +26,10 @@ import static com.dtteam.dynamictrees.command.CommandConstants.JO_CODE;
 
 public final class CreateStaffCommand extends SubCommand {
 
-    @Override
     protected String getName() {
         return CommandConstants.CREATE_STAFF;
     }
 
-    @Override
     protected int getPermissionLevel() {
         return 2;
     }
@@ -44,7 +42,6 @@ public final class CreateStaffCommand extends SubCommand {
     private static final boolean DEFAULT_READ_ONLY = false;
     private static final int DEFAULT_MAX_USES = 64;
 
-    @Override
     public ArgumentBuilder<CommandSourceStack, ?> registerArgument() {
         return blockPosArgument()
                 .then(speciesArgument().executes(context -> this.spawnStaff(context.getSource(), blockPosArgument(context), speciesArgument(context),

@@ -15,12 +15,10 @@ public class AnimationHandlers {
     public static final AnimationHandler voidAnimationHandler = new VoidAnimationHandler();
 
     public static final AnimationHandler defaultAnimationHandler = new PhysicsAnimationHandler() {
-        @Override
         public String getName() {
             return "default";
         }
 
-        @Override
         public void initMotion(FallingTreeEntity entity) {
             super.initMotion(entity);
 
@@ -31,12 +29,10 @@ public class AnimationHandlers {
     };
 
     public static final AnimationHandler blastAnimationHandler = new PhysicsAnimationHandler() {
-        @Override
         public String getName() {
             return "blast";
         }
 
-        @Override
         public void initMotion(FallingTreeEntity entity) {
             super.initMotion(entity);
         }

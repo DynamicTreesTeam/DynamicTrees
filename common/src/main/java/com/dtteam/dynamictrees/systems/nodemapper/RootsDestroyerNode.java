@@ -17,7 +17,6 @@ public class RootsDestroyerNode extends FindEndsNode {
         this.family = family;
     }
 
-    @Override
     public boolean run(BlockState state, LevelAccessor level, BlockPos pos, @Nullable Direction fromDir) {
         BranchBlock branch = TreeHelper.getBranch(state);
 
@@ -28,7 +27,6 @@ public class RootsDestroyerNode extends FindEndsNode {
         return super.run(state, level, pos, fromDir);
     }
 
-    @Override
     public boolean returnRun(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
         return super.returnRun(state, level, pos, fromDir);
     }

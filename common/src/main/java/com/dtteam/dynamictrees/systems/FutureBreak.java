@@ -28,7 +28,7 @@ public class FutureBreak {
     }
 
     public static void add(FutureBreak fb) {
-        if (!fb.level.isClientSide) {
+        if (!fb.level.isClientSide()) {
             FUTURE_BREAKS.add(fb);
         }
     }

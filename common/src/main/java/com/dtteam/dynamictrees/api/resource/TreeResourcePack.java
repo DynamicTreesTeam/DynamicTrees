@@ -1,6 +1,6 @@
 package com.dtteam.dynamictrees.api.resource;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.resources.IoSupplier;
 
@@ -14,7 +14,7 @@ import java.util.Set;
  */
 public interface TreeResourcePack extends PackResources {
     @SuppressWarnings("ConstantConditions")
-    default IoSupplier<InputStream> getResource(ResourceLocation location) {
+    default IoSupplier<InputStream> getResource(Identifier location) {
         return this.getResource(null, location);
     }
 
@@ -24,7 +24,7 @@ public interface TreeResourcePack extends PackResources {
     }
 
     @SuppressWarnings("ConstantConditions")
-    default boolean hasResource(ResourceLocation location) {
+    default boolean hasResource(Identifier location) {
         return this.getResource(null, location) != null;
     }
 

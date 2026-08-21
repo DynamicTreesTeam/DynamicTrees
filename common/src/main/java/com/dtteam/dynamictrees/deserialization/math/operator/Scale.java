@@ -18,7 +18,6 @@ public class Scale implements MathOperator {
 		this.noise = Noise.build(NoiseType.LEGACY);
 	}
 	
-	@Override
 	public double apply(MathContext mc) {
 		double noise = this.noise.apply(mc);
 		return switch (parameters.size()) {

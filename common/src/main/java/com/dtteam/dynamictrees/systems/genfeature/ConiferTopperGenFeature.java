@@ -5,7 +5,7 @@ import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.systems.genfeature.context.PostGenerationContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.LevelAccessor;
 
 import java.util.Collections;
@@ -15,22 +15,19 @@ public class ConiferTopperGenFeature extends GenFeature {
 
     public static final ConfigurationProperty<LeavesProperties> LEAVES_PROPERTIES = ConfigurationProperty.property("leaves_properties", LeavesProperties.class);
 
-    public ConiferTopperGenFeature(ResourceLocation registryName) {
+    public ConiferTopperGenFeature(Identifier registryName) {
         super(registryName);
     }
 
-    @Override
     protected void registerProperties() {
         this.register(LEAVES_PROPERTIES);
     }
 
-    @Override
     public GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(LEAVES_PROPERTIES, LeavesProperties.NULL);
     }
 
-    @Override
     protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
         if (context.endPoints().isEmpty()) {
             return false;

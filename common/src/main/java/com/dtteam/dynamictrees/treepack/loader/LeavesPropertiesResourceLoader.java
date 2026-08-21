@@ -14,7 +14,7 @@ import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.apache.logging.log4j.LogManager;
@@ -28,7 +28,6 @@ public final class LeavesPropertiesResourceLoader extends JsonRegistryResourceLo
         super(LeavesProperties.REGISTRY, LEAVES_PROPERTIES);
     }
 
-    @Override
     public void registerAppliers() {
         this.loadAppliers.register("color", String.class, LeavesProperties::setColorString)
                 .register("color", Integer.class, LeavesProperties::setColorNumber);
@@ -39,16 +38,16 @@ public final class LeavesPropertiesResourceLoader extends JsonRegistryResourceLo
                 .register("only_if_loaded",String.class,LeavesProperties::setOnlyIfLoaded)
                 .registerArrayApplier("only_if_loaded",String.class,LeavesProperties::setOnlyIfLoaded)
                 .registerListApplier("seed_drop_chances", Float.class, LeavesProperties::setSeedDropChances)
-                .registerMapApplier("texture_overrides", ResourceLocation.class, LeavesProperties::setTextureOverrides)
-                .registerMapApplier("model_overrides", ResourceLocation.class, LeavesProperties::setModelOverrides)
-                .register("frond_model_loader", PalmLeavesProperties.class, ResourceLocation.class, PalmLeavesProperties::setFrondLoader)
+                .registerMapApplier("texture_overrides", Identifier.class, LeavesProperties::setTextureOverrides)
+                .registerMapApplier("model_overrides", Identifier.class, LeavesProperties::setModelOverrides)
+                .register("frond_model_loader", PalmLeavesProperties.class, Identifier.class, PalmLeavesProperties::setFrondLoader)
                 .registerMapApplier("lang_overrides", String.class, LeavesProperties::setLangOverrides)
                 .register("perishability", LeavesProperties.Perishability.class, LeavesProperties::setPerishability);
 
         // Primitive leaves are needed both client and server (so cannot be done on load).
         this.setupAppliers.register("primitive_leaves", Block.class, LeavesProperties::setPrimitiveLeaves)
-                .register("family", ResourceLocation.class, (leavesProperties, registryName) -> {
-                    final ResourceLocation processedRegName = ResourceLocationUtils.parseDTLocation(registryName);
+                .register("family", Identifier.class, (leavesProperties, registryName) -> {
+                    final Identifier processedRegName = ResourceLocationUtils.parseDTLocation(registryName);
                     Family.REGISTRY.runOnNextLock(Family.REGISTRY.generateIfValidRunnable(
                             processedRegName,
                             leavesProperties::setFamily,
@@ -95,7 +94,6 @@ public final class LeavesPropertiesResourceLoader extends JsonRegistryResourceLo
         return PropertyApplierResult.success();
     }
 
-    @Override
     protected void applyLoadAppliers(JsonRegistryResourceLoader<LeavesProperties>.LoadData loadData, JsonObject json) {
         final LeavesProperties leavesProperties = loadData.getResource();
         this.readCustomBlockRegistryName(leavesProperties, json);

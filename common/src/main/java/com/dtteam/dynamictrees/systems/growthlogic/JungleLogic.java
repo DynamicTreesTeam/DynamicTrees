@@ -6,30 +6,27 @@ import com.dtteam.dynamictrees.systems.growthlogic.context.DirectionSelectionCon
 import com.dtteam.dynamictrees.systems.growthlogic.context.PositionalSpeciesContext;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class JungleLogic extends GrowthLogicKit {
 
     public static final ConfigurationProperty<Integer> CANOPY_HEIGHT = ConfigurationProperty.integer("canopy_height");
     public static final ConfigurationProperty<Integer> BRANCH_OUT_CHANCE = ConfigurationProperty.integer("branch_out_chance");
 
-    public JungleLogic(final ResourceLocation registryName) {
+    public JungleLogic(final Identifier registryName) {
         super(registryName);
     }
 
-    @Override
     protected GrowthLogicKitConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(CANOPY_HEIGHT, 14)
                 .with(BRANCH_OUT_CHANCE, 5);
     }
 
-    @Override
     protected void registerProperties() {
         this.register(CANOPY_HEIGHT, BRANCH_OUT_CHANCE);
     }
 
-    @Override
     public Direction selectNewDirection(GrowthLogicKitConfiguration configuration, DirectionSelectionContext context) {
         final Direction newDir = super.selectNewDirection(configuration, context);
         if (context.signal().isInTrunk() && newDir != Direction.UP) { // Turned out of trunk
@@ -38,7 +35,6 @@ public class JungleLogic extends GrowthLogicKit {
         return newDir;
     }
 
-    @Override
     public int[] populateDirectionProbabilityMap(GrowthLogicKitConfiguration configuration, DirectionManipulationContext context) {
 
         final int[] probMap = super.populateDirectionProbabilityMap(configuration, context);
@@ -69,7 +65,6 @@ public class JungleLogic extends GrowthLogicKit {
     }
 
     //Jungle trees grow taller in suitable biomes
-    @Override
     public float getEnergy(GrowthLogicKitConfiguration configuration, PositionalSpeciesContext context) {
         return super.getEnergy(configuration, context) *
                 context.species().biomeSuitability(context.level(), context.pos());

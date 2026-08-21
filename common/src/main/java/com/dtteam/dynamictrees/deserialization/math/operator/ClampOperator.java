@@ -18,7 +18,6 @@ public class ClampOperator implements MathOperator {
 		this.max = functionArray[2];
 	}
 
-	@Override
 	public double apply(MathContext mc) {
 		double v = value.apply(mc);
 		double mn = min.apply(mc);

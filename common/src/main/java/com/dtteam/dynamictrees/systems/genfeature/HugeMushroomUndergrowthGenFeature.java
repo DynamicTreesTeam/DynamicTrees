@@ -7,7 +7,7 @@ import com.dtteam.dynamictrees.tree.ChunkTreeHelper;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelAccessor;
@@ -25,29 +25,25 @@ public class HugeMushroomUndergrowthGenFeature extends HugeMushroomGenFeature {
     public static final ConfigurationProperty<Integer> MAX_MUSHROOMS = ConfigurationProperty.integer("max_mushrooms");
     public static final ConfigurationProperty<Integer> MAX_ATTEMPTS = ConfigurationProperty.integer("max_attempts");
 
-    public HugeMushroomUndergrowthGenFeature(ResourceLocation registryName) {
+    public HugeMushroomUndergrowthGenFeature(Identifier registryName) {
         super(registryName);
     }
 
-    @Override
     protected void registerProperties() {
         super.registerProperties();
         this.register(MAX_MUSHROOMS, MAX_ATTEMPTS);
     }
 
-    @Override
     protected GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(MAX_MUSHROOMS, 2)
                 .with(MAX_ATTEMPTS, 4);
     }
 
-    @Override
     protected boolean generate(GenFeatureConfiguration configuration, FullGenerationContext context) {
         return false;
     }
 
-    @Override
     protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
         if (context.endPoints().isEmpty() || !context.isWorldGen() || context.radius() < 5) {
             return false;

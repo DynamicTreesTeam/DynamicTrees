@@ -23,7 +23,6 @@ public interface JsonDeserializer<O> extends Deserializer<JsonElement, O> {
      * This implementation assumes this is always valid. Implementing invalid deserializers should override
      * and return {@code false}.
      */
-    @Override
     default boolean deserializeIfValid(JsonElement input, Consumer<Result<O, JsonElement>> consumer) {
         consumer.accept(this.deserialize(input));
         return true;

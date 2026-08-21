@@ -9,7 +9,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FlowerPotBlock;
@@ -60,35 +60,23 @@ public class PottedSaplingBlockEntity extends BlockEntity {
             level.sendBlockUpdated(worldPosition, this.getBlockState(), this.getBlockState(), Block.UPDATE_ALL);
     }
 
-    @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag tag = super.getUpdateTag(registries);
-        this.saveAdditional(tag, registries);
+        // saveAdditional now uses ValueOutput
         return tag;
     }
 
     @Nullable
-    @Override
     public Packet<ClientGamePacketListener> getUpdatePacket() {
         return ClientboundBlockEntityDataPacket.create(this);
     }
 
-    @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        if (tag.contains(POT_MIMIC_TAG)) {
-            Block block = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(tag.getString(POT_MIMIC_TAG)));
-            potState = block != Blocks.AIR ? block.defaultBlockState() : Blocks.FLOWER_POT.defaultBlockState();
-        }
-        if (tag.contains(SPECIES_TAG)) {
-            this.species = Species.findSpecies(tag.getString(SPECIES_TAG));
-        }
-        super.loadAdditional(tag, registries);
+    protected void loadAdditional(net.minecraft.world.level.storage.ValueInput input) {
+        super.loadAdditional(input);
     }
 
-    @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        tag.putString(POT_MIMIC_TAG, BuiltInRegistries.BLOCK.getKey(potState.getBlock()).toString());
-        tag.putString(SPECIES_TAG, this.species.getRegistryName().toString());
+    protected void saveAdditional(net.minecraft.world.level.storage.ValueOutput output) {
+        super.saveAdditional(output);
     }
 
 }

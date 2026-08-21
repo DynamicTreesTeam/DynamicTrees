@@ -18,7 +18,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
@@ -28,14 +28,14 @@ import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
-import snownee.jade.api.ui.IElement;
-import snownee.jade.impl.ui.ElementHelper;
+import snownee.jade.api.ui.Element;
+import snownee.jade.api.ui.JadeUI;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public class WailaBranchHandler implements IBlockComponentProvider {
-    public static final ResourceLocation ID = DynamicTrees.location("branch");
+    public static final Identifier ID = DynamicTrees.location("branch");
 
     private BlockPos lastPos = BlockPos.ZERO;
     private Species lastSpecies = Species.NULL_SPECIES;
@@ -55,17 +55,14 @@ public class WailaBranchHandler implements IBlockComponentProvider {
         BlockPos pos = accessor.getPosition();
         Species species = Species.NULL_SPECIES;
 
-        //Attempt to get species from server via NBT data
         if (nbtData.contains("species")) {
-            species = Species.findSpecies(ResourceLocation.parse(nbtData.getString("species")));
+            species = Species.findSpecies(Identifier.parse(nbtData.getString("species").orElse("")));
         }
 
-        //Attempt to get species by checking if we're still looking at the same block
         if (species == Species.NULL_SPECIES && lastPos.equals(pos)) {
             species = lastSpecies;
         }
 
-        //Attempt to get species from the world as a last resort as the operation can be rather expensive
         if (species == Species.NULL_SPECIES) {
             species = getWailaSpecies(accessor.getLevel(), pos);
         }
@@ -78,7 +75,6 @@ public class WailaBranchHandler implements IBlockComponentProvider {
             lastVolume = getTreeVolume(accessor.getLevel(), pos, species);
         }
 
-        //Update the cached species and position
         lastSpecies = species;
         lastPos = pos;
 
@@ -93,21 +89,23 @@ public class WailaBranchHandler implements IBlockComponentProvider {
 
             ItemStack seedStack = species.getSeedStack(1);
 
-            List<IElement> elements = new LinkedList<>();
-            elements.add(getElement(seedStack)); //adds seed;
+            List<Element> elements = new LinkedList<>();
+            elements.add(getElement(seedStack));
 
-            if (species.hasFruits()){
-                for (Fruit fruit : species.getFruits()){
+            if (species.hasFruits()) {
+                for (Fruit fruit : species.getFruits()) {
                     ItemStack fruitStack = fruit.getItemStack();
-                    if (fruitStack.getItem() != seedStack.getItem())
+                    if (fruitStack.getItem() != seedStack.getItem()) {
                         elements.add(getElement(fruitStack));
+                    }
                 }
             }
-            if (species.hasPods()){
-                for (Pod pod : species.getPods()){
+            if (species.hasPods()) {
+                for (Pod pod : species.getPods()) {
                     ItemStack podStack = pod.getItemStack();
-                    if (podStack.getItem() != seedStack.getItem())
+                    if (podStack.getItem() != seedStack.getItem()) {
                         elements.add(getElement(podStack));
+                    }
                 }
             }
 
@@ -131,7 +129,6 @@ public class WailaBranchHandler implements IBlockComponentProvider {
 
             tooltip.add(elements.removeFirst());
             elements.forEach(tooltip::append);
-            tooltip.add(ElementHelper.INSTANCE.spacer(0, 2));
         }
     }
 
@@ -139,7 +136,6 @@ public class WailaBranchHandler implements IBlockComponentProvider {
         BlockState state = level.getBlockState(pos);
         Block block = state.getBlock();
 
-        //Dereference proxy trunk shell block
         if (block instanceof TrunkShellBlock) {
             ShellMuse muse = ((TrunkShellBlock) block).getMuse(level, pos);
             if (muse != null) {
@@ -150,7 +146,6 @@ public class WailaBranchHandler implements IBlockComponentProvider {
         }
 
         if (block instanceof BranchBlock branch) {
-            // Analyze only part of the tree beyond the break point and calculate it's volume
             NetVolumeNode volumeSum = new NetVolumeNode();
             branch.analyse(state, level, pos, null, new MapSignal(volumeSum));
 
@@ -167,16 +162,15 @@ public class WailaBranchHandler implements IBlockComponentProvider {
         return TreeHelper.getBestGuessSpecies(level, pos);
     }
 
-    private static IElement getElement(ItemStack stack) {
+    private static Element getElement(ItemStack stack) {
         if (!stack.isEmpty()) {
-            return ElementHelper.INSTANCE.item(stack);
-        } else {
-            return ElementHelper.INSTANCE.spacer(0, 0);
+            return JadeUI.smallItem(stack);
         }
+        return JadeUI.spacer(0, 0);
     }
 
     @Override
-    public ResourceLocation getUid() {
+    public Identifier getUid() {
         return ID;
     }
 }

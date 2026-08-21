@@ -10,7 +10,7 @@ import com.dtteam.dynamictrees.deserialization.result.JsonResult;
 import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import org.apache.logging.log4j.LogManager;
@@ -27,10 +27,9 @@ public final class SoilPropertiesResourceLoader extends JsonRegistryResourceLoad
         super(SoilProperties.REGISTRY, SOIL_PROPERTIES);
     }
 
-    @Override
     public void registerAppliers() {
         this.loadAppliers
-                .register("substitute_soil", ResourceLocation.class,
+                .register("substitute_soil", Identifier.class,
                         (soilProperties, registryName) -> {
                             soilProperties.setGenerateBlock(false);
                             registryName = ResourceLocationUtils.parseDTLocation(registryName);
@@ -43,8 +42,8 @@ public final class SoilPropertiesResourceLoader extends JsonRegistryResourceLoad
                 .register("primitive_soil", Block.class, SoilProperties::setPrimitiveSoilBlock)
                 .register("only_if_loaded", String.class, SoilProperties::setOnlyIfLoaded)
                 .registerArrayApplier("only_if_loaded",String.class,SoilProperties::setOnlyIfLoaded)
-                .registerMapApplier("model_overrides", ResourceLocation.class, SoilProperties::setModelOverrides)
-                .registerMapApplier("texture_overrides", ResourceLocation.class, SoilProperties::setTextureOverrides);
+                .registerMapApplier("model_overrides", Identifier.class, SoilProperties::setModelOverrides)
+                .registerMapApplier("texture_overrides", Identifier.class, SoilProperties::setTextureOverrides);
 
         this.setupAppliers
                 .register("primitive_soil", Block.class, SoilProperties::setPrimitiveSoilBlock);
@@ -60,7 +59,7 @@ public final class SoilPropertiesResourceLoader extends JsonRegistryResourceLoad
         super.registerAppliers();
     }
 
-    private static Runnable setSubstituteWarn(final SoilProperties soilProperties, final ResourceLocation registryName) {
+    private static Runnable setSubstituteWarn(final SoilProperties soilProperties, final Identifier registryName) {
         return () -> LOGGER.warn("Could not set soil substitute for \"{}\" as soil with name \"{}\" was not found.", soilProperties, registryName);
     }
 
@@ -83,7 +82,6 @@ public final class SoilPropertiesResourceLoader extends JsonRegistryResourceLoad
                         ));
     }
 
-    @Override
     protected void applyLoadAppliers(LoadData loadData, JsonObject json) {
         this.readCustomBlockRegistryName(loadData.getResource(), json);
         super.applyLoadAppliers(loadData, json);
@@ -101,7 +99,6 @@ public final class SoilPropertiesResourceLoader extends JsonRegistryResourceLoad
                 );
     }
 
-    @Override
     protected void postLoadOnLoad(LoadData loadData, JsonObject json) {
         super.postLoadOnLoad(loadData, json);
         SoilProperties soilProperties = loadData.getResource();

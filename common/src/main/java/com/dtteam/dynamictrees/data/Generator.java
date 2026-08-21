@@ -103,7 +103,6 @@ public interface Generator<P extends DTDataProvider, I> {
             return optional;
         }
 
-        @Override
         public boolean equals(Object other) {
             if (this == other) {
                 return true;
@@ -115,7 +114,6 @@ public interface Generator<P extends DTDataProvider, I> {
             return optional == that.optional && Objects.equals(name, that.name);
         }
 
-        @Override
         public int hashCode() {
             return Objects.hash(name, optional);
         }

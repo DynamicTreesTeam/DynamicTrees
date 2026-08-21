@@ -8,7 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
-import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 
 import java.util.List;
@@ -30,12 +30,10 @@ public final class MultiplyCount extends LootItemConditionalFunction {
         this.multiplier = multiplier;
     }
 
-    @Override
-    public LootItemFunctionType<? extends LootItemConditionalFunction> getType() {
-        return DTRegistries.MULTIPLY_COUNT.get();
+    public MapCodec<? extends LootItemConditionalFunction> codec() {
+        return CODEC;
     }
 
-    @Override
     protected ItemStack run(ItemStack stack, LootContext context) {
         stack.setCount((int) (stack.getCount() * multiplier));
         return stack;

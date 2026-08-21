@@ -103,7 +103,6 @@ public class NetVolumeNode implements NodeInspector {
 
     private final Volume volume = new Volume();//number of voxels(1x1x1 pixels) of wood accumulated from network analysis
 
-    @Override
     public boolean run(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
         if (TreeHelper.isBranch(state)) {
             BranchBlock branchBlock = TreeHelper.getBranch(state);
@@ -113,7 +112,6 @@ public class NetVolumeNode implements NodeInspector {
         return true;
     }
 
-    @Override
     public boolean returnRun(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
         return false;
     }

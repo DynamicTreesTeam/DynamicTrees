@@ -29,7 +29,6 @@ public class GrowthSubstance implements SubstanceEffect {
      	this.fillFertility = fillFertility;
     }
 
-    @Override
     public boolean apply(Level level, BlockPos rootPos) {
         // Don't apply if there is already a growth substance.
         if (LingeringEffectorEntity.treeHasEffectorForEffect(level, rootPos, this)) {
@@ -39,13 +38,12 @@ public class GrowthSubstance implements SubstanceEffect {
         	new FertilizeSubstance().setAmount(15).setDisplayParticles(false).apply(level, rootPos);
 		}
 
-        TreeHelper.treeParticles(level, rootPos, ParticleTypes.EFFECT, 8);
+        TreeHelper.treeParticles(level, rootPos, ParticleTypes.HAPPY_VILLAGER, 8);
         return true;
     }
 
     private int pulseCount;
 
-    @Override
     public boolean update(Level level, BlockPos rootPos, int deltaTicks, int fertility) {
         // Stop when fertility has depleted.
         if (fertility <= 0 || this.pulseCount >= this.pulses) {
@@ -54,7 +52,7 @@ public class GrowthSubstance implements SubstanceEffect {
 
         if (level.isClientSide()) {
             if (deltaTicks % this.ticksPerParticlePulse == 0) {
-                TreeHelper.rootParticles(level, rootPos, Direction.UP, ParticleTypes.EFFECT, 1);
+                TreeHelper.rootParticles(level, rootPos, Direction.UP, ParticleTypes.HAPPY_VILLAGER, 1);
             }
         } else {
             if (deltaTicks % this.ticksPerPulse == 0) {
@@ -66,12 +64,10 @@ public class GrowthSubstance implements SubstanceEffect {
         return true;
     }
 
-    @Override
     public String getName() {
         return "growth";
     }
 
-    @Override
     public boolean isLingering() {
         return true;
     }

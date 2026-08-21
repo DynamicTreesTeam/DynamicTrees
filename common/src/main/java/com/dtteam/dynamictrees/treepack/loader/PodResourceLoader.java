@@ -10,7 +10,7 @@ import com.dtteam.dynamictrees.utility.NullUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -30,7 +30,6 @@ public final class PodResourceLoader extends JsonRegistryResourceLoader<Pod> {
         super(Pod.REGISTRY, PODS);
     }
 
-    @Override
     public void registerAppliers() {
         this.loadAppliers
                 .register("max_age", Integer.class, Pod::setMaxAge)
@@ -41,11 +40,14 @@ public final class PodResourceLoader extends JsonRegistryResourceLoader<Pod> {
 
         // Item is needed on datagen and setup
         this.gatherDataAppliers
-                .register("item_stack", Item.class, (pod, item) -> pod.setItemStack(new ItemStack(item)))
+                .register("item_stack", Item.class, (pod, item) -> {
+                    pod.setDropItem(item);
+                    com.dtteam.dynamictrees.compat.DeferredItemStacks.setWhenBound(pod::setItemStack, item);
+                })
                 .register("drop_count", Integer.class, Pod::setDropCount)
                 .register("min_drop_count", Integer.class, Pod::setMinDropCount)
                 .register("max_drop_count", Integer.class, Pod::setMaxDropCount);
-        this.setupAppliers.register("item_stack", Item.class, (pod, item) -> pod.setItemStack(new ItemStack(item)));
+        this.setupAppliers.register("item_stack", Item.class, (pod, item) -> com.dtteam.dynamictrees.compat.DeferredItemStacks.setWhenBound(pod::setItemStack, item));
 
         this.reloadAppliers
                 .register("item_stack", ItemStack.class, Pod::setItemStack)
@@ -69,7 +71,6 @@ public final class PodResourceLoader extends JsonRegistryResourceLoader<Pod> {
         });
     }
 
-    @Override
     protected void applyLoadAppliers(JsonRegistryResourceLoader<Pod>.LoadData loadData, JsonObject json) {
         super.applyLoadAppliers(loadData, json);
         final JsonObject propertiesJson = getBlockPropertiesJson(json);
@@ -106,7 +107,7 @@ public final class PodResourceLoader extends JsonRegistryResourceLoader<Pod> {
      * using the pod's registry name)
      */
     @Nullable
-    private ResourceLocation getBlockRegistryName(Pod pod, JsonObject json) {
+    private Identifier getBlockRegistryName(Pod pod, JsonObject json) {
         return NullUtils.applyIfNonnull(json.get("block_registry_name"), element ->
                 ResourceLocationDeserializer.create(pod.getRegistryName().getNamespace())
                         .deserialize(element)

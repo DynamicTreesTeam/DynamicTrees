@@ -38,7 +38,7 @@ public class DynamicSaplingBlock extends Block implements BonemealableBlock {
     protected Species species;
 
     public DynamicSaplingBlock(Species species) {
-        super(Properties.of().mapColor(MapColor.PLANT).noCollission().pushReaction(PushReaction.DESTROY).instabreak().sound(SoundType.GRASS).randomTicks().noOcclusion());
+        super(Properties.of().mapColor(MapColor.PLANT).noCollision().pushReaction(PushReaction.DESTROY).instabreak().sound(SoundType.GRASS).randomTicks().noOcclusion());
         this.species = species;
     }
 
@@ -66,7 +66,6 @@ public class DynamicSaplingBlock extends Block implements BonemealableBlock {
         return this.getSpecies().saplingFlammability();
     }
 
-    @Override
     protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         if (this.getSpecies().canSaplingGrowNaturally(level, pos)) {
             this.performBonemeal(level, random, pos, state);
@@ -87,22 +86,18 @@ public class DynamicSaplingBlock extends Block implements BonemealableBlock {
         return level.isEmptyBlock(pos.above()) && species.isAcceptableSoil(level, pos.below(), level.getBlockState(pos.below()));
     }
 
-    @Override
     public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         return canSaplingStay(level, this.getSpecies(), pos);
     }
 
-    @Override
     public boolean isValidBonemealTarget(LevelReader levelReader, BlockPos blockPos, BlockState blockState) {
         return this.getSpecies().canSaplingConsumeBoneMeal(levelReader, blockPos);
     }
 
-    @Override
     public boolean isBonemealSuccess(@NotNull Level level, @NotNull RandomSource rand, @NotNull BlockPos pos, @NotNull BlockState state) {
         return this.getSpecies().canSaplingGrowAfterBoneMeal(level, rand, pos);
     }
 
-    @Override
     public void performBonemeal(@NotNull ServerLevel level, @NotNull RandomSource rand, @NotNull BlockPos pos, @NotNull BlockState state) {
         if (this.canSurvive(state, level, pos)) {
             final Species species = this.getSpecies().selfOrLocationOverride(level, pos);;
@@ -114,7 +109,6 @@ public class DynamicSaplingBlock extends Block implements BonemealableBlock {
         }
     }
 
-    @Override
     protected SoundType getSoundType(BlockState state) {
         return this.getSpecies().getSaplingSound();
     }
@@ -123,8 +117,9 @@ public class DynamicSaplingBlock extends Block implements BonemealableBlock {
     // DROPS
     ///////////////////////////////////////////
 
-    @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block blockIn, net.minecraft.world.level.redstone.Orientation orientation, boolean isMoving) {
+        BlockPos neighborPos = pos;
+        BlockPos fromPos = pos;
         if (!this.canSurvive(state, level, pos)) {
             this.dropBlock(level, state, pos);
         }
@@ -137,17 +132,15 @@ public class DynamicSaplingBlock extends Block implements BonemealableBlock {
         }
     }
 
-    @Override
-    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
         return this.getSpecies().getSeedStack(1);
     }
 
-    @Override
     public List<ItemStack> getDrops(@NotNull BlockState state, @NotNull LootParams.Builder builder) {
         if (!DTConfigs.SERVER.dynamicSaplingDrops.get())
             return Collections.emptyList();
         // If a loot table has been added load those drops instead.
-        LootTable loottable = builder.getLevel().getServer().reloadableRegistries().getLootTable(getLootTable());
+        LootTable loottable = builder.getLevel().getServer().reloadableRegistries().getLootTable(getLootTable().orElseThrow());
         if (loottable == LootTable.EMPTY)
             return Collections.singletonList(this.getSpecies().getSeedStack(1));
 
@@ -158,7 +151,6 @@ public class DynamicSaplingBlock extends Block implements BonemealableBlock {
     // PHYSICAL BOUNDS
     ///////////////////////////////////////////
 
-    @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return this.getSpecies().getSaplingShape();
     }

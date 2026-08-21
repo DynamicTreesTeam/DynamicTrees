@@ -52,7 +52,7 @@ public final class CoordUtils {
             this.name = name;
             BlockPos pos = BlockPos.ZERO;
             for (Direction d : dirs) {
-                pos = pos.offset(d.getNormal());
+                pos = pos.offset(d.getUnitVec3i());
             }
             this.offset = pos;
         }
@@ -162,7 +162,7 @@ public final class CoordUtils {
             return d0 <= d1 ? blockraytraceresult : blockraytraceresult1;
         }, (context1) -> {
             Vec3 vec3d = context1.getStartVector().subtract(context1.getEndVector());
-            return BlockHitResult.miss(context1.getEndVector(), Direction.getNearest(vec3d.x, vec3d.y, vec3d.z), BlockPos.containing(context1.getEndVector()));
+            return BlockHitResult.miss(context1.getEndVector(), Direction.getApproximateNearest(vec3d.x, vec3d.y, vec3d.z), BlockPos.containing(context1.getEndVector()));
         });
     }
 
@@ -305,12 +305,10 @@ public final class CoordUtils {
 
     public static Iterable<BlockPos> goHorSides(final BlockPos pos, @Nullable final Direction ignore) {
         return new Iterable<>() {
-            @Override
             public Iterator<BlockPos> iterator() {
                 return new AbstractIterator<BlockPos>() {
                     private int currentDir = 0;
 
-                    @Override
                     protected BlockPos computeNext() {
                         while (true) {
                             if (currentDir < HORIZONTALS.length) {

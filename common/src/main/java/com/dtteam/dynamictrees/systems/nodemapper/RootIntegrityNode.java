@@ -22,12 +22,10 @@ public class RootIntegrityNode implements NodeInspector {
         this.endPoints = ends;
     }
 
-    @Override
     public boolean run(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
         return false;
     }
 
-    @Override
     public boolean returnRun(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
         if (state.getBlock() instanceof BasicRootsBlock rootsBlock && rootsBlock.isFullBlock(state)){
             endPoints.add(pos);

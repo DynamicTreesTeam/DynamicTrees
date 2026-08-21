@@ -6,8 +6,8 @@ import com.dtteam.dynamictrees.tree.family.Family;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
-import net.neoforged.neoforge.common.data.SpriteSourceProvider;
+import net.minecraft.resources.Identifier;
+import net.neoforged.neoforge.client.data.SpriteSourceProvider;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,32 +18,29 @@ public class DTSpriteSourceProvider extends SpriteSourceProvider {
     private final String modId;
     private final List<Registry<Family>> registries;
 
-    public DTSpriteSourceProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, ExistingFileHelper existingFileHelper,
+    public DTSpriteSourceProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, String modId,
                                   Registry<?>... registries) {
-        super(output, lookupProvider, modId, existingFileHelper);
+        super(output, lookupProvider, modId);
         this.modId = modId;
         this.registries = ImmutableList.copyOf(castToFamilyRegistries(registries));
     }
 
     @SuppressWarnings("unchecked")
-    private List<Registry<Family>> castToFamilyRegistries(Registry<?>... registries){
+    private static List<Registry<Family>> castToFamilyRegistries(Registry<?>... registries) {
         return Arrays.stream(registries)
-                .filter(registry->Family.class.isAssignableFrom(registry.getType()))
-                .map(registry->(Registry<Family>)registry).toList();
+                .filter(registry -> Family.class.isAssignableFrom(registry.getType()))
+                .map(registry -> (Registry<Family>) registry)
+                .toList();
     }
 
     @Override
     protected void gather() {
-        SourceList blockSourceList = atlas(BLOCKS_ATLAS);
+        SourceList blockSourceList = atlas(Identifier.withDefaultNamespace("blocks"));
         this.registries.forEach(registry ->
-                registry.dataGenerationStream(this.modId).forEach(
-                        family -> gatherForFamily(family, blockSourceList)
+                registry.dataGenerationStream(this.modId).forEach(family ->
+                        family.topBranchTextureLocations().forEach(location ->
+                                blockSourceList.addSource(new ThickBranchRingsSource(location)))
                 )
         );
-    }
-
-    private void gatherForFamily(Family family, SourceList atlasList){
-        family.topBranchTextureLocations().forEach(location ->
-                atlasList.addSource(new ThickBranchRingsSource(location)));
     }
 }

@@ -1,5 +1,7 @@
 package com.dtteam.dynamictrees.tree.species;
 
+import net.minecraft.world.level.gamerules.GameRules;
+
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.lazyvalue.LazyValue;
 import com.dtteam.dynamictrees.api.lazyvalue.MutableLazyValue;
@@ -82,10 +84,10 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
+import com.dtteam.dynamictrees.data.tags.TagAppender;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.ReloadableServerRegistries;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -127,52 +129,43 @@ import java.util.stream.Collectors;
 
 public class Species extends RegistryEntry<Species> implements Resettable<Species> {
 
-    public static final HashMap<ResourceLocation, Supplier<Generator<DTDataProvider.BlockState, Species>>> blockStateGenerators = new HashMap<>();
-    public static final HashMap<ResourceLocation, Supplier<Generator<DTDataProvider.ItemModel, Species>>> itemModelGenerators = new HashMap<>();
-    public static final HashMap<ResourceLocation, Supplier<Generator<DTDataProvider.Language, Species>>> languageGenerators = new HashMap<>();
+    public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.BlockState, Species>>> blockStateGenerators = new HashMap<>();
+    public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.ItemModel, Species>>> itemModelGenerators = new HashMap<>();
+    public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.Language, Species>>> languageGenerators = new HashMap<>();
 
     public static final Species NULL_SPECIES = new Species() {
-        @Override
         public Optional<Seed> getSeed() {
             return Optional.empty();
         }
 
-        @Override
         public Family getFamily() {
             return Family.NULL_FAMILY;
         }
 
-        @Override
         public boolean plantSapling(LevelAccessor level, BlockPos pos, boolean locationOverride) {
             return false;
         }
 
-        @Override
         public boolean generate(DynamicTreeGenerationContext context) {
             return false;
         }
 
-        @Override
         public float biomeSuitability(Level level, BlockPos pos) {
             return 0.0f;
         }
 
-        @Override
         public Species setSeed(Supplier<Seed> seedSup) {
             return this;
         }
 
-        @Override
         public ItemStack getSeedStack(int qty) {
             return ItemStack.EMPTY;
         }
 
-        @Override
         public Component getTextComponent() {
             return this.formatComponent(Component.translatable("gui.none"), ChatFormatting.DARK_RED);
         }
 
-        @Override
         public boolean update(Level level, SoilBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, RandomSource random, boolean rapid) {
             return false;
         }
@@ -180,15 +173,15 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     public static final TypedRegistry.EntryType<Species> TYPE = createDefaultType(Species::new);
 
-    public static final Codec<Species> CODEC = ResourceLocation.CODEC.comapFlatMap(Species::read, Species::getRegistryName);
+    public static final Codec<Species> CODEC = Identifier.CODEC.comapFlatMap(Species::read, Species::getRegistryName);
 
-    public static TypedRegistry.EntryType<Species> createDefaultType(final Function3<ResourceLocation, Family, LeavesProperties, Species> constructor) {
+    public static TypedRegistry.EntryType<Species> createDefaultType(final Function3<Identifier, Family, LeavesProperties, Species> constructor) {
         return TypedRegistry.newType(createDefaultCodec(constructor));
     }
 
-    public static Codec<Species> createDefaultCodec(final Function3<ResourceLocation, Family, LeavesProperties, Species> constructor) {
+    public static Codec<Species> createDefaultCodec(final Function3<Identifier, Family, LeavesProperties, Species> constructor) {
         return RecordCodecBuilder.create(instance -> instance
-                .group(ResourceLocation.CODEC.fieldOf(TypedRegistry.RESOURCE_LOCATION.toString())
+                .group(Identifier.CODEC.fieldOf(TypedRegistry.RESOURCE_LOCATION.toString())
                                 .forGetter(Species::getRegistryName),
                         Family.REGISTRY.getGetterCodec().fieldOf("family").forGetter(Species::getFamily),
                         LeavesProperties.REGISTRY.getGetterCodec().optionalFieldOf("leaves_properties",
@@ -196,7 +189,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
                 .apply(instance, constructor));
     }
 
-    private static DataResult<Species> read(ResourceLocation name) {
+    private static DataResult<Species> read(Identifier name) {
         final Species species = Species.REGISTRY.get(name);
         return species == null ? DataResult.error(() -> "Species not found: " + name) : DataResult.success(species);
     }
@@ -322,7 +315,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @param name   The simple name of the species e.g. "oak"
      * @param family The {@link Family} that this species belongs to.
      */
-    public Species(ResourceLocation name, Family family) {
+    public Species(Identifier name, Family family) {
         this(name, family, family.getCommonLeaves());
     }
 
@@ -333,7 +326,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @param leavesProperties The properties of the leaves to be used for this species
      * @param family           The {@link Family} that this species belongs to.
      */
-    public Species(ResourceLocation name, Family family, LeavesProperties leavesProperties) {
+    public Species(Identifier name, Family family, LeavesProperties leavesProperties) {
         this.setRegistryName(name);
         this.setUnlocalizedName(name.toString());
         this.family = family;
@@ -347,7 +340,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      *
      * @return This {@link Species} object for chaining.
      */
-    @Override
     public Species reset() {
         this.fruits.clear();
         this.pods.clear();
@@ -364,7 +356,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * Can be overridden by subclasses for setting defaults for things before reload.
      * @return This {@link Species} object for chaining.
      */
-    @Override
     public Species setPreReloadDefaults() {
         return this.setDefaultGrowingParameters()
                 .setSaplingShape(CommonVoxelShapes.SAPLING)
@@ -377,7 +368,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      *
      * @return This {@link Species} object for chaining.
      */
-    @Override
     public Species setPostReloadDefaults() {
         // If no seed has been set, use the common seed.
         if (!this.hasSeed()) {
@@ -422,7 +412,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return this.unlocalizedName;
     }
 
-    @Override
     public Component getTextComponent() {
         return this.formatComponent(Component.translatable(this.getUnlocalizedName()), ChatFormatting.AQUA);
     }
@@ -559,11 +548,11 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     private String seedName = null;
 
-    public ResourceLocation getSeedName() {
+    public Identifier getSeedName() {
         if (seedName == null) {
             return ResourceLocationUtils.suffix(getRegistryName(), "_seed");
         } else {
-            return ResourceLocation.fromNamespaceAndPath(getRegistryName().getNamespace(), seedName);
+            return Identifier.fromNamespaceAndPath(getRegistryName().getNamespace(), seedName);
         }
     }
 
@@ -600,7 +589,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     //region loot
 
     public List<ItemStack> getVoluntaryDrops(Level level, BlockPos rootPos, int fertility) {
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return Collections.emptyList();
         }
         if (level.getServer() == null) return List.of();
@@ -617,7 +606,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
                 .create(DTLootParameterSets.VOLUNTARY);
     }
 
-    public LootTable getLootTable(ReloadableServerRegistries.Holder lootTables, Function<Species, ResourceLocation> nameFunction) {
+    public LootTable getLootTable(ReloadableServerRegistries.Holder lootTables, Function<Species, Identifier> nameFunction) {
         final LootTable table = lootTables.getLootTable(ResourceKey.create(Registries.LOOT_TABLE, nameFunction.apply(this)));
         return table == LootTable.EMPTY ? (this.isCommonSpecies() ? lootTables.getLootTable(ResourceKey.create(Registries.LOOT_TABLE, nameFunction.apply(getCommonSpecies()))) : LootTable.EMPTY) : table;
     }
@@ -633,7 +622,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public List<ItemStack> getBranchesDrops(Level level, NetVolumeNode.Volume volume,
                                             ItemStack tool, @Nullable Float explosionRadius) {
         processVolume(volume);
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return Collections.emptyList();
         }
         final List<ItemStack> drops = new ArrayList<>();
@@ -719,15 +708,15 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return true if seed was dropped
      */
     public boolean handleVoluntaryDrops(Level level, List<BlockPos> endPoints, BlockPos rootPos, BlockPos treePos, int fertility) {
-        int tickSpeed = level.getGameRules().getInt(GameRules.RULE_RANDOMTICKING);
+        int tickSpeed = ((net.minecraft.server.level.ServerLevel) level).getGameRules().get(GameRules.RANDOM_TICK_SPEED);
         if (tickSpeed > 0) {
             double slowFactor = 3.0 / tickSpeed; //This is to prevent high tick-speeds from spamming the floor with seeds
-            if (level.random.nextDouble() < slowFactor) {
+            if (level.getRandom().nextDouble() < slowFactor) {
                 final List<ItemStack> drops = getVoluntaryDrops(level, rootPos, fertility);
 
                 if (!drops.isEmpty() && !endPoints.isEmpty()) {
                     for (ItemStack drop : drops) {
-                        BlockPos branchPos = endPoints.get(level.random.nextInt(endPoints.size()));
+                        BlockPos branchPos = endPoints.get(level.getRandom().nextInt(endPoints.size()));
                         branchPos = branchPos.above();//We'll aim at the block above the end branch. Helps with Acacia leaf block formations
                         BlockPos itemPos = CoordUtils.getRayTraceFruitPos(level, this, treePos, branchPos, false);
 
@@ -736,7 +725,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
                             Vec3 motion = new Vec3(itemPos.getX(), itemPos.getY(), itemPos.getZ()).subtract(new Vec3(treePos.getX(), treePos.getY(), treePos.getZ()));
                             float distAngle = 15;//The spread angle(center to edge)
                             float launchSpeed = 4;//Blocks(meters) per second
-                            motion = new Vec3(motion.x, 0, motion.y).normalize().yRot((level.random.nextFloat() * distAngle * 2) - distAngle).scale(launchSpeed / 20f);
+                            motion = new Vec3(motion.x, 0, motion.y).normalize().yRot((level.getRandom().nextFloat() * distAngle * 2) - distAngle).scale(launchSpeed / 20f);
                             itemEntity.setDeltaMovement(motion.x, motion.y, motion.z);
                             return level.addFreshEntity(itemEntity);
                         }
@@ -989,11 +978,11 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     private String saplingName = null;
 
     //This is used to load the sapling model
-    public ResourceLocation getSaplingRegName() {
+    public Identifier getSaplingRegName() {
         if (saplingName == null) {
             return ResourceLocationUtils.suffix(this.getRegistryName(), "_sapling");
         } else {
-            return ResourceLocation.fromNamespaceAndPath(getRegistryName().getNamespace(), saplingName);
+            return Identifier.fromNamespaceAndPath(getRegistryName().getNamespace(), saplingName);
         }
     }
 
@@ -1009,7 +998,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         this.tintSapling = tintSapling;
     }
 
-    public int saplingColorMultiplier(BlockState state, BlockAndTintGetter level, BlockPos pos, int tintIndex) {
+    public int saplingColorMultiplier(BlockState state, BlockGetter level, BlockPos pos, int tintIndex) {
         if (tintSapling){
             if (tintIndex == 0)
                 return getLeavesProperties().foliageColorMultiplier(state, level, pos);
@@ -1563,7 +1552,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     protected GrowSignal sendGrowthSignal(TreePart treeBase, Level level, BlockPos treePos, BlockPos rootPos, Direction defaultDir){
-        final GrowSignal signal = new GrowSignal(this, rootPos, getEnergy(level, rootPos), level.random, defaultDir);
+        final GrowSignal signal = new GrowSignal(this, rootPos, getEnergy(level, rootPos), level.getRandom(), defaultDir);
         return treeBase.growSignal(level, treePos, signal);
     }
 
@@ -1938,7 +1927,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         if (effect != null) {
             boolean applied = effect.apply(level, rootPos);
             if (applied && effect.isLingering() && !level.isClientSide()) {
-                LingeringEffectorEntity entity = DTRegistries.LINGERING_EFFECTOR.get().create(level);
+                LingeringEffectorEntity entity = DTRegistries.LINGERING_EFFECTOR.get().create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
                 if (entity != null){
                     entity.setData(level, rootPos, effect);
                     if (entity.isAlive()) {
@@ -2395,25 +2384,22 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
                     DynamicTrees.location("species_lang")
             ));
 
-    @Override
     public void generateStateData(DTDataProvider.BlockState provider) {
         // Generate sapling block state and model.
         this.saplingStateGenerator.get().generate(provider, this);
     }
-    @Override
     public void generateItemModelData(DTDataProvider.ItemModel provider) {
         // Generate seed models.
         this.seedItemModelGenerator.get().generate(provider, this);
     }
-    @Override
     public void generateLangData(DTDataProvider.Language provider) {
         this.speciesLangGenerator.get().generate(provider, this);
     }
 
     protected List<String> onlyIfLoaded = new ArrayList<>();
-    protected HashMap<String, ResourceLocation> textureOverrides = new HashMap<>();
+    protected HashMap<String, Identifier> textureOverrides = new HashMap<>();
     protected HashMap<String, String> langOverrides = new HashMap<>();
-    protected HashMap<String, ResourceLocation> modelOverrides = new HashMap<>();
+    protected HashMap<String, Identifier> modelOverrides = new HashMap<>();
     public static final String SAPLING = "sapling";
     public static final String SEED_PARENT = "seed_parent";
     public static final String SEED = "seed";
@@ -2425,20 +2411,20 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return !onlyIfLoaded.isEmpty();
     }
 
-    public void setModelOverrides(Map<String, ResourceLocation> modelOverrides) {
+    public void setModelOverrides(Map<String, Identifier> modelOverrides) {
         this.modelOverrides.putAll(modelOverrides);
     }
-    public void setTextureOverrides(Map<String, ResourceLocation> textureOverrides) {
+    public void setTextureOverrides(Map<String, Identifier> textureOverrides) {
         this.textureOverrides.putAll(textureOverrides);
     }
     public void setLangOverrides(Map<String, String> textureOverrides) {
         this.langOverrides.putAll(textureOverrides);
     }
 
-    public Optional<ResourceLocation> getModelPath(String key) {
+    public Optional<Identifier> getModelPath(String key) {
         return Optional.ofNullable(modelOverrides.getOrDefault(key, null));
     }
-    public Optional<ResourceLocation> getTexturePath(String key) {
+    public Optional<Identifier> getTexturePath(String key) {
         return Optional.ofNullable(textureOverrides.getOrDefault(key, null));
     }
     public Optional<String> getLangOverride(String key) {
@@ -2447,15 +2433,15 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     /**
      * @return the location of the dynamic sapling smartmodel for this type of species
      */
-    public ResourceLocation getSaplingSmartModelLocation() {
+    public Identifier getSaplingSmartModelLocation() {
         if (modelOverrides.containsKey(SAPLING)) return modelOverrides.get(SAPLING);
         return DynamicTrees.location("block/smartmodel/sapling");
     }
 
-    public void addSaplingTextures(BiConsumer<String, ResourceLocation> textureConsumer,
-                                   ResourceLocation leavesTextureLocation, ResourceLocation barkTextureLocation) {
-        ResourceLocation leavesLoc = getLeavesProperties().getTexturePath(LeavesProperties.LEAVES).orElse(leavesTextureLocation);
-        ResourceLocation logLoc = getFamily().getTexturePath(Family.BRANCH).orElse(barkTextureLocation);
+    public void addSaplingTextures(BiConsumer<String, Identifier> textureConsumer,
+                                   Identifier leavesTextureLocation, Identifier barkTextureLocation) {
+        Identifier leavesLoc = getLeavesProperties().getTexturePath(LeavesProperties.LEAVES).orElse(leavesTextureLocation);
+        Identifier logLoc = getFamily().getTexturePath(Family.BRANCH).orElse(barkTextureLocation);
         textureConsumer.accept("log", logLoc);
         textureConsumer.accept("leaves", leavesLoc);
     }
@@ -2463,12 +2449,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     /**
      * @return the location of the parent model of the seed item model
      */
-    public ResourceLocation getSeedParentModelLocation() {
+    public Identifier getSeedParentModelLocation() {
         if (modelOverrides.containsKey(SEED_PARENT)) return modelOverrides.get(SEED_PARENT);
         return DynamicTrees.location("item/standard_seed");
     }
 
-    public void addGeneratedBlockTags (Function<TagKey<Block>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tagAppender){
+    public void addGeneratedBlockTags (Function<TagKey<Block>, TagAppender<Block>> tagAppender){
         // Create dynamic sapling block tags.
         getSapling().ifPresent(sapling ->
                 defaultSaplingTags().forEach(tag -> {
@@ -2481,7 +2467,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         );
     }
 
-    public void addGeneratedItemTags (Function<TagKey<Item>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Item>> tagAppender){
+    public void addGeneratedItemTags (Function<TagKey<Item>, TagAppender<Item>> tagAppender){
         // Some species return the common seed, so only return if the species has its own seed.
         if (!hasSeed()) {
             return;
@@ -2502,10 +2488,10 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return this.seed != null;
     }
 
-    private final LazyValue<ResourceLocation> voluntaryDropsPath = LazyValue.supplied(() ->
+    private final LazyValue<Identifier> voluntaryDropsPath = LazyValue.supplied(() ->
             ResourceLocationUtils.prefix(getRegistryName(), "trees/voluntary/"));
 
-    public ResourceLocation getVoluntaryDropsPath() {
+    public Identifier getVoluntaryDropsPath() {
         return voluntaryDropsPath.get();
     }
 
@@ -2529,7 +2515,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return Collections.singletonList(DTItemTags.SEEDS);
     }
 
-    @Override
     public String toLoadDataString() {
         final RegistryHandler registryHandler = RegistryHandler.get(this.getRegistryName().getNamespace());
         return this.getString(Pair.of("seed", this.seed != null ? BuiltInRegistries.ITEM.getKey(this.seed.get()) : null),
@@ -2538,7 +2523,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
                                 null));
     }
 
-    @Override
     public String toReloadDataString() {
         return this.getString(Pair.of("tapering", this.tapering), Pair.of("upProbability", this.upProbability),
                 Pair.of("lowestBranchHeight", this.lowestBranchHeight), Pair.of("signalEnergy", this.signalEnergy),
@@ -2563,7 +2547,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return findSpecies(ResourceLocationUtils.parseDTLocation(name));
     }
 
-    public static Species findSpecies(final ResourceLocation name) {
+    public static Species findSpecies(final Identifier name) {
         return Species.REGISTRY.get(name);
     }
 
@@ -2575,7 +2559,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return The tree that was found or null if not found
      */
     public static Species findSpeciesSloppy(final String name) {
-        final ResourceLocation resourceLocation = ResourceLocationUtils.parseDTLocation(name);
+        final Identifier resourceLocation = ResourceLocationUtils.parseDTLocation(name);
         // Search specific domain first.
         if (Species.REGISTRY.has(resourceLocation)) {
             return findSpecies(resourceLocation);
@@ -2590,11 +2574,11 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     /**
-     * Returns a new {@link ArrayList<ResourceLocation>} from the {@link Species#REGISTRY} values.
+     * Returns a new {@link ArrayList<Identifier>} from the {@link Species#REGISTRY} values.
      *
      * @return A new {@link List} from the {@link Species#REGISTRY}.
      */
-    public static List<ResourceLocation> getSpeciesDirectory() {
+    public static List<Identifier> getSpeciesDirectory() {
         return new ArrayList<>(Species.REGISTRY.getRegistryNames());
     }
     //endregion

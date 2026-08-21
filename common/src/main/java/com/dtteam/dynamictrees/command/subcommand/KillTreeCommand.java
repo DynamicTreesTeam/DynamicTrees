@@ -14,17 +14,14 @@ import java.util.Objects;
 
 public final class KillTreeCommand extends SubCommand {
 
-    @Override
     protected String getName() {
         return CommandConstants.KILL_TREE;
     }
 
-    @Override
     protected int getPermissionLevel() {
         return 2;
     }
 
-    @Override
     public ArgumentBuilder<CommandSourceStack, ?> registerArgument() {
         return blockPosArgument().executes(context -> executesSuccess(() -> this.killTree(context.getSource(), rootPosArgument(context))));
     }

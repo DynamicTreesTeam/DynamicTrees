@@ -15,10 +15,6 @@ neoForge {
     if (at.exists()) {
         accessTransformers.from(at.absolutePath)
     }
-    parchment {
-        minecraftVersion = parchment_minecraft
-        mappingsVersion = parchment_version
-    }
 }
 
 
@@ -44,13 +40,13 @@ configurations {
 
 artifacts {
     sourceSets.main.resources {
-        srcDir("src/generated/resources")
+        srcDir("src/generated/client/resources")
+        srcDir("src/generated/server/resources")
         srcDir("src/localization/resources")
     }
 
     commonJava sourceSets.main.java.sourceDirectories.singleFile
     commonResources sourceSets.main.resources.sourceDirectories.files
-
 }
 
 publishing {

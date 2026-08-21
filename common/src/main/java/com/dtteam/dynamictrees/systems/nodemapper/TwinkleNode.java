@@ -19,7 +19,6 @@ public class TwinkleNode implements NodeInspector {
         numParticles = num;
     }
 
-    @Override
     public boolean run(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
         if (level.isClientSide() && TreeHelper.isBranch(state)) {
             ParticleHelper.spawnParticles(level, this.particleType, pos.getX(), pos.getY(), pos.getZ(), this.numParticles, level.getRandom());
@@ -27,7 +26,6 @@ public class TwinkleNode implements NodeInspector {
         return false;
     }
 
-    @Override
     public boolean returnRun(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
         return false;
     }

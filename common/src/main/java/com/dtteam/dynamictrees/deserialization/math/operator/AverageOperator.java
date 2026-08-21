@@ -11,7 +11,6 @@ public class AverageOperator implements MathOperator {
 		this.functions = functionArray;
 	}
 	
-	@Override
 	public double apply(MathContext mc) {
 		double r = 0D;
 		for (MathOperator f : functions) {

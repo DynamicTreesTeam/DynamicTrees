@@ -28,7 +28,6 @@ public final class MapDeserializer<K, V> implements JsonDeserializer<Map<K, V>> 
         this.mapSupplier = mapSupplier;
     }
 
-    @Override
     public Result<Map<K, V>, JsonElement> deserialize(JsonElement jsonElement) {
         return JsonDeserializers.JSON_OBJECT.deserialize(jsonElement).map((object, warningConsumer) -> {
             final Map<K, V> map = this.mapSupplier.get();

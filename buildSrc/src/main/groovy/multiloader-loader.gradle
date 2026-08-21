@@ -23,9 +23,7 @@ dependencies {
 
 tasks.named('compileJava', JavaCompile) {
     dependsOn(configurations.commonJava)
-    if (project.name != 'fabric') {
-        source(configurations.commonJava)
-    }
+    source(configurations.commonJava)
 }
 
 processResources {
@@ -35,16 +33,12 @@ processResources {
 
 tasks.named('javadoc', Javadoc).configure {
     dependsOn(configurations.commonJava)
-    if (project.name != 'fabric') {
-        source(configurations.commonJava)
-    }
+    source(configurations.commonJava)
 }
 
 tasks.named('sourcesJar', Jar) {
     dependsOn(configurations.commonJava)
-    if (project.name != 'fabric') {
-        from(configurations.commonJava)
-    }
+    from(configurations.commonJava)
     dependsOn(configurations.commonResources)
     from(configurations.commonResources)
 }
@@ -56,7 +50,7 @@ pluginManager.withPlugin('me.modmuss50.mod-publish-plugin') {
     def releaseType = isFabric ? project.findProperty('fabricVersionType') : project.findProperty('versionType')
 
     afterEvaluate {
-        def publishMcVersion = isFabric ? fabric_minecraft_version : minecraft_version
+        def publishMcVersion = minecraft_version
         publishMods {
             file = jar.archiveFile
             displayName = "${mod_name.replace(' ','')}-${loaderName}-${publishMcVersion} ${project.mod_version}"

@@ -18,18 +18,15 @@
 // */
 //public final class CreateTransformPotionCommand extends SubCommand {
 //
-//    @Override
-//    protected String getName() {
+////    protected String getName() {
 //        return CommandConstants.CREATE_TRANSFORM_POTION;
 //    }
 //
-//    @Override
-//    protected int getPermissionLevel() {
+////    protected int getPermissionLevel() {
 //        return 2;
 //    }
 //
-//    @Override
-//    public ArgumentBuilder<CommandSourceStack, ?> registerArgument() {
+////    public ArgumentBuilder<CommandSourceStack, ?> registerArgument() {
 //        return blockPosArgument().then(transformableSpeciesArgument().executes(context -> this.spawnTransformPotion(context.getSource(),
 //                blockPosArgument(context), speciesArgument(context))));
 //    }

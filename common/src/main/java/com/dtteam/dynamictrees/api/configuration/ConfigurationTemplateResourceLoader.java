@@ -31,7 +31,6 @@ public class ConfigurationTemplateResourceLoader<C extends Configuration<C, E>, 
         this.templateRegistry = templateRegistry;
     }
 
-    @Override
     public void applyOnReload(ResourceAccessor<JsonElement> resourceAccessor, ResourceManager resourceManager) {
         resourceAccessor.forEach(resource -> {
             try {

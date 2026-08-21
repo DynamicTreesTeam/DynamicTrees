@@ -17,7 +17,6 @@ public class LogOperator implements MathOperator {
 		this.base = functionArray.length >= 2 ? functionArray[1] : mc -> Math.E;
 	}
 
-	@Override
 	public double apply(MathContext mc) {
 		double x = value.apply(mc);
 		double b = base.apply(mc);

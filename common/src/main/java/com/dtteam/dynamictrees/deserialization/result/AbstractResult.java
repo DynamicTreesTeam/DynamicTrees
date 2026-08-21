@@ -41,7 +41,6 @@ public abstract class AbstractResult<T, I> implements Result<T, I> {
     /**
      * @return the original input object
      */
-    @Override
     public I getInput() {
         return this.input;
     }
@@ -50,7 +49,6 @@ public abstract class AbstractResult<T, I> implements Result<T, I> {
      * @return the deserialised value
      * @throws NoSuchElementException if this is an unsuccessful result
      */
-    @Override
     public T get() throws NoSuchElementException {
         if (this.value == null) {
             throw new NoSuchElementException("No value present in deserialisation result.");
@@ -64,7 +62,6 @@ public abstract class AbstractResult<T, I> implements Result<T, I> {
      * @param other the value to return if this is an unsuccessful result
      * @return the deserialised value, or {@code other} if this is an unsuccessful result
      */
-    @Override
     public T orElse(T other) {
         return this.value == null ? other : this.value;
     }
@@ -75,7 +72,6 @@ public abstract class AbstractResult<T, I> implements Result<T, I> {
      * @param other the value to return if this is an unsuccessful result
      * @return the deserialised value, or the result of invoking {@code other} if this is an unsuccessful result
      */
-    @Override
     public T orElseGet(Supplier<T> other) {
         return this.value == null ? other.get() : this.value;
     }
@@ -86,7 +82,6 @@ public abstract class AbstractResult<T, I> implements Result<T, I> {
      * @return the deserialised value
      * @throws DeserializationException if this is an unsuccessful result
      */
-    @Override
     public T orElseThrow() throws DeserializationException {
         if (this.value == null) {
             throw DeserializationException.error(String.valueOf(this.error));
@@ -98,7 +93,6 @@ public abstract class AbstractResult<T, I> implements Result<T, I> {
      * @return the error if this is an unsuccessful result; otherwise {@code null}
      */
     @Nullable
-    @Override
     public String getError() {
         return this.error;
     }
@@ -109,7 +103,6 @@ public abstract class AbstractResult<T, I> implements Result<T, I> {
      * @param action the action to accept for each warning
      * @return this result for chaining
      */
-    @Override
     public Result<T, I> forEachWarning(Consumer<String> action) {
         this.warnings.forEach(action);
         return this;
@@ -118,7 +111,6 @@ public abstract class AbstractResult<T, I> implements Result<T, I> {
     /**
      * @return a list of warnings associated with this result
      */
-    @Override
     public List<String> getWarnings() {
         return this.warnings;
     }
@@ -126,7 +118,6 @@ public abstract class AbstractResult<T, I> implements Result<T, I> {
     /**
      * @return {@code true} if this result is successful; {@code false} otherwise
      */
-    @Override
     public boolean success() {
         return this.value != null;
     }

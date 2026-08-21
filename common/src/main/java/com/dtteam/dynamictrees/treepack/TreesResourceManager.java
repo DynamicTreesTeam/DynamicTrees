@@ -7,7 +7,7 @@ import com.dtteam.dynamictrees.api.resource.loading.ApplierResourceLoader;
 import com.dtteam.dynamictrees.api.resource.loading.ResourceLoader;
 import com.dtteam.dynamictrees.utility.CommonCollectors;
 import com.google.common.collect.Lists;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -27,27 +27,22 @@ public final class TreesResourceManager implements ResourceManager, TreeResource
     private final List<TreeResourcePack> resourcePacks = Lists.newArrayList();
     private final List<ResourceLoader<?>> resourceLoaders = Lists.newArrayList();
 
-    @Override
     public void addLoader(ResourceLoader<?> loader) {
         this.resourceLoaders.add(loader);
     }
 
-    @Override
     public void addLoaders(ResourceLoader<?>... loaders) {
         this.resourceLoaders.addAll(Arrays.asList(loaders));
     }
 
-    @Override
     public void addLoaderBefore(ResourceLoader<?> loader, ResourceLoader<?> existing) {
         this.resourceLoaders.add(this.resourceLoaders.indexOf(existing), loader);
     }
 
-    @Override
     public void addLoaderAfter(ResourceLoader<?> loader, ResourceLoader<?> existing) {
         this.resourceLoaders.add(this.resourceLoaders.indexOf(existing) + 1, loader);
     }
 
-    @Override
     public void registerAppliers() {
         this.resourceLoaders.stream()
                 .filter(ApplierResourceLoader.class::isInstance)
@@ -55,22 +50,18 @@ public final class TreesResourceManager implements ResourceManager, TreeResource
                 .forEach(ApplierResourceLoader::registerAppliers);
     }
 
-    @Override
     public void load() {
         this.resourceLoaders.forEach(loader -> loader.load(this).join());
     }
 
-    @Override
     public void gatherData() {
         this.resourceLoaders.forEach(loader -> loader.gatherData(this).join());
     }
 
-    @Override
     public void setup() {
         this.resourceLoaders.forEach(loader -> loader.setup(this).join());
     }
 
-    @Override
     public CompletableFuture<?>[] prepareReload(final Executor gameExecutor, final Executor backgroundExecutor) {
         return this.resourceLoaders.stream()
                 .map(loader -> loader.prepareReload(this))
@@ -83,7 +74,6 @@ public final class TreesResourceManager implements ResourceManager, TreeResource
      *
      * @param futures the futures returned from {@link #prepareReload(Executor, Executor)}
      */
-    @Override
     public void reload(final CompletableFuture<?>[] futures) {
         for (int i = 0; i < futures.length; i++) {
             this.reload(this.resourceLoaders.get(i), futures[i]);
@@ -95,12 +85,10 @@ public final class TreesResourceManager implements ResourceManager, TreeResource
         loader.reload((CompletableFuture<ResourceAccessor<R>>) future, this);
     }
 
-    @Override
     public void addPack(TreeResourcePack pack) {
         this.resourcePacks.add(pack);
     }
 
-    @Override
     public Set<String> getNamespaces() {
         return this.resourcePacks.stream()
                 .map(TreeResourcePack::getNamespaces)
@@ -108,32 +96,28 @@ public final class TreesResourceManager implements ResourceManager, TreeResource
                 .collect(CommonCollectors.toLinkedSet());
     }
 
-    @Override
-    public Optional<Resource> getResource(final ResourceLocation location) {
+    public Optional<Resource> getResource(final Identifier location) {
         final List<Resource> resources = this.getResourceStack(location);
         return resources.isEmpty() ? Optional.empty() : Optional.of(resources.getLast());
     }
 
-    @Override
-    public Resource getResourceOrThrow(ResourceLocation location) throws FileNotFoundException {
+    public Resource getResourceOrThrow(Identifier location) throws FileNotFoundException {
         return getResource(location).orElseThrow(() -> new FileNotFoundException("Could not find path '" + location + "' in any tree packs."));
     }
 
-    @Override
-    public List<Resource> getResourceStack(ResourceLocation path) {
+    public List<Resource> getResourceStack(Identifier path) {
         return this.resourcePacks.stream()
                 .filter(resourcePack -> resourcePack.hasResource(path))
                 .map(resourcePack -> getResource(path, resourcePack))
                 .toList();
     }
 
-    private Resource getResource(ResourceLocation path, TreeResourcePack resourcePack) {
+    private Resource getResource(Identifier path, TreeResourcePack resourcePack) {
         return new Resource(resourcePack, resourcePack.getResource(path));
     }
 
-    @Override
-    public Map<ResourceLocation, Resource> listResources(String path, Predicate<ResourceLocation> filter) {
-        Map<ResourceLocation, Resource> resources = new LinkedHashMap<>();
+    public Map<Identifier, Resource> listResources(String path, Predicate<Identifier> filter) {
+        Map<Identifier, Resource> resources = new LinkedHashMap<>();
 
         for (TreeResourcePack pack : this.resourcePacks) {
             for (String namespace : pack.getNamespaces()) {
@@ -150,9 +134,8 @@ public final class TreesResourceManager implements ResourceManager, TreeResource
         return resources;
     }
 
-    @Override
-    public Map<ResourceLocation, List<Resource>> listResourceStacks(String path, Predicate<ResourceLocation> filter) {
-        Map<ResourceLocation, List<Resource>> resources = new LinkedHashMap<>();
+    public Map<Identifier, List<Resource>> listResourceStacks(String path, Predicate<Identifier> filter) {
+        Map<Identifier, List<Resource>> resources = new LinkedHashMap<>();
 
         for (TreeResourcePack pack : this.resourcePacks) {
             for (String namespace : pack.getNamespaces()) {
@@ -169,7 +152,6 @@ public final class TreesResourceManager implements ResourceManager, TreeResource
     }
 
     @SuppressWarnings("unchecked")
-    @Override
     public Stream<PackResources> listPacks() {
         return (Stream<PackResources>) (Stream<?>) this.resourcePacks.stream();
     }

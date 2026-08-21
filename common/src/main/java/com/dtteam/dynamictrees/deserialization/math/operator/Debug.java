@@ -13,7 +13,6 @@ public class Debug implements MathOperator {
 		this.functions = functionArray;
 	}
 	
-	@Override
 	public double apply(MathContext mc) {
 		if (functions.length == 1) {
 			double val = functions[0].apply(mc);

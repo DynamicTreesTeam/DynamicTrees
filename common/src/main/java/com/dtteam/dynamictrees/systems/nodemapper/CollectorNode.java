@@ -19,13 +19,11 @@ public class CollectorNode implements NodeInspector {
         this.nodeSet = nodeSet;
     }
 
-    @Override
     public boolean run(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
         nodeSet.add(pos);
         return false;
     }
 
-    @Override
     public boolean returnRun(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
         return false;
     }

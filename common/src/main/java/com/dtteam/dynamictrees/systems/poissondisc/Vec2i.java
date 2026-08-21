@@ -76,18 +76,15 @@ public class Vec2i {
         return (c1.x * c2.z) - (c1.z * c2.x);
     }
 
-    @Override
     public boolean equals(Object o) {
         Vec2i v = (Vec2i) o;
         return this.x == v.x && this.z == v.z;
     }
 
-    @Override
     public int hashCode() {
         return x ^ (z * 98764313);
     }
 
-    @Override
     public String toString() {
         return "Coord " + x + "," + z + "," + (tight ? "T" : "L");
     }

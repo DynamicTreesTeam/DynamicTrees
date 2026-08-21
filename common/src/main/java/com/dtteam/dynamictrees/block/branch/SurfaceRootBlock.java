@@ -1,5 +1,7 @@
 package com.dtteam.dynamictrees.block.branch;
 
+import net.minecraft.world.level.LevelReader;
+
 import com.dtteam.dynamictrees.api.network.RootConnections;
 import com.dtteam.dynamictrees.api.treedata.SurfaceRootShapeState;
 import com.dtteam.dynamictrees.tree.ChunkTreeHelper;
@@ -64,14 +66,12 @@ public class SurfaceRootBlock extends Block implements SimpleWaterloggedBlock {
             this.radius = radius;
         }
 
-        @Override
         public String toString() {
             return super.toString() + " Level: " + this.level.toString() + " Radius: " + this.radius;
         }
     }
 
-    @Override
-    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
         return this.family.getBranchItem().map(ItemStack::new).orElse(ItemStack.EMPTY);
     }
 
@@ -79,7 +79,6 @@ public class SurfaceRootBlock extends Block implements SimpleWaterloggedBlock {
     // BLOCK STATES
     ///////////////////////////////////////////
 
-    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(RADIUS, GROUNDED, WATERLOGGED);
     }
@@ -110,24 +109,22 @@ public class SurfaceRootBlock extends Block implements SimpleWaterloggedBlock {
     // WATER LOGGING
     ///////////////////////////////////////////
 
-    @Override
     public FluidState getFluidState(BlockState state) {
         return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
-    @Override
-    public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor level, BlockPos currentPos, BlockPos facingPos) {
+    public BlockState updateShape(BlockState stateIn, LevelReader level, net.minecraft.world.level.ScheduledTickAccess ticks, BlockPos currentPos, Direction facing, BlockPos facingPos, BlockState facingState, RandomSource random) {
         if (stateIn.getValue(WATERLOGGED)) {
-            level.getFluidTicks().schedule(new ScheduledTick<>(Fluids.WATER, currentPos, Fluids.WATER.getTickDelay(level), 1));
+            ticks.scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
-        return super.updateShape(stateIn, facing, facingState, level, currentPos, facingPos);
+        return super.updateShape(stateIn, level, ticks, currentPos, facing, facingPos, facingState, random);
     }
 
     ///////////////////////////////////////////
     // RENDERING
     ///////////////////////////////////////////
 
-    public RootConnections getConnectionData(final BlockAndTintGetter level, final BlockPos pos) {
+    public RootConnections getConnectionData(final BlockGetter level, final BlockPos pos) {
         final RootConnections connections = new RootConnections();
 
         for (Direction dir : CoordUtils.HORIZONTALS) {
@@ -149,7 +146,6 @@ public class SurfaceRootBlock extends Block implements SimpleWaterloggedBlock {
     // PHYSICAL BOUNDS
     ///////////////////////////////////////////
 
-    @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         final int thisRadius = getRadius(state);
 
@@ -251,12 +247,12 @@ public class SurfaceRootBlock extends Block implements SimpleWaterloggedBlock {
         return null;
     }
 
-    @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block blockIn, net.minecraft.world.level.redstone.Orientation orientation, boolean isMoving) {
+        BlockPos neighborPos = pos;
+        BlockPos fromPos = pos;
         level.scheduleTick(pos, state.getBlock(), 0);
     }
 
-    @Override
     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         super.tick(state, level, pos, random);
         if (!canBlockStay(level, pos, state)) {
@@ -268,7 +264,6 @@ public class SurfaceRootBlock extends Block implements SimpleWaterloggedBlock {
         }
     }
 
-    @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         BlockState destroyed = super.playerWillDestroy(level, pos, state, player);
         int thisRad = state.hasProperty(RADIUS) ? state.getValue(RADIUS) : 0;

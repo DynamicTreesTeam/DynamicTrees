@@ -56,7 +56,6 @@ public abstract class StagedApplierResourceLoader<I, R> extends AbstractResource
      * Called from {@link Resources#setupTreesResourceManager()}. Sub-classes should can override to register
      * their Json appliers, and should call super so their events are posted properly.
      */
-    @Override
     public void registerAppliers() {
         Services.EVENT.postApplierEvent(ApplierStage.LOAD, this.loadAppliers, this.appliersIdentifier);
         Services.EVENT.postApplierEvent(ApplierStage.GATHER_DATA, this.gatherDataAppliers, this.appliersIdentifier);

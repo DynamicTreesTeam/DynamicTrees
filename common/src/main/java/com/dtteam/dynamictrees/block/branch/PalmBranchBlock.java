@@ -8,24 +8,22 @@ import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class PalmBranchBlock extends BasicBranchBlock{
 
-    public PalmBranchBlock(ResourceLocation name, Properties properties) {
+    public PalmBranchBlock(Identifier name, Properties properties) {
         super(name, properties);
     }
 
-    @Override
     public Cell getHydrationCell(BlockGetter level, BlockPos pos, BlockState state, Direction dir, LeavesProperties leavesProperties) {
         if (getRadius(state) != getFamily().getPrimaryThickness()) return CellNull.NULL_CELL;
         return super.getHydrationCell(level, pos, state, dir, leavesProperties);
     }
 
-    @Override
     public GrowSignal growIntoAir(Level world, BlockPos pos, GrowSignal signal, int fromRadius) {
         final Species species = signal.getSpecies();
 

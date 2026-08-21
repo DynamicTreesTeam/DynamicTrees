@@ -11,7 +11,6 @@ public class IfOperator implements MathOperator {
 		throwIfInvalidParameterLengthRange(functions.length, 2, 3);
 	}
 	
-	@Override
 	public double apply(MathContext mc) {
 		if (functions.length == 3) {
 			return BooleanLogicOperator.isTrue(functions[0].apply(mc)) ? functions[1].apply(mc) : functions[2].apply(mc);

@@ -1,6 +1,6 @@
 package com.dtteam.dynamictrees.api.resource;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.function.Function;
 
@@ -11,7 +11,7 @@ import java.util.function.Function;
  * @param resource the type of the resource object
  * @author Harley O'Connor
  */
-public record DTResource<R>(ResourceLocation location, R resource) {
+public record DTResource<R>(Identifier location, R resource) {
 
     public <N> DTResource<N> map(Function<R, N> mapper) {
         return new DTResource<>(this.location, mapper.apply(this.resource));

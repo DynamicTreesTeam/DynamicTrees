@@ -22,7 +22,6 @@ public final class ListDeserializer<T> implements JsonDeserializer<List<T>> {
         this.listSupplier = listSupplier;
     }
 
-    @Override
     public Result<List<T>, JsonElement> deserialize(JsonElement jsonElement) {
         return JsonDeserializers.JSON_ARRAY.deserialize(jsonElement).map(array -> {
             final List<T> getterList = this.listSupplier.get();

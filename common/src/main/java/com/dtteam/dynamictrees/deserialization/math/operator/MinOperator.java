@@ -11,7 +11,6 @@ public class MinOperator implements MathOperator {
 		this.functions = functionArray;
 	}
 	
-	@Override
 	public double apply(MathContext mc) {
 		Double r = null;
 		for (MathOperator f : functions) {

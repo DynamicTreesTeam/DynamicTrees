@@ -27,7 +27,6 @@ public final class SeedSaplingRecipeDeserializer implements JsonDeserializer<See
                 .registerArrayApplier("seed_to_sapling_extra_ingredients", Item.class, SeedSaplingRecipe::addExtraIngredientForSeedToSapling);
     }
 
-    @Override
     public Result<SeedSaplingRecipe, JsonElement> deserialize(JsonElement input) {
         return JsonResult.forInput(input)
                 .mapIfType(Block.class, block -> new SeedSaplingRecipe(block, block.asItem()))

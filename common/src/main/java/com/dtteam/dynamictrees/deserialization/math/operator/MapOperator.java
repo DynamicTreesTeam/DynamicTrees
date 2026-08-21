@@ -20,7 +20,6 @@ public class MapOperator implements MathOperator {
 		this.toEnd = functionArray[4];
 	}
 
-	@Override
 	public double apply(MathContext mc) {
 		double d = delta.apply(mc);
 		double s1 = fromStart.apply(mc);

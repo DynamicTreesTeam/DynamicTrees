@@ -7,7 +7,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -56,7 +56,6 @@ public final class ShapeFunctions {
 
     public static class FruitShapeFunction implements ShapeFunction<FruitShapeFunction.Parameters> {
 
-        @Override
         public DataResult<Pair<Parameters, JsonElement>> getParameters(JsonElement json) {
             return Parameters.CODEC.decode(JsonOps.INSTANCE, json);
         }
@@ -64,7 +63,6 @@ public final class ShapeFunctions {
         /**
          * @author Max Hyper
          */
-        @Override
         public VoxelShape calculateShape(Parameters parameters) {
             final float fraction = parameters.fraction;
             final float radius = parameters.width / 2;
@@ -98,7 +96,6 @@ public final class ShapeFunctions {
 
     public static class PodShapeFunction implements ShapeFunction<PodShapeFunction.Parameters> {
 
-        @Override
         public DataResult<Pair<Parameters, JsonElement>> getParameters(JsonElement json) {
             return Parameters.CODEC.decode(JsonOps.INSTANCE, json);
         }
@@ -106,7 +103,6 @@ public final class ShapeFunctions {
         /**
          * @author Max Hyper
          */
-        @Override
         public VoxelShape calculateShape(Parameters parameters) {
             final float fraction = parameters.fraction;
             final float radius = parameters.width / 2;

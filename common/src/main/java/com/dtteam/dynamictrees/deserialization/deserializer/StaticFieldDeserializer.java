@@ -26,7 +26,6 @@ public final class StaticFieldDeserializer<T> implements JsonDeserializer<T> {
         this.type = type;
     }
 
-    @Override
     public Result<T, JsonElement> deserialize(JsonElement jsonElement) {
         return JsonDeserializers.STRING.deserialize(jsonElement)
                 .map(string -> Stream.of(this.type.getFields())

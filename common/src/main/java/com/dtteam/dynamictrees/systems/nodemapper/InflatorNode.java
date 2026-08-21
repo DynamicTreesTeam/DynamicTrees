@@ -33,7 +33,6 @@ public class InflatorNode implements NodeInspector {
         this.maxRadius = Math.min(maxRadius, species.getMaxBranchRadius());
     }
 
-    @Override
     public boolean run(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
         BranchBlock branch = TreeHelper.getBranch(state);
 
@@ -47,7 +46,6 @@ public class InflatorNode implements NodeInspector {
         return false;
     }
 
-    @Override
     public boolean returnRun(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
         //Calculate Branch Thickness based on neighboring branches
 

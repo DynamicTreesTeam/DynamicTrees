@@ -19,11 +19,10 @@ import java.util.stream.Stream;
 
 public class SeedConversionRecipe extends CustomRecipe {
 
-    public SeedConversionRecipe(CraftingBookCategory pCategory) {
-        super(pCategory);
+    public SeedConversionRecipe() {
+        super();
     }
 
-    @Override
     public boolean matches(CraftingInput craftingInput, Level level) {
         if(DTConfigs.COMMON.generateDirtBucketRecipes.get() && hasDirtBucket(craftingInput)) {
             for (Species species : Species.REGISTRY) {
@@ -43,8 +42,7 @@ public class SeedConversionRecipe extends CustomRecipe {
         return false;
     }
 
-    @Override
-    public ItemStack assemble(CraftingInput craftingInput, HolderLookup.Provider registryAccess) {
+    public ItemStack assemble(CraftingInput craftingInput) {
         for(Species species : Species.REGISTRY) {
             for (SeedSaplingRecipe recipe : species.getPrimitiveSaplingRecipes()) {
                 if (saplingToSeedCondition(craftingInput, recipe)) {
@@ -90,13 +88,11 @@ public class SeedConversionRecipe extends CustomRecipe {
         return craftingInput.items().stream().filter(s -> !s.isEmpty());
     }
 
-    @Override
     public boolean canCraftInDimensions(int i, int i1) {
         return true;
     }
 
-    @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<? extends CustomRecipe> getSerializer() {
         return DTRegistries.SEED_CONVERSION_RECIPE_TYPE.get();
     }
 

@@ -10,7 +10,7 @@ import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockGetter;
@@ -31,27 +31,25 @@ public class PalmLeavesProperties extends LeavesProperties {
 
     public static final TypedRegistry.EntryType<LeavesProperties> TYPE = TypedRegistry.newType(PalmLeavesProperties::new);
 
-    public PalmLeavesProperties(ResourceLocation registryName) {
+    public PalmLeavesProperties(Identifier registryName) {
         super(registryName);
     }
 
-    @Override
     protected DynamicLeavesBlock createDynamicLeaves(BlockBehaviour.Properties properties) {
         return new DynamicPalmLeavesBlock(this, properties);
     }
 
-    ResourceLocation frondLoader = DynamicTrees.location("large_palm_fronds");
-    public void setFrondLoader(ResourceLocation frondLoader) {
+    Identifier frondLoader = DynamicTrees.location("large_palm_fronds");
+    public void setFrondLoader(Identifier frondLoader) {
         this.frondLoader = frondLoader;
     }
-    public ResourceLocation getFrondLoader () { return frondLoader; }
+    public Identifier getFrondLoader () { return frondLoader; }
 
     protected final MutableLazyValue<Generator<DTDataProvider.BlockState, LeavesProperties>> frondsStateGenerator =
             MutableLazyValue.supplied(blockStateGenerators.get(
                     DynamicTrees.location("palm_fronds")
             ));
 
-    @Override
     public void generateStateData(DTDataProvider.BlockState provider) {
         // Generate leaves block state and model.
         this.frondsStateGenerator.get().generate(provider, this);
@@ -70,22 +68,22 @@ public class PalmLeavesProperties extends LeavesProperties {
     public static final String FROND = "frond";
     public static final String CORE_TOP = "core_top";
     public static final String CORE_BOTTOM = "core_bottom";
-    public void addFrondTextures(BiConsumer<String, ResourceLocation> textureConsumer, ResourceLocation leavesTextureLocation) {
-        ResourceLocation leavesLoc = getTexturePath(FROND).orElse(leavesTextureLocation);
+    public void addFrondTextures(BiConsumer<String, Identifier> textureConsumer, Identifier leavesTextureLocation) {
+        Identifier leavesLoc = getTexturePath(FROND).orElse(leavesTextureLocation);
         textureConsumer.accept("frond", leavesLoc);
     }
 
-    public void addCoreTextures(BiConsumer<String, ResourceLocation> textureConsumer,
-                                   ResourceLocation coreTextureLocation) {
-        ResourceLocation coreLoc = getTexturePath(CORE_BOTTOM).orElse(coreTextureLocation);
+    public void addCoreTextures(BiConsumer<String, Identifier> textureConsumer,
+                                   Identifier coreTextureLocation) {
+        Identifier coreLoc = getTexturePath(CORE_BOTTOM).orElse(coreTextureLocation);
         textureConsumer.accept("core_bottom", coreLoc);
     }
 
-    public ResourceLocation getCoreTopSmartModelLocation() {
+    public Identifier getCoreTopSmartModelLocation() {
         if (modelOverrides.containsKey(CORE_TOP)) return modelOverrides.get(CORE_TOP);
         return DynamicTrees.location("block/smartmodel/palm/core_top");
     }
-    public ResourceLocation getCoreBottomSmartModelLocation() {
+    public Identifier getCoreBottomSmartModelLocation() {
         if (modelOverrides.containsKey(CORE_BOTTOM)) return modelOverrides.get(CORE_BOTTOM);
         return DynamicTrees.location("block/smartmodel/palm/core_bottom");
     }
@@ -105,7 +103,6 @@ public class PalmLeavesProperties extends LeavesProperties {
                 {}  //distance 7
         };
 
-        @Override
         public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource rand) {
             if (state.getBlock() == this) {
                 int dist = state.getValue(DISTANCE);
@@ -122,7 +119,6 @@ public class PalmLeavesProperties extends LeavesProperties {
             registerDefaultState(defaultBlockState().setValue(DIRECTION, 0));
         }
 
-        @Override
         protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
             super.createBlockStateDefinition(builder);
             builder.add(DIRECTION);
@@ -136,22 +132,18 @@ public class PalmLeavesProperties extends LeavesProperties {
             return state.setValue(DIRECTION, surround == null ? 0 : surround.ordinal() + 1);
         }
 
-        @Override
         public int getRadiusForConnection(BlockState state, BlockGetter level, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
             return side == Direction.UP && from.getFamily().isCompatibleDynamicLeaves(Species.NULL_SPECIES, state, level, pos) ? fromRadius : 0;
         }
 
-        @Override
         public int branchSupport(BlockState state, BlockGetter level, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
             return branch.getFamily() == getFamily(state, level, pos) ? BranchBlock.setSupport(0, 1) : 0;
         }
 
-        @Override
         public boolean appearanceChangesWithHydro(int oldHydro, int newHydro) {
             return true;
         }
 
-        @Override
         public BlockState getLeavesBlockStateForPlacement(LevelAccessor level, BlockPos pos, BlockState leavesStateWithHydro, int oldHydro, boolean worldGen) {
             for (CoordUtils.Surround surround : CoordUtils.Surround.values()) {
                 BlockState offstate = level.getBlockState(pos.offset(surround.getOffset()));
@@ -162,9 +154,8 @@ public class PalmLeavesProperties extends LeavesProperties {
             return leavesStateWithHydro;
         }
 
-        @Override
-        public VoxelShape getOcclusionShape(BlockState state, BlockGetter level, BlockPos pos) {
-            AABB base = super.getOcclusionShape(state, level, pos).bounds();
+        public VoxelShape getOcclusionShape(BlockState state) {
+            AABB base = super.getOcclusionShape(state).bounds();
             base.inflate(1, 0, 1);
             base.inflate(-1, -0, -1);
             return Shapes.create(base);
@@ -172,8 +163,7 @@ public class PalmLeavesProperties extends LeavesProperties {
 
     }
 
-//    @Override
-//    protected String getBlockRegistryNameSuffix() {
+////    protected String getBlockRegistryNameSuffix() {
 //        return "_fronds";
 //    }
 

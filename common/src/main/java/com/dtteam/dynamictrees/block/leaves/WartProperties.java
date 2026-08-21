@@ -4,7 +4,7 @@ import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.data.DTLootTableBuilder;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -22,16 +22,14 @@ public class WartProperties extends SolidLeavesProperties {
 
     public static final TypedRegistry.EntryType<LeavesProperties> TYPE = TypedRegistry.newType(WartProperties::new);
 
-    public WartProperties(final ResourceLocation registryName) {
+    public WartProperties(final Identifier registryName) {
         super(registryName);
     }
 
-    @Override
     protected String getBlockRegistryNameSuffix() {
         return "_wart";
     }
 
-    @Override
     public BlockBehaviour.Properties getDefaultBlockProperties() {
         return BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_RED)
@@ -40,17 +38,14 @@ public class WartProperties extends SolidLeavesProperties {
                 .randomTicks();
     }
 
-    @Override
     public List<TagKey<Block>> defaultLeavesTags() {
         return Collections.singletonList(DTBlockTags.WART_BLOCKS);
     }
 
-    @Override
     public LootTable.Builder createBlockDrops(HolderLookup.Provider registries) {
         return DTLootTableBuilder.createWartBlockDrops(primitiveLeaves.getBlock(), registries);
     }
 
-    @Override
     public LootTable.Builder createDrops(HolderLookup.Provider registries) {
         return DTLootTableBuilder.createWartDrops(primitiveLeaves.getBlock(), registries);
     }

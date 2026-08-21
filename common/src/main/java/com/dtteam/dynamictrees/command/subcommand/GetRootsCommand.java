@@ -15,19 +15,16 @@ import java.util.Optional;
 
 public final class GetRootsCommand extends SubCommand {
 
-    @Override
     protected String getName() {
         return CommandConstants.GET_ROOTS;
     }
 
-    @Override
     protected int getPermissionLevel() {
         return 0;
     }
 
     private static final String CODE_RAW = "code_raw";
 
-    @Override
     public ArgumentBuilder<CommandSourceStack, ?> registerArgument() {
         return blockPosArgument().executes(context -> this.getRoots(context.getSource(), blockPosArgument(context), false))
                 .then(booleanArgument(CODE_RAW).executes(context -> this.getRoots(context.getSource(), blockPosArgument(context),

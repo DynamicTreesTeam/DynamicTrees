@@ -18,7 +18,7 @@ import com.dtteam.dynamictrees.worldgen.BiomeDatabases;
 import com.dtteam.dynamictrees.worldgen.IDTBiomeHolderSet;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -81,7 +81,6 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
         super(RESOURCE_PREPARER);
     }
 
-    @Override
     public void registerAppliers() {
         this.entryAppliers
                 .register("species", JsonElement.class, this::applySpecies)
@@ -159,13 +158,12 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
                         JsonResult.success(input, BiomeDatabase.Operation.REPLACE));
     }
 
-    private void readCaveRootedPopulatorSection(BiomeDatabase database, ResourceLocation location, JsonObject json) throws DeserializationException {
+    private void readCaveRootedPopulatorSection(BiomeDatabase database, Identifier location, JsonObject json) throws DeserializationException {
         final IDTBiomeHolderSet biomes = collectBiomes(json, warning -> LOGGER.warn("Warning whilst loading cave rooted populator \"{}\": {}", location, warning));
         if (biomes != null)
             applyCaveRootedPopulatorSection(database, json.getAsJsonObject(APPLY), biomes);
     }
 
-    @Override
     public void applyOnReload(ResourceAccessor<Iterable<JsonElement>> resourceAccessor, ResourceManager resourceManager) {
         this.readPopulators(
                 resourceAccessor.filtered(this::isDefaultPopulator).map(BiomePopulatorsResourceLoader::toLinkedList)
@@ -212,11 +210,11 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
         );
     }
 
-    private void readDimensionalPopulator(ResourceLocation dimensionLocation, JsonElement dimensionalPopulator) {
+    private void readDimensionalPopulator(Identifier dimensionLocation, JsonElement dimensionalPopulator) {
         this.readPopulator(BiomeDatabases.getOrCreateDimensional(dimensionLocation), dimensionLocation, dimensionalPopulator);
     }
 
-    private void readPopulator(BiomeDatabase database, ResourceLocation location, JsonElement json) {
+    private void readPopulator(BiomeDatabase database, Identifier location, JsonElement json) {
         LOGGER.debug("Loading Json biome populator \"{}\".", location);
 
         try {
@@ -235,7 +233,7 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
         }
     }
 
-    private void readPopulatorSection(BiomeDatabase database, ResourceLocation location, JsonObject json)
+    private void readPopulatorSection(BiomeDatabase database, Identifier location, JsonObject json)
             throws DeserializationException {
 
         final IDTBiomeHolderSet biomes = collectBiomes(json, warning ->
@@ -265,7 +263,7 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
         }
     }
 
-    private void applyWhite(BiomeDatabase database, ResourceLocation location, IDTBiomeHolderSet biomes, String type)
+    private void applyWhite(BiomeDatabase database, Identifier location, IDTBiomeHolderSet biomes, String type)
             throws DeserializationException {
         if (type.equalsIgnoreCase("all")) {
             database.getAllEntries().forEach(entry -> entry.setBlacklisted(false));
@@ -277,7 +275,7 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
         }
     }
 
-    private boolean isDefaultPopulator(final ResourceLocation key) {
+    private boolean isDefaultPopulator(final Identifier key) {
         return key.getPath().equals(DEFAULT_POPULATOR);
     }
 

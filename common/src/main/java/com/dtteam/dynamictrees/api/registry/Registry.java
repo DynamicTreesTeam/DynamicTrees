@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.api.registry;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Comparator;
 import java.util.Iterator;
@@ -25,8 +25,8 @@ public interface Registry<V extends RegistryEntry<V>> extends Iterable<V> {
      * Registers the given {@link RegistryEntry} to this {@link Registry}.
      *
      * <p>Note that this will throw a runtime exception if this {@link Registry} is locked, or if
-     * the {@link ResourceLocation} already has a value registered, therefore {@link #isLocked()} or/and {@link
-     * #has(ResourceLocation)} should be checked before calling if either conditions are uncertain.</p>
+     * the {@link Identifier} already has a value registered, therefore {@link #isLocked()} or/and {@link
+     * #has(Identifier)} should be checked before calling if either conditions are uncertain.</p>
      *
      * <p>If you're thinking of using this you should probably be doing it from a
      * RegistryEvent, in which case you don't have to worry about locking.</p>
@@ -45,17 +45,17 @@ public interface Registry<V extends RegistryEntry<V>> extends Iterable<V> {
     @SuppressWarnings("unchecked")
     void registerAll(V... values);
 
-    boolean has(ResourceLocation registryName);
+    boolean has(Identifier registryName);
 
-    Optional<V> getOptional(ResourceLocation registryName);
+    Optional<V> getOptional(Identifier registryName);
 
     Optional<V> getOptional(String registryName);
 
-    V get(ResourceLocation registryName);
+    V get(Identifier registryName);
 
     V get(String registryName);
 
-    DataResult<V> getAsDataResult(ResourceLocation registryName);
+    DataResult<V> getAsDataResult(Identifier registryName);
 
     /**
      * Gets all {@link RegistryEntry} objects currently registered. Note this are obtained as an
@@ -67,12 +67,12 @@ public interface Registry<V extends RegistryEntry<V>> extends Iterable<V> {
     Set<V> getAll();
 
     /**
-     * Gets all the registry name {@link ResourceLocation} objects of all the entries currently in this {@link
+     * Gets all the registry name {@link Identifier} objects of all the entries currently in this {@link
      * Registry}.
      *
      * @return The {@link Set} of registry names.
      */
-    Set<ResourceLocation> getRegistryNames();
+    Set<Identifier> getRegistryNames();
 
     Class<V> getType();
 
@@ -104,14 +104,14 @@ public interface Registry<V extends RegistryEntry<V>> extends Iterable<V> {
 
     /**
      * Generates a runnable that runs the given {@link Consumer} only if the {@link RegistryEntry} obtained from the
-     * given {@link ResourceLocation} is valid (not null), and if it's not runs the given {@link Runnable}.
+     * given {@link Identifier} is valid (not null), and if it's not runs the given {@link Runnable}.
      *
-     * @param registryName The {@link ResourceLocation} of the {@link RegistryEntry}.
+     * @param registryName The {@link Identifier} of the {@link RegistryEntry}.
      * @param consumer     The {@link Consumer} to accept if the {@link RegistryEntry} is vaid.
      * @param elseRunnable A {@link Runnable} to run if the entry is not valid.
      * @return The generated {@link Runnable}.
      */
-    Runnable generateIfValidRunnable(ResourceLocation registryName, Consumer<V> consumer, Runnable elseRunnable);
+    Runnable generateIfValidRunnable(Identifier registryName, Consumer<V> consumer, Runnable elseRunnable);
 
     /**
      * Posts a RegistryEvent to the mod event bus. Note that this is posted using
@@ -133,7 +133,6 @@ public interface Registry<V extends RegistryEntry<V>> extends Iterable<V> {
 
     Stream<V> dataGenerationStream(String namespace);
 
-    @Override
     Iterator<V> iterator();
 
 }

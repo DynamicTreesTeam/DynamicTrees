@@ -12,7 +12,7 @@ import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -22,16 +22,14 @@ public class FruitGenFeature extends GenFeature {
 
     public static final ConfigurationProperty<Fruit> FRUIT = ConfigurationProperty.property("fruit", Fruit.class);
 
-    public FruitGenFeature(ResourceLocation registryName) {
+    public FruitGenFeature(Identifier registryName) {
         super(registryName);
     }
 
-    @Override
     protected void registerProperties() {
         this.register(FRUIT, VERTICAL_SPREAD, QUANTITY, RAY_DISTANCE, FRUITING_RADIUS, PLACE_CHANCE);
     }
 
-    @Override
     public GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(FRUIT, Fruit.NULL)
@@ -41,12 +39,10 @@ public class FruitGenFeature extends GenFeature {
                 .with(PLACE_CHANCE, 1f);
     }
 
-    @Override
     public boolean shouldApply(Species species, GenFeatureConfiguration configuration) {
         return species.hasFruit(configuration.get(FRUIT));
     }
 
-    @Override
     protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
         if (!context.endPoints().isEmpty()) {
             int qty = configuration.get(QUANTITY);
@@ -61,7 +57,6 @@ public class FruitGenFeature extends GenFeature {
         return false;
     }
 
-    @Override
     protected boolean postGrow(GenFeatureConfiguration configuration, PostGrowContext context) {
         final LevelAccessor level = context.level();
         final BlockState blockState = level.getBlockState(context.treePos());

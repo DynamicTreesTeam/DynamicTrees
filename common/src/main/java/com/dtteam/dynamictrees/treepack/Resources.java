@@ -6,15 +6,17 @@ import com.dtteam.dynamictrees.api.resource.*;
 import com.dtteam.dynamictrees.platform.*;
 import com.dtteam.dynamictrees.systems.genfeature.*;
 import com.dtteam.dynamictrees.systems.growthlogic.*;
+import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.treepack.loader.*;
 import net.minecraft.network.chat.*;
 import net.minecraft.server.packs.*;
 import net.minecraft.server.packs.repository.*;
 import net.minecraft.server.packs.resources.*;
-import net.minecraft.util.profiling.*;
 import net.minecraft.world.item.crafting.*;
 
 import java.io.*;
+import java.net.URI;
+import java.net.URL;
 import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.*;
@@ -62,6 +64,7 @@ public final class Resources {
         MANAGER.registerAppliers();
 
         registerModTreePacks();
+        addClasspathTreePackIfMissing();
         registerFlatTreePack();
 
         DynamicTrees.LOG.debug("Successfully loaded {} tree packs.", MANAGER.listPacks().count());
@@ -130,6 +133,70 @@ public final class Resources {
     }
 
     /**
+     * Ensures tree-packs are visible and {@code generate_data} has been applied before any
+     * datagen provider runs. Fails loudly if {@link Family#REGISTRY} still has nothing to emit.
+     */
+    public static void prepareDatagen() {
+        addClasspathTreePackIfMissing();
+        MANAGER.gatherData();
+        if (Family.REGISTRY.dataGenerationStream(DynamicTrees.MOD_ID).findAny().isEmpty()) {
+            throw new IllegalStateException(
+                    "Family.REGISTRY has no data-generation entries for '" + DynamicTrees.MOD_ID
+                            + "'. Tree-packs must be on the datagen classpath (common trees/). Loaded families: "
+                            + Family.REGISTRY.getAllFor(DynamicTrees.MOD_ID)
+                            + ", pack namespaces: " + MANAGER.getNamespaces());
+        }
+    }
+
+    private static void addClasspathTreePackIfMissing() {
+        if (MANAGER.getNamespaces().contains(DynamicTrees.MOD_ID)) {
+            return;
+        }
+        Path treesRoot = findClasspathTreesRoot();
+        if (treesRoot == null || !Files.exists(treesRoot)) {
+            DynamicTrees.LOG.error("Tree pack for {} was not on the classpath (looked for trees/dynamictrees/families/oak.json).", DynamicTrees.MOD_ID);
+            return;
+        }
+        DynamicTrees.LOG.info("Adding classpath tree pack from {}", treesRoot);
+        MANAGER.addPack(new TreePackResources(
+                new PackLocationInfo(
+                        DynamicTrees.MOD_ID + "_classpath",
+                        Component.translatable("treePack." + DynamicTrees.MOD_ID + ".name"),
+                        PackSource.BUILT_IN,
+                        Optional.empty()),
+                treesRoot.toAbsolutePath()
+        ));
+    }
+
+    private static Path findClasspathTreesRoot() {
+        URL oak = Resources.class.getClassLoader().getResource("trees/dynamictrees/families/oak.json");
+        if (oak == null) {
+            return null;
+        }
+        try {
+            URI uri = oak.toURI();
+            if ("file".equals(uri.getScheme())) {
+                return Path.of(uri).getParent().getParent().getParent();
+            }
+            if ("jar".equals(uri.getScheme())) {
+                String spec = uri.toString();
+                int bang = spec.indexOf("!/");
+                URI jarUri = URI.create(spec.substring(0, bang));
+                FileSystem fs;
+                try {
+                    fs = FileSystems.getFileSystem(jarUri);
+                } catch (FileSystemNotFoundException ignored) {
+                    fs = FileSystems.newFileSystem(jarUri, Map.of());
+                }
+                return fs.getPath("trees");
+            }
+        } catch (Exception e) {
+            DynamicTrees.LOG.error("Failed to resolve classpath tree pack from {}", oak, e);
+        }
+        return null;
+    }
+
+    /**
      * Listens for datapack reloads for actions such as reloading the trees resource manager and registering dirt bucket
      * recipes.
      */
@@ -140,10 +207,7 @@ public final class Resources {
             this.recipeManager = recipeManager;
         }
 
-        @Override
-        public CompletableFuture<Void> reload(PreparationBarrier stage, ResourceManager resourceManager,
-                                              ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler,
-                                              Executor backgroundExecutor, Executor gameExecutor) {
+        public CompletableFuture<Void> reload(PreparableReloadListener.SharedState sharedState, Executor backgroundExecutor, PreparationBarrier stage, Executor gameExecutor) {
             final CompletableFuture<?>[] futures = MANAGER.prepareReload(gameExecutor, backgroundExecutor);
 
             // Reload all reload listeners in the trees resource manager and registers dirt bucket recipes.

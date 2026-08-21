@@ -4,28 +4,25 @@ import com.dtteam.dynamictrees.api.configuration.ConfigurationProperty;
 import com.dtteam.dynamictrees.systems.genfeature.context.PreGenerationContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class ClearVolumeGenFeature extends GenFeature {
 
     public static final ConfigurationProperty<Integer> HEIGHT = ConfigurationProperty.integer("height");
 
-    public ClearVolumeGenFeature(ResourceLocation registryName) {
+    public ClearVolumeGenFeature(Identifier registryName) {
         super(registryName);
     }
 
-    @Override
     protected void registerProperties() {
         this.register(HEIGHT);
     }
 
-    @Override
     public GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(HEIGHT, 8);
     }
 
-    @Override
     protected BlockPos preGenerate(GenFeatureConfiguration configuration, PreGenerationContext context) {
         final BlockPos rootPos = context.pos();
 

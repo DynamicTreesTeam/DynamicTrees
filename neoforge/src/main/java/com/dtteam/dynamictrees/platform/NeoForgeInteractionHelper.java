@@ -20,7 +20,7 @@ public class NeoForgeInteractionHelper implements IInteractionHelper {
 
     @Override
     public boolean canToolAxeDig(ItemStack stack) {
-        return stack.canPerformAction(ItemAbilities.AXE_DIG);
+        return stack.canPerformAction(ItemAbilities.AXE_STRIP);
     }
 
     @Override
@@ -36,7 +36,7 @@ public class NeoForgeInteractionHelper implements IInteractionHelper {
 
     @Override
     public boolean blockDestroyByPlayer (BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluidState){
-        return state.onDestroyedByPlayer(level, pos, player, willHarvest, fluidState);
+        return state.onDestroyedByPlayer(level, pos, player, player.getMainHandItem(), willHarvest, fluidState);
     }
 
 }

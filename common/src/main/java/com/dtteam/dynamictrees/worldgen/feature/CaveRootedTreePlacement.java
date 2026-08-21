@@ -25,14 +25,12 @@ public class CaveRootedTreePlacement extends PlacementModifier {
     private CaveRootedTreePlacement(Unit unit) {
     }
 
-    @Override
     public Stream<BlockPos> getPositions(PlacementContext context, RandomSource random, BlockPos pos) {
-        return DynamicTreeFeature.DISC_PROVIDER.getPoissonDiscs(LevelContext.create(context.getLevel()), new ChunkPos(pos))
+        return DynamicTreeFeature.DISC_PROVIDER.getPoissonDiscs(LevelContext.create(context.getLevel()), ChunkPos.containing(pos))
                 .stream()
                 .map(disc -> new BlockPos(disc.x, 0, disc.z));
     }
 
-    @Override
     public PlacementModifierType<?> type() {
         return DTRegistries.CAVE_ROOTED_TREE_PLACEMENT_MODIFIER_TYPE.get();
     }

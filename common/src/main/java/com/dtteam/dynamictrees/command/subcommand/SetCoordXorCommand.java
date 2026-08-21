@@ -11,19 +11,16 @@ import java.util.Collections;
 
 public final class SetCoordXorCommand extends SubCommand {
 
-    @Override
     protected String getName() {
         return CommandConstants.SET_COORD_XOR;
     }
 
-    @Override
     protected int getPermissionLevel() {
         return 2;
     }
 
     private static final String XOR = "xor";
 
-    @Override
     public ArgumentBuilder<CommandSourceStack, ?> registerArgument() {
         return intArgument(XOR).suggests(((context, builder) -> SharedSuggestionProvider.suggest(Collections.singletonList("0"), builder)))
                 .executes(context -> executesSuccess(() -> this.setXor(context.getSource(), intArgument(context, XOR))));

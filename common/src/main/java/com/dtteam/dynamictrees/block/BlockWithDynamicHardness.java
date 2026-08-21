@@ -62,11 +62,10 @@ public abstract class BlockWithDynamicHardness extends Block {
      */
     protected final class DynamicHardnessBlockState extends BlockState {
 
-        public DynamicHardnessBlockState(Block block, Reference2ObjectArrayMap<Property<?>, Comparable<?>> propertiesToValueMap, MapCodec<BlockState> codec) {
-            super(block, propertiesToValueMap, codec);
+        public DynamicHardnessBlockState(Block block, Property<?>[] properties, Comparable<?>[] values) {
+            super(block, properties, values);
         }
 
-        @Override
         public float getDestroySpeed(BlockGetter level, BlockPos pos) {
             return getHardness(this, level, pos);
         }

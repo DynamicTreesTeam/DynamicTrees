@@ -18,8 +18,7 @@
 //        this.modFile = modFile;
 //    }
 //
-//    @Override
-//    protected Path resolve(String paths) {
+////    protected Path resolve(String paths) {
 //        String[] newPaths = new String[paths.length + 1];
 //        newPaths[0] = Resources.TREES;
 //        System.arraycopy(paths, 0, newPaths, 1, paths.length);

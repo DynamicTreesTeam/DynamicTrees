@@ -14,13 +14,11 @@ public final class MutableSuppliedLazyValue<T> extends SuppliedLazyValue<T> impl
         super(supplier);
     }
 
-    @Override
     public void reset(Supplier<T> supplier) {
         this.supplier = supplier;
         this.object = null;
     }
 
-    @Override
     public void set(@NotNull T value) {
         Objects.requireNonNull(value);
         this.object = value;

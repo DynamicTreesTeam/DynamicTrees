@@ -23,7 +23,6 @@ public class Noise implements MathOperator {
 		this.noise = noise;
 	}
 	
-	@Override
 	public double apply(MathContext mc) {
 		double x = xFunc.apply(mc);
 		double y = yFunc.apply(mc);

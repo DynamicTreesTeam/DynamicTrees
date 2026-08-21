@@ -175,7 +175,7 @@ public class SurfaceRootBlockBakedModel extends DynamicTreesBlockStateModel {
 
         for (Direction face : Direction.values()) {
             if (isGrounded) {
-                CuboidQuadBaker.emit(emitter, cores[coreDir][coreRadius - 1], face, cullTest);
+                emit(emitter, cores[coreDir][coreRadius - 1], face, cullTest);
             }
             if (coreRadius != 8) {
                 for (Direction connDir : CoordUtils.HORIZONTALS) {
@@ -183,10 +183,10 @@ public class SurfaceRootBlockBakedModel extends DynamicTreesBlockStateModel {
                     int connRadius = connections[idx];
                     if (connRadius > 0 && connRadius < 8) {
                         if (isGrounded) {
-                            CuboidQuadBaker.emit(emitter, sleeves[idx][connRadius - 1], face, cullTest);
+                            emit(emitter, sleeves[idx][connRadius - 1], face, cullTest);
                         }
                         if (connectionLevels[idx] == RootConnections.ConnectionLevel.HIGH) {
-                            CuboidQuadBaker.emit(emitter, verts[idx][connRadius - 1], face, cullTest);
+                            emit(emitter, verts[idx][connRadius - 1], face, cullTest);
                         }
                     }
                 }
@@ -201,6 +201,23 @@ public class SurfaceRootBlockBakedModel extends DynamicTreesBlockStateModel {
         }
         List<BakedQuad> core = cores[0][coreRadius - 1];
         return core != null ? core : List.of();
+    }
+
+    private static void emit(QuadEmitter emitter, List<BakedQuad> quads, Direction face, Predicate<Direction> cullTest) {
+        if (face != null && cullTest.test(face)) {
+            return;
+        }
+        if (quads == null) {
+            return;
+        }
+        for (BakedQuad quad : quads) {
+            if (face != null && quad.direction() != face) {
+                continue;
+            }
+            emitter.fromBakedQuad(quad);
+            emitter.cullFace(quad.direction());
+            emitter.emit();
+        }
     }
 
     protected Direction getSourceDir(int coreRadius, int[] connections) {

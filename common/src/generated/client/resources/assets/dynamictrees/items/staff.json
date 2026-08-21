@@ -1,0 +1,20 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "dynamictrees:item/staff",
+    "tints": [
+      {
+        "type": "dynamictrees:staff",
+        "index": 0
+      },
+      {
+        "type": "dynamictrees:staff",
+        "index": 1
+      },
+      {
+        "type": "minecraft:constant",
+        "value": -1
+      }
+    ]
+  }
+}

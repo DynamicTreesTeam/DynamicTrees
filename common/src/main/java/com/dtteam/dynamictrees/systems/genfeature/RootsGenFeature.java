@@ -14,7 +14,7 @@ import com.dtteam.dynamictrees.utility.CoordUtils;
 import com.dtteam.dynamictrees.utility.CoordUtils.Surround;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.LevelAccessor;
@@ -33,18 +33,16 @@ public class RootsGenFeature extends GenFeature {
 
     private final SimpleVoxmap[] rootMaps;
 
-    public RootsGenFeature(ResourceLocation registryName) {
+    public RootsGenFeature(Identifier registryName) {
         super(registryName);
 
         this.rootMaps = createRootMaps();
     }
 
-    @Override
     protected void registerProperties() {
         this.register(MIN_TRUNK_RADIUS, LEVEL_LIMIT, SCALE_FACTOR);
     }
 
-    @Override
     protected GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(MIN_TRUNK_RADIUS, 13)
@@ -76,7 +74,6 @@ public class RootsGenFeature extends GenFeature {
         return Math.max(8, configuration.get(MIN_TRUNK_RADIUS));
     }
 
-    @Override
     protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
         final BlockPos treePos = context.pos().above();
         final int trunkRadius = TreeHelper.getRadius(context.level(), treePos);
@@ -84,7 +81,6 @@ public class RootsGenFeature extends GenFeature {
                 this.startRoots(configuration, context.level(), treePos, context.species(), trunkRadius);
     }
 
-    @Override
     protected boolean postGrow(GenFeatureConfiguration configuration, PostGrowContext context) {
         final LevelAccessor level = context.level();
         final BlockPos treePos = context.treePos();

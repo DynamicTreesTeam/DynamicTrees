@@ -15,7 +15,6 @@ import java.util.List;
  */
 public final class SurfaceGroundFinder implements GroundFinder {
 
-    @Override
     public List<BlockPos> findGround(LevelAccessor level, BlockPos start, @Nullable Heightmap.Types heightmap) {
     	if (heightmap == null) {
     		return Collections.singletonList(CoordUtils.findWorldSurface(level, start, true));

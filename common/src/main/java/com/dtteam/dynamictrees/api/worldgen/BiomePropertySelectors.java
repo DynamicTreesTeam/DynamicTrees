@@ -69,19 +69,15 @@ public class BiomePropertySelectors {
         private NoFeatureCancellation() {
         }
 
-        @Override
         public void cancelFeatures(BiomeGenSettingsBuilderWrapper generationSettingsBuilder) {
         }
 
-        @Override
         public void cancelUsing(FeatureCanceller featureCanceller) {
         }
 
-        @Override
         public void cancelWithNamespace(String namespace) {
         }
 
-        @Override
         public void cancelDuring(GenerationStep.Decoration generationStep) {
         }
 
@@ -103,7 +99,6 @@ public class BiomePropertySelectors {
             this.decorationSteps = decorationSteps;
         }
 
-        @Override
         public void cancelFeatures(BiomeGenSettingsBuilderWrapper generationSettingsBuilder) {
             decorationSteps.stream().map(generationSettingsBuilder::getFeatures).forEach(features ->
                     features.removeIf(placedFeatureHolder -> shouldRemovePlacedFeature(placedFeatureHolder.value()))
@@ -112,21 +107,18 @@ public class BiomePropertySelectors {
 
         private boolean shouldRemovePlacedFeature(PlacedFeature placedFeature) {
             return placedFeature.getFeatures().anyMatch(configuredFeature ->
-                    cancellers.stream().anyMatch(canceller -> canceller.shouldCancel(configuredFeature, this))
+                    cancellers.stream().anyMatch(canceller -> canceller.shouldCancel(configuredFeature.value(), this))
             );
         }
 
-        @Override
         public void cancelUsing(FeatureCanceller featureCanceller) {
             cancellers.add(featureCanceller);
         }
 
-        @Override
         public void cancelWithNamespace(String namespace) {
             namespaces.add(namespace);
         }
 
-        @Override
         public void cancelDuring(GenerationStep.Decoration generationStep) {
             decorationSteps.add(generationStep);
         }
@@ -213,7 +205,6 @@ public class BiomePropertySelectors {
             this(new SpeciesSelection());
         }
 
-        @Override
         public SpeciesSelection getSpecies(BlockPos pos, BlockState dirt, RandomSource random) {
             return decision;
         }
@@ -250,7 +241,6 @@ public class BiomePropertySelectors {
             return this;
         }
 
-        @Override
         public SpeciesSelection getSpecies(BlockPos pos, BlockState dirt, RandomSource random) {
             int chance = random.nextInt(totalWeight);
 

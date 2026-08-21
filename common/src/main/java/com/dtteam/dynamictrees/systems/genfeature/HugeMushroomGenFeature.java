@@ -10,7 +10,7 @@ import com.dtteam.dynamictrees.tree.ChunkTreeHelper;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.google.common.collect.Iterables;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
@@ -32,23 +32,20 @@ public class HugeMushroomGenFeature extends GenFeature {
 
     private int height = -1;
 
-    public HugeMushroomGenFeature(ResourceLocation registryName) {
+    public HugeMushroomGenFeature(Identifier registryName) {
         super(registryName);
     }
 
-    @Override
     protected void registerProperties() {
         this.register(MUSHROOM_BLOCK, STEM_BLOCK);
     }
 
-    @Override
     protected GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(MUSHROOM_BLOCK, Blocks.AIR)
                 .with(STEM_BLOCK, Blocks.MUSHROOM_STEM);
     }
 
-    @Override
     public boolean shouldApply(Species species, GenFeatureConfiguration configuration) {
         return !Services.PLATFORM.isModLoaded(DynamicTrees.DYNAMIC_TREES_PLUS);
     }
@@ -181,7 +178,6 @@ public class HugeMushroomGenFeature extends GenFeature {
         return this.height > 0 ? this.height : random.nextInt(maxHeightVar) + maxHeightBase;
     }
 
-    @Override
     protected boolean generate(GenFeatureConfiguration configuration, FullGenerationContext context) {
         return generateMushrooms(configuration, context);
     }

@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.api.resource.loading.preparation;
 
 import com.dtteam.dynamictrees.api.resource.DTResource;
 import com.dtteam.dynamictrees.api.resource.ResourceCollector;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 
 import java.io.BufferedReader;
@@ -23,8 +23,7 @@ public class TextResourcePreparer extends AbstractResourcePreparer<List<String>>
         super(folderName, EXTENSION, resourceCollector);
     }
 
-    @Override
-    protected void readAndPutResource(Resource resource, ResourceLocation resourceName)
+    protected void readAndPutResource(Resource resource, Identifier resourceName)
             throws IOException {
         final List<String> lines = this.readResource(resource);
         this.resourceCollector.put(new DTResource<>(resourceName, lines));

@@ -1,7 +1,7 @@
 package com.dtteam.dynamictrees.worldgen.holderset;
 
 import com.mojang.datafixers.util.Either;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.tags.TagKey;
@@ -57,5 +57,10 @@ public abstract class StreamBackedHolderSet<T> implements HolderSet<T> {
     @Override
     public Optional<TagKey<T>> unwrapKey() {
         return Optional.empty();
+    }
+
+    @Override
+    public boolean isBound() {
+        return true;
     }
 }

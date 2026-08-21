@@ -19,23 +19,19 @@ public final class RegistryCommand extends SubCommand {
         Registries.REGISTRIES.forEach(registry -> subCommands.add(new RegistrySubCommand<>(registry)));
     }
 
-    @Override
     protected String getName() {
         return "registry";
     }
 
-    @Override
     protected int getPermissionLevel() {
         return 0;
     }
 
-    @Override
     protected List<ArgumentBuilder<CommandSourceStack, ?>> registerArguments() {
         return this.subCommands.stream().map(SubCommand::register)
                 .collect(Collectors.toList());
     }
 
-    @Override
     public ArgumentBuilder<CommandSourceStack, ?> registerArgument() {
         return stringArgument("null");
     }

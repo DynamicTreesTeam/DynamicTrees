@@ -9,7 +9,6 @@ public class Const implements MathOperator {
 		this.value = value;
 	}
 	
-	@Override
 	public double apply(MathContext mc) {
 		return value;
 	}

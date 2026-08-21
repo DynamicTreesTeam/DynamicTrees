@@ -6,7 +6,7 @@ import com.dtteam.dynamictrees.systems.growthlogic.context.DirectionSelectionCon
 import com.dtteam.dynamictrees.systems.growthlogic.context.PositionalSpeciesContext;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class ConiferLogic extends GrowthLogicKit {
 
@@ -24,11 +24,10 @@ public class ConiferLogic extends GrowthLogicKit {
      */
     public static final ConfigurationProperty<Boolean> VARIATE_LOWEST_BRANCH = ConfigurationProperty.bool("variate_lowest_branch");
 
-    public ConiferLogic(final ResourceLocation registryName) {
+    public ConiferLogic(final Identifier registryName) {
         super(registryName);
     }
 
-    @Override
     protected GrowthLogicKitConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(ENERGY_DIVISOR, 3F)
@@ -37,12 +36,10 @@ public class ConiferLogic extends GrowthLogicKit {
                 .with(VARIATE_LOWEST_BRANCH, false);
     }
 
-    @Override
     protected void registerProperties() {
         this.register(ENERGY_DIVISOR, HORIZONTAL_LIMITER, HEIGHT_VARIATION, VARIATE_LOWEST_BRANCH);
     }
 
-    @Override
     public Direction selectNewDirection(GrowthLogicKitConfiguration configuration, DirectionSelectionContext context) {
         final Direction newDir = super.selectNewDirection(configuration, context);
         if (context.signal().isInTrunk() && newDir != Direction.UP) { // Turned out of trunk.
@@ -55,7 +52,6 @@ public class ConiferLogic extends GrowthLogicKit {
         return newDir;
     }
 
-    @Override
     public int[] populateDirectionProbabilityMap(GrowthLogicKitConfiguration configuration, DirectionManipulationContext context) {
         final int[] probMap = super.populateDirectionProbabilityMap(configuration, context);
         Direction originDir = context.signal().dir.getOpposite();
@@ -74,13 +70,11 @@ public class ConiferLogic extends GrowthLogicKit {
     //Spruce trees are so similar that it makes sense to randomize their height for a little variation
     //but we don't want the trees to always be the same height all the time when planted in the same location
     //so we feed the hash function the in-game month
-    @Override
     public float getEnergy(GrowthLogicKitConfiguration configuration, PositionalSpeciesContext context) {
         return super.getEnergy(configuration, context) * context.species().biomeSuitability(context.level(), context.pos())
                 + getHashVariation(configuration, context); // Vary the height energy by a psuedorandom hash function
     }
 
-    @Override
     public int getLowestBranchHeight(GrowthLogicKitConfiguration configuration, PositionalSpeciesContext context) {
         return (int)(super.getLowestBranchHeight(configuration, context) +
                 (configuration.get(VARIATE_LOWEST_BRANCH) ? getHashVariation(configuration, context) : 1f));

@@ -134,7 +134,6 @@ public abstract class Configuration<T extends Configuration<T, C>, C extends Con
         return this.configurable;
     }
 
-    @Override
     public String toString() {
         return this.getClass().getSimpleName() + "{" +
                 "configurable=" + configurable +

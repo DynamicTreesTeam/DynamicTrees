@@ -4,7 +4,7 @@ import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
 import com.dtteam.dynamictrees.deserialization.result.Result;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.world.phys.shapes.BooleanOp;
 
 import java.util.Map;
@@ -33,7 +33,6 @@ public final class BooleanOpDeserializer implements JsonDeserializer<BooleanOp> 
         values.put("true", BooleanOp.TRUE);
     });
 
-    @Override
     public Result<BooleanOp, JsonElement> deserialize(JsonElement input) {
         return JsonDeserializers.STRING.deserialize(input)
                 .map(VALUES::get);

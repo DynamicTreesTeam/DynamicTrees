@@ -1,5 +1,9 @@
 package com.dtteam.dynamictrees.registry;
 
+import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
+
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
+
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.branch.TrunkShellBlock;
@@ -61,9 +65,9 @@ import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvi
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElementType;
-import net.minecraft.world.level.storage.loot.entries.LootPoolEntryType;
-import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
-import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.MapCodec;
 
 import java.util.LinkedList;
 import java.util.Optional;
@@ -226,25 +230,25 @@ public class DTRegistries {
     // LOOT
     ///////////////////////////////////////////
 
-    public static final Supplier<LootItemConditionType> SPECIES_MATCHES = Services.REGISTRY.getRegistryLoader()
+    public static final Supplier<MapCodec<? extends LootItemCondition>> SPECIES_MATCHES = Services.REGISTRY.getRegistryLoader()
             .registerLootConditionType("species_matches", SpeciesMatches.CODEC);
-    public static final Supplier<LootItemConditionType> SEASONAL_SEED_DROP_CHANCE = Services.REGISTRY.getRegistryLoader()
+    public static final Supplier<MapCodec<? extends LootItemCondition>> SEASONAL_SEED_DROP_CHANCE = Services.REGISTRY.getRegistryLoader()
             .registerLootConditionType("seasonal_seed_drop_chance", SeasonalSeedDropChance.CODEC);
-    public static final Supplier<LootItemConditionType> VOLUNTARY_SEED_DROP_CHANCE = Services.REGISTRY.getRegistryLoader()
+    public static final Supplier<MapCodec<? extends LootItemCondition>> VOLUNTARY_SEED_DROP_CHANCE = Services.REGISTRY.getRegistryLoader()
             .registerLootConditionType("voluntary_seed_drop_chance", VoluntarySeedDropChance.CODEC);
 
-    public static final Supplier<LootPoolEntryType> ITEM_BY_SPECIES = Services.REGISTRY.getRegistryLoader()
+    public static final Supplier<MapCodec<? extends LootPoolEntryContainer>> ITEM_BY_SPECIES = Services.REGISTRY.getRegistryLoader()
             .registerLootPoolEntryType("item_by_species", ItemBySpeciesLootPoolEntry.CODEC);
-    public static final Supplier<LootPoolEntryType> SEED_ITEM = Services.REGISTRY.getRegistryLoader()
+    public static final Supplier<MapCodec<? extends LootPoolEntryContainer>> SEED_ITEM = Services.REGISTRY.getRegistryLoader()
             .registerLootPoolEntryType("seed_item", SeedItemLootPoolEntry.CODEC);
-    public static final Supplier<LootPoolEntryType> WEIGHTED_ITEM = Services.REGISTRY.getRegistryLoader()
+    public static final Supplier<MapCodec<? extends LootPoolEntryContainer>> WEIGHTED_ITEM = Services.REGISTRY.getRegistryLoader()
             .registerLootPoolEntryType("weighted_item", WeightedItemLootPoolEntry.CODEC);
 
-    public static final Supplier<LootItemFunctionType<MultiplyCount>> MULTIPLY_COUNT = Services.REGISTRY.getRegistryLoader()
+    public static final Supplier<MapCodec<MultiplyCount>> MULTIPLY_COUNT = Services.REGISTRY.getRegistryLoader()
             .registerLootFunctionType("multiply_count", MultiplyCount.CODEC);
-    public static final Supplier<LootItemFunctionType<MultiplyByLogsCount>> MULTIPLY_LOGS_COUNT = Services.REGISTRY.getRegistryLoader()
+    public static final Supplier<MapCodec<MultiplyByLogsCount>> MULTIPLY_LOGS_COUNT = Services.REGISTRY.getRegistryLoader()
             .registerLootFunctionType("multiply_logs_count", MultiplyByLogsCount.CODEC);
-    public static final Supplier<LootItemFunctionType<MultiplyBySticksCount>> MULTIPLY_STICKS_COUNT = Services.REGISTRY.getRegistryLoader()
+    public static final Supplier<MapCodec<MultiplyBySticksCount>> MULTIPLY_STICKS_COUNT = Services.REGISTRY.getRegistryLoader()
             .registerLootFunctionType("multiply_sticks_count", MultiplyBySticksCount.CODEC);
 
     ///////////////////////////////////////////
@@ -275,7 +279,7 @@ public class DTRegistries {
             .registerStructurePoolElementType("tree_pool_element", () -> () -> TreePoolElement.CODEC);
 
     public static final Supplier<RecipeSerializer<SeedConversionRecipe>> SEED_CONVERSION_RECIPE_TYPE = Services.REGISTRY.getRegistryLoader()
-            .registerRecipeType("seed_conversion", ()->new SimpleCraftingRecipeSerializer<>(SeedConversionRecipe::new));
+            .registerRecipeType("seed_conversion", ()->new RecipeSerializer<>(MapCodec.unit(new SeedConversionRecipe()), StreamCodec.unit(new SeedConversionRecipe())));
     public static final Supplier<RecipeSerializer<MegaSeedRecipe>> MEGA_SEED_RECIPE_TYPE = Services.REGISTRY.getRegistryLoader()
-            .registerRecipeType("mega_seed", ()->new SimpleCraftingRecipeSerializer<>(MegaSeedRecipe::new));
+            .registerRecipeType("mega_seed", ()->new RecipeSerializer<>(MapCodec.unit(new MegaSeedRecipe()), StreamCodec.unit(new MegaSeedRecipe())));
 }

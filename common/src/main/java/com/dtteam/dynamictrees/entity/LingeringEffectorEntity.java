@@ -16,9 +16,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 
-public class LingeringEffectorEntity extends Entity {// implements IEntityAdditionalSpawnData {
+public class LingeringEffectorEntity extends Entity {
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
+    }
+// implements IEntityAdditionalSpawnData {
 
-    public static final EntityDataAccessor<CompoundTag> effectorDataParameter = SynchedEntityData.defineId(LingeringEffectorEntity.class, EntityDataSerializers.COMPOUND_TAG);
+    public static final EntityDataAccessor<String> effectorDataParameter = SynchedEntityData.defineId(LingeringEffectorEntity.class, EntityDataSerializers.STRING);
 
     private BlockPos blockPos;
     private SubstanceEffect effect;
@@ -37,7 +41,7 @@ public class LingeringEffectorEntity extends Entity {// implements IEntityAdditi
             // Search for existing effectors with the same effect in the same place.
             for (final LingeringEffectorEntity effector : level.getEntitiesOfClass(LingeringEffectorEntity.class, new AABB(pos))) {
                 if (effector.getEffect() != null && effector.getEffect().getName().equals(effect.getName())) {
-                    effector.kill(); // Kill old effector if it's the same.
+                    effector.discard(); // Kill old effector if it's the same.
                 }
             }
         }
@@ -67,21 +71,16 @@ public class LingeringEffectorEntity extends Entity {// implements IEntityAdditi
         return this.effect;
     }
 
-    @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        builder.define(effectorDataParameter, new CompoundTag());
+        builder.define(effectorDataParameter, "");
     }
 
-    @Override
-    protected void readAdditionalSaveData(CompoundTag tag) {
-        CompoundTag effector = (CompoundTag) tag.get("effector");
-        if (effector != null)
-            setEffectorData(effector);
+    protected void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput input) {
+        input.read("effector", CompoundTag.CODEC).ifPresent(this::setEffectorData);
     }
 
-    @Override
-    protected void addAdditionalSaveData(CompoundTag tag) {
-        tag.put("effector", getEffectorData());
+    protected void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput output) {
+        output.store("effector", CompoundTag.CODEC, getEffectorData());
     }
 
     public CompoundTag buildEffectorData(BlockPos pos, @Nullable SubstanceEffect substance) {
@@ -95,30 +94,37 @@ public class LingeringEffectorEntity extends Entity {// implements IEntityAdditi
     }
 
     public void setEffectorData(CompoundTag tag) {
-        blockPos = new BlockPos(tag.getInt("posx"), tag.getInt("posy"), tag.getInt("posz"));
-        effect = LingeringSubstances.fromIndex(tag.getInt("effect")).get();
-        getEntityData().set(effectorDataParameter, tag);
+        blockPos = new BlockPos(tag.getIntOr("posx", 0), tag.getIntOr("posy", 0), tag.getIntOr("posz", 0));
+        effect = LingeringSubstances.fromIndex(tag.getIntOr("effect", 0)).get();
+        getEntityData().set(effectorDataParameter, tag.toString());
     }
 
     public CompoundTag getEffectorData() {
-        return getEntityData().get(effectorDataParameter);
+        try {
+            String snbt = getEntityData().get(effectorDataParameter);
+            return snbt == null || snbt.isEmpty() ? new CompoundTag() : net.minecraft.nbt.TagParser.parseCompoundFully(snbt);
+        } catch (Exception e) {
+            return new CompoundTag();
+        }
     }
 
     private byte invalidTicks = 0;
 
-    @Override
     public void tick() {
         super.tick();
 
-        if (level().isClientSide() && !clientBuilt){
-            setEffectorData(getEffectorData());
-            clientBuilt = true;
+        if (level().isClientSide() && !clientBuilt) {
+            String snbt = getEntityData().get(effectorDataParameter);
+            if (snbt != null && !snbt.isEmpty()) {
+                setEffectorData(getEffectorData());
+                clientBuilt = true;
+            }
         }
 
         if (this.effect == null) {
             // If effect hasn't been set for 20 ticks then kill the entity.
             if (++this.invalidTicks > 20) {
-                this.kill();
+                this.discard();
             }
             return;
         }
@@ -129,10 +135,10 @@ public class LingeringEffectorEntity extends Entity {// implements IEntityAdditi
 
         if (blockState.getBlock() instanceof SoilBlock) {
             if (!this.effect.update(this.level(), this.blockPos, this.tickCount, blockState.getValue(SoilBlock.FERTILITY))) {
-                this.kill();
+                this.discard();
             }
         } else {
-            this.kill();
+            this.discard();
         }
     }
 

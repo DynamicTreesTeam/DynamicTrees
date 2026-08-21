@@ -20,7 +20,6 @@ public class ActiveSeasonGrowthCalculator implements SeasonGrowthCalculator {
         } else return summerOffset;
     }
 
-    @Override
     public float calcGrowthRate(Float seasonValue, ClimateZoneType type) {
 
         if (seasonValue == null) {
@@ -36,7 +35,6 @@ public class ActiveSeasonGrowthCalculator implements SeasonGrowthCalculator {
         };
     }
 
-    @Override
     public float calcSeedDropRate(Float seasonValue, ClimateZoneType type) {
 
         if (seasonValue == null) {
@@ -52,7 +50,6 @@ public class ActiveSeasonGrowthCalculator implements SeasonGrowthCalculator {
         };
     }
 
-    @Override
     public float calcFruitProductionRate(Float seasonValue, ClimateZoneType type) {
 
         if (seasonValue == null) {
@@ -68,7 +65,6 @@ public class ActiveSeasonGrowthCalculator implements SeasonGrowthCalculator {
         };
     }
 
-    @Override
     public Float getPeakFruitProductionSeasonValue(ClimateZoneType type) {
         return switch (type) {
             case TEMPERATE, COLD -> 2 + peakClimateOffset(SeasonType.TEMPERATURE);

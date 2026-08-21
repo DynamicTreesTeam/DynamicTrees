@@ -498,15 +498,14 @@ public class JoCode {
         return new CodeCompiler(code).compile();
     }
 
-    @Override
     public String toString() {
         return encode(instructions);
     }
 
     public Component getTextComponent() {
         return Component.literal(this.toString()).withStyle(style ->
-                style.withColor(ChatFormatting.AQUA).withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, this.toString()))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("chat.copy.click")))
+                style.withColor(ChatFormatting.AQUA).withClickEvent(new ClickEvent.CopyToClipboard( this.toString()))
+                        .withHoverEvent(new HoverEvent.ShowText( Component.translatable("chat.copy.click")))
         );
     }
 

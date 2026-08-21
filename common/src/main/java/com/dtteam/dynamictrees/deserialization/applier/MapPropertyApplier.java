@@ -29,7 +29,6 @@ public class MapPropertyApplier<T, V, I> extends PropertyApplier<T, Map<String,V
     }
 
     @Nullable
-    @Override
     protected PropertyApplierResult applyIfShould(T object, I input, Applier<T, Map<String,V>> applier) {
         HashMap<String, V> values = new HashMap<>();
         jsonObjectDeserializer.apply(input).entrySet().forEach((entry)->{

@@ -3,7 +3,7 @@ package com.dtteam.dynamictrees.api.resource.loading.preparation;
 import com.dtteam.dynamictrees.api.resource.ResourceAccessor;
 import com.dtteam.dynamictrees.api.resource.ResourceCollector;
 import com.mojang.logging.LogUtils;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.slf4j.Logger;
@@ -29,7 +29,6 @@ public abstract class AbstractResourcePreparer<R> implements ResourcePreparer<R>
         this.resourceCollector = resourceCollector;
     }
 
-    @Override
     public ResourceAccessor<R> prepare(ResourceManager resourceManager) {
         this.readAndPutResources(resourceManager, this.collectResources(resourceManager));
         ResourceAccessor<R> accessor = this.resourceCollector.createAccessor();
@@ -37,18 +36,18 @@ public abstract class AbstractResourcePreparer<R> implements ResourcePreparer<R>
         return accessor;
     }
 
-    protected Map<ResourceLocation, Resource> collectResources(ResourceManager resourceManager) {
+    protected Map<Identifier, Resource> collectResources(ResourceManager resourceManager) {
         return resourceManager.listResources(this.folderName, (fileName) -> fileName.getPath().endsWith(this.extension));
     }
 
-    protected void readAndPutResources(ResourceManager resourceManager, Map<ResourceLocation, Resource> resourceMap) {
+    protected void readAndPutResources(ResourceManager resourceManager, Map<Identifier, Resource> resourceMap) {
         resourceMap.forEach((location, resource) -> {
-            final ResourceLocation resourceName = this.getResourceName(location);
+            final Identifier resourceName = this.getResourceName(location);
             this.tryReadAndPutResource(resource, location, resourceName);
         });
     }
 
-    private void tryReadAndPutResource(Resource resource, ResourceLocation location, ResourceLocation resourceName) {
+    private void tryReadAndPutResource(Resource resource, Identifier location, Identifier resourceName) {
         try {
             this.readAndPutResource(resource, resourceName);
         } catch (PreparationException | IOException e) {
@@ -56,19 +55,19 @@ public abstract class AbstractResourcePreparer<R> implements ResourcePreparer<R>
         }
     }
 
-    protected abstract void readAndPutResource(Resource resource, ResourceLocation resourceName)
+    protected abstract void readAndPutResource(Resource resource, Identifier resourceName)
             throws PreparationException, IOException;
 
-    protected void logError(ResourceLocation location, Exception e) {
+    protected void logError(Identifier location, Exception e) {
         LOGGER.error("Could not read file \"{}\" due to exception.", location, e);
     }
 
-    protected ResourceLocation getResourceName(ResourceLocation location) {
+    protected Identifier getResourceName(Identifier location) {
         final String resourcePath = location.getPath();
         final int pathIndex = this.folderName.length() + 1;
         final int pathEndIndex = resourcePath.length() - this.extensionLength;
 
-        return ResourceLocation.fromNamespaceAndPath(location.getNamespace(),
+        return Identifier.fromNamespaceAndPath(location.getNamespace(),
                 resourcePath.substring(pathIndex, pathEndIndex));
     }
 

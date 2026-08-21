@@ -5,7 +5,7 @@ import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.LevelAccessor;
@@ -34,7 +34,7 @@ public class SubterraneanGroundFinder implements GroundFinder {
 
     protected ArrayList<Integer> findSubterraneanLayerHeights(final LevelAccessor level, final BlockPos start) {
         final int maxY = this.getTopY(level, start);
-        final int minY = level.getMinBuildHeight();
+        final int minY = level.getMinY();
         final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(start.getX(), minY, start.getZ());
         final ArrayList<Integer> layers = new ArrayList<>();
 
@@ -62,7 +62,6 @@ public class SubterraneanGroundFinder implements GroundFinder {
         return layers;
     }
 
-    @Override
     public List<BlockPos> findGround(LevelAccessor level, BlockPos start, @Nullable Heightmap.Types heightmap) {
         final ArrayList<Integer> layers = findSubterraneanLayerHeights(level, start);
         if (layers.isEmpty()) {
@@ -72,7 +71,7 @@ public class SubterraneanGroundFinder implements GroundFinder {
         for (int y : layers) {
             BlockPos pos = new BlockPos(start.getX(), y, start.getZ());
             //We only want positions for underground biomes and underground dimensions
-            if (level.dimensionType().hasCeiling() || level.getBiome(pos).is(TagKey.create(Registries.BIOME, ResourceLocation.parse("c:is_underground"))))
+            if (level.dimensionType().hasCeiling() || level.getBiome(pos).is(TagKey.create(Registries.BIOME, Identifier.parse("c:is_underground"))))
                 positions.add(pos);
         }
 

@@ -22,19 +22,16 @@ import static com.dtteam.dynamictrees.command.CommandConstants.*;
 
 public final class SetTreeCommand extends SubCommand {
 
-    @Override
     protected String getName() {
         return CommandConstants.SET_TREE;
     }
 
-    @Override
     protected int getPermissionLevel() {
         return 2;
     }
 
     private static final int DEFAULT_FERTILITY = 0;
 
-    @Override
     public ArgumentBuilder<CommandSourceStack, ?> registerArgument() {
         return blockPosArgument()
                 .then(speciesArgument()//Already suggests

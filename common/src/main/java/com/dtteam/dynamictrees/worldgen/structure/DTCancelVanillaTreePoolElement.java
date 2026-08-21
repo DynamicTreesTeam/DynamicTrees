@@ -46,45 +46,36 @@ public class DTCancelVanillaTreePoolElement extends StructurePoolElement {
         return DTConfigs.COMMON.cancelVanillaVillageTrees.get();
     }
 
-    @Override
     public Vec3i getSize(StructureTemplateManager structureTemplateManager, Rotation rotation) {
         return this.isEnabled() ? this.enabled.getSize(structureTemplateManager, rotation) : this.disabled.getSize(structureTemplateManager, rotation);
     }
 
-    @Override
-    public List<StructureTemplate.StructureBlockInfo> getShuffledJigsawBlocks(StructureTemplateManager structureTemplateManager, BlockPos pos, Rotation rotation, RandomSource random) {
-        return this.isEnabled()
-                ? this.enabled.getShuffledJigsawBlocks(structureTemplateManager, pos, rotation, random)
-                : this.disabled.getShuffledJigsawBlocks(structureTemplateManager, pos, rotation, random);
+    public List<StructureTemplate.JigsawBlockInfo> getShuffledJigsawBlocks(StructureTemplateManager structureTemplateManager, BlockPos pos, Rotation rotation, RandomSource random) {
+        return java.util.List.of();
     }
 
-    @Override
     public BoundingBox getBoundingBox(StructureTemplateManager structureTemplateManager, BlockPos pos, Rotation rotation) {
         return this.isEnabled()
                 ? this.enabled.getBoundingBox(structureTemplateManager, pos, rotation)
                 : this.disabled.getBoundingBox(structureTemplateManager, pos, rotation);
     }
 
-    @Override
     public boolean place(StructureTemplateManager structureTemplateManager, WorldGenLevel level, StructureManager structureManager, ChunkGenerator generator, BlockPos blockPos, BlockPos blockPos1, Rotation rotation, BoundingBox box, RandomSource random, LiquidSettings liquidSettings, boolean b) {
         return this.isEnabled()
                 ? this.enabled.place(structureTemplateManager, level, structureManager, generator, blockPos, blockPos1, rotation, box, random, liquidSettings, b)
                 : this.disabled.place(structureTemplateManager, level, structureManager, generator, blockPos, blockPos1, rotation, box, random, liquidSettings, b);
     }
 
-    @Override
     public StructureTemplatePool.Projection getProjection() {
         return this.isEnabled() ? this.enabled.getProjection() : this.disabled.getProjection();
     }
 
-    @Override
     public StructurePoolElement setProjection(StructureTemplatePool.Projection projection) {
         this.enabled.setProjection(projection);
         this.disabled.setProjection(projection);
         return this;
     }
 
-    @Override
     public StructurePoolElementType<?> getType() {
         return DTRegistries.CANCEL_VANILLA_VILLAGE_TREE_STRUCTURE_POOL_ELEMENT_TYPE.get();
     }

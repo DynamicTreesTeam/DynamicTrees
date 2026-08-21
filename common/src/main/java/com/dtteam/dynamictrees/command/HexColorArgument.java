@@ -26,7 +26,6 @@ public final class HexColorArgument implements ArgumentType<Integer> {
         return context.getArgument(name, Integer.class);
     }
 
-    @Override
     public Integer parse(StringReader reader) throws CommandSyntaxException {
         final String in = reader.readString();
         final int colour;
@@ -40,7 +39,6 @@ public final class HexColorArgument implements ArgumentType<Integer> {
         return colour;
     }
 
-    @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
         return SharedSuggestionProvider.suggest(Collections.singletonList("00FFFF"), builder);
     }

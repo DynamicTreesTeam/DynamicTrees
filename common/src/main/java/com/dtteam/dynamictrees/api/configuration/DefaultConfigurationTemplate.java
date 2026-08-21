@@ -19,12 +19,10 @@ public final class DefaultConfigurationTemplate<C extends Configuration<C, ?>> i
         this.registeredProperties = Collections.unmodifiableSet(configurable.getRegisteredProperties());
     }
 
-    @Override
     public Result<C, ?> apply(PropertiesAccessor properties) {
         return JsonResult.success(JsonNull.INSTANCE, this.defaultConfiguration.copy().withAll(properties));
     }
 
-    @Override
     public Iterable<ConfigurationProperty<?>> getRegisteredProperties() {
         return this.registeredProperties;
     }

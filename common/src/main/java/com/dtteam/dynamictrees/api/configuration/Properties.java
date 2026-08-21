@@ -28,12 +28,10 @@ public final class Properties implements PropertiesAccessor {
         return (V) this.map.get(property);
     }
 
-    @Override
     public boolean has(ConfigurationProperty<?> property) {
         return this.map.containsKey(property);
     }
 
-    @Override
     public void forEach(IterationAction<?> action) {
         this.map.forEach((property, value) -> this.applyIteration(action, property, value));
     }
@@ -43,7 +41,6 @@ public final class Properties implements PropertiesAccessor {
         action.apply(((ConfigurationProperty<V>) property), (V) value);
     }
 
-    @Override
     public String toString() {
         return map.toString();
     }

@@ -1,5 +1,7 @@
 package com.dtteam.dynamictrees.worldgen.feature;
 
+import net.minecraft.world.level.WorldGenLevel;
+
 import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.mojang.serialization.MapCodec;
@@ -23,15 +25,13 @@ public class DTReplaceNyliumFungiBlockStateProvider extends BlockStateProvider {
         this.disabled = disabled;
     }
 
-    @Override
     protected BlockStateProviderType<?> type() {
         return DTRegistries.REPLACE_NYLIUM_FUNGI_BLOCK_STATE_PROVIDER_TYPE.get();
     }
 
-    @Override
-    public BlockState getState(RandomSource random, BlockPos state) {
+    public BlockState getState(WorldGenLevel genLevel, RandomSource random, BlockPos state) {
         return DTConfigs.COMMON.replaceNyliumFungi.get()
-                ? this.enabled.getState(random, state)
-                : this.disabled.getState(random, state);
+                ? this.enabled.getState(genLevel, random, state)
+                : this.disabled.getState(genLevel, random, state);
     }
 }

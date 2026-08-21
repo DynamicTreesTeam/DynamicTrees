@@ -23,7 +23,6 @@ public final class JsonPropertyApplier<O, V> extends PropertyApplier<O, V, JsonE
     }
 
     @Nullable
-    @Override
     protected PropertyApplierResult applyIfShould(O object, JsonElement input,
                                                   Applier<O, V> applier) {
         if (input.isJsonNull())

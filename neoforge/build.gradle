@@ -13,12 +13,9 @@ neoForge {
     if (at.exists()) {
         accessTransformers.from(at.absolutePath)
     }
-    parchment {
-        minecraftVersion = parchment_minecraft
-        mappingsVersion = parchment_version
-    }
     def mainResources = project(":common").file("src/main/resources")
-    def genResources = project(":common").file("src/generated/resources")
+    def genClientResources = project(":common").file("src/generated/client/resources")
+    def genServerResources = project(":common").file("src/generated/server/resources")
     runs {
         configureEach {
             systemProperty('neoforge.enabledGameTestNamespaces', mod_id)
@@ -27,15 +24,13 @@ neoForge {
         client {
             client()
         }
-        data {
-            data()
-            programArgument ('--all')
-            programArgument ('--existing')
-            programArgument (mainResources.absolutePath)
-            programArgument ('--output')
-            programArgument (genResources.absolutePath)
-            programArgument ('--mod')
-            programArgument ("${mod_id}")
+        serverData {
+            serverData()
+            programArguments.addAll '--mod', "${mod_id}", '--all', '--output', genServerResources.absolutePath, '--existing', mainResources.absolutePath
+        }
+        clientData {
+            clientData()
+            programArguments.addAll '--mod', "${mod_id}", '--all', '--output', genClientResources.absolutePath, '--existing', mainResources.absolutePath
         }
         server {
             server()
@@ -53,20 +48,32 @@ neoForge {
                 includeGroup "curse.maven"
             }
         }
+        maven {
+            url "https://api.modrinth.com/maven"
+            content {
+                includeGroup "maven.modrinth"
+            }
+        }
+        maven {
+            name = "BlameJared"
+            url = "https://maven.blamejared.com"
+        }
         flatDir {
             dir 'libs'
         }
     }
     dependencies {
-        implementation "curse.maven:jade-324717:6011258"
-        implementation "curse.maven:jei-238222:5846880"
-        implementation "curse.maven:glitchcore-955399:5660740"
-        implementation "curse.maven:serene-seasons-291874:5753503"
-        
-        runtimeOnly "curse.maven:patchouli-306770:6164617"
-        runtimeOnly "curse.maven:spark-361579:6225208"
+        implementation "maven.modrinth:jade:uGgaQ65p"
+        implementation "mezz.jei:jei-26.2-neoforge:30.24.0.176"
+        implementation "maven.modrinth:glitchcore:POAebwFo"
+        implementation "maven.modrinth:serene-seasons:h9W9TVDe"
+        implementation "net.jodah:typetools:0.6.3"
     }
 
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+tasks.named('compileJava', JavaCompile) {
+    options.compilerArgs << '-Xmaxerrs' << '10000'
+}

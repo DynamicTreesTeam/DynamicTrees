@@ -6,11 +6,8 @@ import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.tags.ItemTagsProvider;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.world.level.block.Block;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
-import org.jetbrains.annotations.Nullable;
+import net.neoforged.neoforge.common.data.ItemTagsProvider;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -18,20 +15,24 @@ import java.util.concurrent.CompletableFuture;
  * @author Harley O'Connor
  */
 public class DTItemTagsProvider extends ItemTagsProvider {
-    public DTItemTagsProvider(PackOutput output, String modId, CompletableFuture<HolderLookup.Provider> lookupProvider,
-                              CompletableFuture<TagLookup<Block>> blockTags, @Nullable ExistingFileHelper fileHelper) {
-        super(output, lookupProvider, blockTags, modId, fileHelper);
+    public DTItemTagsProvider(PackOutput output, String modId, CompletableFuture<HolderLookup.Provider> lookupProvider) {
+        super(output, lookupProvider, modId);
     }
 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
+        this.addDTTags();
         if (this.modId.equals(DynamicTrees.MOD_ID)) {
             this.addDTOnlyTags();
         }
-        this.addDTTags();
     }
 
     private void addDTOnlyTags() {
+        this.tag(DTItemTags.BRANCHES_THAT_BURN);
+        this.tag(DTItemTags.FUNGUS_BRANCHES);
+        this.tag(DTItemTags.FUNGUS_CAPS);
+        this.tag(DTItemTags.SEEDS);
+
         this.tag(DTItemTags.BRANCHES)
                 .addTag(DTItemTags.BRANCHES_THAT_BURN)
                 .addTag(DTItemTags.FUNGUS_BRANCHES);
@@ -45,15 +46,14 @@ public class DTItemTagsProvider extends ItemTagsProvider {
 
     protected void addDTTags() {
         Family.REGISTRY.dataGenerationStream(this.modId).forEach(family ->
-                family.addGeneratedItemTags(this::tag));
+                family.addGeneratedItemTags(tag -> NeoForgeTagAppender.items(this.tag(tag))));
 
         Species.REGISTRY.dataGenerationStream(this.modId).forEach(species ->
-                species.addGeneratedItemTags(this::tag));
+                species.addGeneratedItemTags(tag -> NeoForgeTagAppender.items(this.tag(tag))));
     }
 
     @Override
     public String getName() {
-        return modId + " DT Item Tags";
+        return this.modId + " DT Item Tags";
     }
-
 }

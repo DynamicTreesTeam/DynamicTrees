@@ -15,19 +15,16 @@ import java.util.Optional;
 
 public final class GetTreeCommand extends SubCommand {
 
-    @Override
     protected String getName() {
         return CommandConstants.GET_TREE;
     }
 
-    @Override
     protected int getPermissionLevel() {
         return 0;
     }
 
     private static final String CODE_RAW = "code_raw";
 
-    @Override
     public ArgumentBuilder<CommandSourceStack, ?> registerArgument() {
         return blockPosArgument().executes(context -> this.getTree(context.getSource(), blockPosArgument(context), false))
                 .then(booleanArgument(CODE_RAW).executes(context -> this.getTree(context.getSource(), blockPosArgument(context),

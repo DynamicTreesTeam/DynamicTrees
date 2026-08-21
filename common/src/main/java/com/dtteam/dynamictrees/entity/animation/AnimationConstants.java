@@ -13,6 +13,6 @@ public class AnimationConstants {
     public static final ResourceKey<DamageType> TREE_DAMAGE_TYPE = ResourceKey.create(Registries.DAMAGE_TYPE, DynamicTrees.location("falling_tree"));
 
     public static DamageSource treeDamage(RegistryAccess registryAccess) {
-        return new DamageSource(registryAccess.registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(TREE_DAMAGE_TYPE));
+        return new DamageSource(registryAccess.lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(TREE_DAMAGE_TYPE));
     }
 }

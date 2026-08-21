@@ -8,7 +8,7 @@ import com.dtteam.dynamictrees.systems.genfeature.context.PostGenerationContext;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelAccessor;
@@ -43,16 +43,14 @@ public class BushGenFeature extends GenFeature {
     public static final ConfigurationProperty<Integer> SECONDARY_LEAVES_CHANCE =
             ConfigurationProperty.integer("secondary_leaves_chance");
 
-    public BushGenFeature(ResourceLocation registryName) {
+    public BushGenFeature(Identifier registryName) {
         super(registryName);
     }
 
-    @Override
     protected void registerProperties() {
         this.register(BIOME_PREDICATE, LOG, LEAVES, SECONDARY_LEAVES, SECONDARY_LEAVES_CHANCE);
     }
 
-    @Override
     public GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(BIOME_PREDICATE, i -> true)
@@ -62,14 +60,12 @@ public class BushGenFeature extends GenFeature {
                 .with(SECONDARY_LEAVES_CHANCE, 4);
     }
 
-    @Override
     protected boolean generate(GenFeatureConfiguration configuration, FullGenerationContext context) {
         this.commonGen(configuration, context.level(), context.pos(), context.species(), context.random(),
                 context.radius(), context.isWorldGen());
         return true;
     }
 
-    @Override
     protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
         if (configuration.get(BIOME_PREDICATE).test(context.biome())) {
             this.commonGen(configuration, context.level(), context.pos(), context.species(), context.random(),

@@ -6,18 +6,17 @@ import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class AzaleaLogic extends GrowthLogicKit {
 
     private static final Direction[] HORIZONTALS = {Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST};
 
-    public AzaleaLogic(ResourceLocation registryName) {
+    public AzaleaLogic(Identifier registryName) {
         super(registryName);
     }
 
-    @Override
     public int[] populateDirectionProbabilityMap(GrowthLogicKitConfiguration configuration, DirectionManipulationContext context) {
         int[] probMap = context.probMap();
         Direction originDir = context.signal().dir.getOpposite();

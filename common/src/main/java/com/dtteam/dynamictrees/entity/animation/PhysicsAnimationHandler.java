@@ -25,7 +25,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 
 public class PhysicsAnimationHandler implements AnimationHandler {
-    @Override
     public String getName() {
         return "physics";
     }
@@ -53,14 +52,13 @@ public class PhysicsAnimationHandler implements AnimationHandler {
         }
     }
 
-    @Override
     public void initMotion(FallingTreeEntity entity) {
         entity.dataAnimationHandler = new HandlerData();
         final BlockPos cutPos = entity.getDestroyData().cutPos;
 
         //playStartSound(entity);
 
-        final long seed = entity.level().random.nextLong();
+        final long seed = entity.level().getRandom().nextLong();
         final RandomSource random = RandomSource.create(seed ^ (((long) cutPos.getX()) << 32 | ((long) cutPos.getZ())));
         final float mass = entity.getDestroyData().woodVolume.getVolume();
         final float inertialMass = Mth.clamp(mass, 1, 3);
@@ -76,7 +74,6 @@ public class PhysicsAnimationHandler implements AnimationHandler {
         FallingTreeEntity.standardDropLeavesPayLoad(entity); // Seeds and stuff fall out of the tree before it falls over.
     }
 
-    @Override
     public void handleMotion(FallingTreeEntity entity) {
         if (entity.landed) {
             return;
@@ -149,7 +146,6 @@ public class PhysicsAnimationHandler implements AnimationHandler {
 
     }
 
-    @Override
     public void dropPayload(FallingTreeEntity entity) {
         final Level level = entity.level();
         entity.getPayload().forEach(i -> Block.popResource(level, BlockPos.containing(entity.getX(), entity.getY(), entity.getZ()), i));
@@ -159,7 +155,6 @@ public class PhysicsAnimationHandler implements AnimationHandler {
         return entity.landed || entity.tickCount > 120;
     }
 
-    @Override
     public void renderTransform(FallingTreeEntity entity, float entityYaw, float partialTick, PoseStack poseStack) {
         final float yaw = Mth.wrapDegrees(MathUtils.angleDegreesInterpolate(entity.yRotO, entity.getYRot(), partialTick));
         final float pit = Mth.wrapDegrees(MathUtils.angleDegreesInterpolate(entity.xRotO, entity.getXRot(), partialTick));
@@ -171,7 +166,6 @@ public class PhysicsAnimationHandler implements AnimationHandler {
         poseStack.translate(-mc.x - 0.5, -mc.y, -mc.z - 0.5);
     }
 
-    @Override
 //    
     public boolean shouldRender(FallingTreeEntity entity, double x, double y, double z) {
         return true;

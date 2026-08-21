@@ -20,7 +20,6 @@ public final class RegistryEntryDeserializer<T extends RegistryEntry<T>> impleme
         this.registry = registry;
     }
 
-    @Override
     public Result<T, JsonElement> deserialize(JsonElement jsonElement) {
         return JsonDeserializers.DT_RESOURCE_LOCATION.deserialize(jsonElement)
                 .map(

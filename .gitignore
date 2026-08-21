@@ -26,8 +26,14 @@ neoforge/libs/
 eclipse
 run
 runs
+/fabric/runs/
+/neoforge/run/
 /neoforge/mcmodsrepo
 .cursor/
+
+# 26.2 one-shot migrator leftovers
+/fabric/scripts/
+/fabric/mc26-common-renames.tsv
 
 # Port scratch — isolated from the original fork. Never commit.
 .port/

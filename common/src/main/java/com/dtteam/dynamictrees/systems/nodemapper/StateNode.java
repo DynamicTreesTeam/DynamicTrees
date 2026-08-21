@@ -31,7 +31,6 @@ public class StateNode implements NodeInspector {
         return map;
     }
 
-    @Override
     public boolean run(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
         BranchBlock branch = TreeHelper.getBranch(state);
 
@@ -43,7 +42,6 @@ public class StateNode implements NodeInspector {
         return true;
     }
 
-    @Override
     public boolean returnRun(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
         return false;
     }

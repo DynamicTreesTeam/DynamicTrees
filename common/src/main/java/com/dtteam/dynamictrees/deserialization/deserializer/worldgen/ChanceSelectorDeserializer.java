@@ -21,7 +21,6 @@ import java.util.function.Consumer;
  */
 public final class ChanceSelectorDeserializer implements JsonBiomeDatabaseDeserializer<BiomePropertySelectors.ChanceSelector> {
 
-    @Override
     public Result<BiomePropertySelectors.ChanceSelector, JsonElement> deserialize(JsonElement input) {
         return JsonResult.forInput(input)
                 .mapIfType(JsonObject.class, this::readJsonChanceSelector) // Deprecated

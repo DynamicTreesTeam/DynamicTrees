@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.api.resource.loading;
 
 import com.dtteam.dynamictrees.api.resource.ResourceAccessor;
 import com.dtteam.dynamictrees.api.resource.loading.preparation.ResourcePreparer;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.server.packs.resources.ResourceManager;
 
 import java.util.concurrent.CompletableFuture;
@@ -18,7 +18,6 @@ public abstract class AbstractResourceLoader<R> implements ResourceLoader<R> {
         this.resourcePreparer = resourcePreparer;
     }
 
-    @Override
     public final CompletableFuture<Void> gatherData(ResourceManager resourceManager) {
         return CompletableFuture.supplyAsync(
                         () -> this.resourcePreparer.prepare(resourceManager),
@@ -28,7 +27,6 @@ public abstract class AbstractResourceLoader<R> implements ResourceLoader<R> {
         );
     }
 
-    @Override
     public final CompletableFuture<Void> load(ResourceManager resourceManager) {
         return CompletableFuture.supplyAsync(
                 () -> this.resourcePreparer.prepare(resourceManager),
@@ -38,7 +36,6 @@ public abstract class AbstractResourceLoader<R> implements ResourceLoader<R> {
         );
     }
 
-    @Override
     public final CompletableFuture<Void> setup(ResourceManager resourceManager) {
         return CompletableFuture.supplyAsync(
                 () -> this.resourcePreparer.prepare(resourceManager),
@@ -48,7 +45,6 @@ public abstract class AbstractResourceLoader<R> implements ResourceLoader<R> {
         );
     }
 
-    @Override
     public CompletableFuture<ResourceAccessor<R>> prepareReload(ResourceManager resourceManager) {
         return CompletableFuture.supplyAsync(
                 () -> this.resourcePreparer.prepare(resourceManager),
@@ -56,28 +52,23 @@ public abstract class AbstractResourceLoader<R> implements ResourceLoader<R> {
         );
     }
 
-    @Override
     public final void reload(CompletableFuture<ResourceAccessor<R>> future,
                                                 ResourceManager resourceManager) {
         this.applyOnReload(future.join(), resourceManager);
     }
 
-    @Override
     public void applyOnLoad(ResourceAccessor<R> resourceAccessor, ResourceManager resourceManager) {
 
     }
 
-    @Override
     public void applyOnGatherData(ResourceAccessor<R> resourceAccessor, ResourceManager resourceManager) {
 
     }
 
-    @Override
     public void applyOnSetup(ResourceAccessor<R> resourceAccessor, ResourceManager resourceManager) {
 
     }
 
-    @Override
     public void applyOnReload(ResourceAccessor<R> resourceAccessor, ResourceManager resourceManager) {
 
     }

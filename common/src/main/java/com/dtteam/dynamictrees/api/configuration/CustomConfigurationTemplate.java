@@ -38,7 +38,6 @@ public final class CustomConfigurationTemplate<C extends Configuration<C, ?>> im
         ).collect(CommonCollectors.toUnmodifiableSet());
     }
 
-    @Override
     public Result<C, JsonElement> apply(PropertiesAccessor properties) {
         String json = this.processJson(properties);
         return this.deserialiseJson(json);
@@ -62,7 +61,6 @@ public final class CustomConfigurationTemplate<C extends Configuration<C, ?>> im
         return json;
     }
 
-    @Override
     public Iterable<ConfigurationProperty<?>> getRegisteredProperties() {
         return this.registeredProperties;
     }

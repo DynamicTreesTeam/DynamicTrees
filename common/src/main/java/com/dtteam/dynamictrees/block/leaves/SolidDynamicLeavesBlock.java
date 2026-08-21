@@ -21,28 +21,23 @@ public class SolidDynamicLeavesBlock extends DynamicLeavesBlock {
         super(leavesProperties, properties);
     }
 
-    @Override
     public VoxelShape getBlockSupportShape(BlockState pState, BlockGetter pReader, BlockPos pPos) {
         return Shapes.block();
     }
 
-    @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return Shapes.block();
     }
 
-    @Override
     public boolean addLandingEffects(BlockState state1, ServerLevel level, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
         return false;
     }
 
-    @Override
     public void fallOn(Level level, BlockState blockstate, BlockPos pos, Entity entity, float fallDistance) {
         super.superFallOn(level, blockstate, pos, entity, fallDistance);
     }
 
-    @Override
-    public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+    public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, net.minecraft.world.entity.InsideBlockEffectApplier applier, boolean moved) {
     }
 
 }

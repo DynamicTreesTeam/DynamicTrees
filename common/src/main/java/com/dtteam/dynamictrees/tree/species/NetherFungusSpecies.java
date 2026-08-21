@@ -10,7 +10,7 @@ import com.dtteam.dynamictrees.systems.genfeature.GenFeatures;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.family.NetherFungusFamily;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -34,25 +34,22 @@ public class NetherFungusSpecies extends Species {
 
     public static final TypedRegistry.EntryType<Species> TYPE = createDefaultType(NetherFungusSpecies::new);
 
-    public NetherFungusSpecies(ResourceLocation name, Family family, LeavesProperties leavesProperties) {
+    public NetherFungusSpecies(Identifier name, Family family, LeavesProperties leavesProperties) {
         super(name, family, leavesProperties);
         if (!(family instanceof NetherFungusFamily)) {
             LogManager.getLogger().warn("Family {} for nether fungus species {} is not of type {}", family.getRegistryName(), getRegistryName(), NetherFungusFamily.class);
         }
     }
 
-    @Override
     public Species setDefaultGrowingParameters() {
         this.setBasicGrowingParameters(0f, 14.0f, 0, 4, 1f);
         return super.setDefaultGrowingParameters();
     }
 
-    @Override
     protected void setStandardSoils() {
         this.addAcceptableSoils(SoilHelper.NETHER_SOIL_LIKE, SoilHelper.FUNGUS_LIKE, SoilHelper.DIRT_LIKE);
     }
 
-    @Override
     public Species setPreReloadDefaults() {
         return this.setDefaultGrowingParameters()
                 .setSaplingSound(SoundType.FUNGUS)
@@ -62,7 +59,6 @@ public class NetherFungusSpecies extends Species {
                 ;
     }
 
-    @Override
     public Species setPostReloadDefaults() {
         if (!this.hasGenFeatures()) {
             this.addGenFeature(GenFeatures.CLEAR_VOLUME).addGenFeature(GenFeatures.SHROOMLIGHT);
@@ -70,7 +66,6 @@ public class NetherFungusSpecies extends Species {
         return super.setPostReloadDefaults();
     }
 
-    @Override
     public boolean isAcceptableSoilForWorldgen(LevelAccessor level, BlockPos pos, BlockState soilBlockState) {
         if (soilBlockState.getBlock() == Blocks.NETHERRACK) {
             return true; //Soil exception for worldgen
@@ -78,30 +73,25 @@ public class NetherFungusSpecies extends Species {
         return super.isAcceptableSoilForWorldgen(level, pos, soilBlockState);
     }
 
-    @Override
     public float defaultSeedComposterChance() {
         return 0.65f;
     }
 
-    @Override
     public List<TagKey<Block>> defaultSaplingTags() {
         return Collections.singletonList(DTBlockTags.FUNGUS_CAPS);
     }
 
-    @Override
     public List<TagKey<Item>> defaultSeedTags() {
         return Collections.singletonList(DTItemTags.FUNGUS_CAPS);
     }
 
-    @Override
-    public void addSaplingTextures(BiConsumer<String, ResourceLocation> textureConsumer,
-                                   ResourceLocation leavesTextureLocation, ResourceLocation barkTextureLocation) {
-        ResourceLocation capLoc = getTexturePath(SAPLING).orElse(surround(this.getRegistryName(), "block/", "_cap"));
+    public void addSaplingTextures(BiConsumer<String, Identifier> textureConsumer,
+                                   Identifier leavesTextureLocation, Identifier barkTextureLocation) {
+        Identifier capLoc = getTexturePath(SAPLING).orElse(surround(this.getRegistryName(), "block/", "_cap"));
         textureConsumer.accept("stem", capLoc);
         textureConsumer.accept("cap", capLoc);
     }
 
-    @Override
     public float falloverParticleFlingMultiplier() {
         return 0.5f;
     }

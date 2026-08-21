@@ -15,7 +15,6 @@ public class BooleanLogicOperator implements MathOperator {
 		this.operator = operator;
 	}
 	
-	@Override
 	public double apply(MathContext mc) {
 		final boolean leftValue = isTrue(left.apply(mc));
 		return switch (operator) {

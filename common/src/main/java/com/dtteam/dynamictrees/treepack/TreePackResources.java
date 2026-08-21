@@ -1,8 +1,8 @@
 package com.dtteam.dynamictrees.treepack;
 
 import com.mojang.logging.LogUtils;
-import net.minecraft.FileUtil;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FileUtil;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.PathPackResources;
@@ -32,12 +32,11 @@ public class TreePackResources extends PathPackResources implements com.dtteam.d
         this.root = root;
     }
 
-    @Override
-    public IoSupplier<InputStream> getResource(PackType packType, ResourceLocation location) {
+    public IoSupplier<InputStream> getResource(PackType packType, Identifier location) {
         return this.getRootResource(getPathFromLocation(location));
     }
 
-    private static String[] getPathFromLocation(ResourceLocation location) {
+    private static String[] getPathFromLocation(Identifier location) {
         String[] parts = location.getPath().split("/");
         String[] result = new String[parts.length + 1];
         result[0] = location.getNamespace();
@@ -45,14 +44,12 @@ public class TreePackResources extends PathPackResources implements com.dtteam.d
         return result;
     }
 
-    @Override
     public void listResources(@Nullable PackType packType, String namespace, String path, ResourceOutput resourceOutput) {
         FileUtil.decomposePath(path)
                 .ifSuccess(parts -> net.minecraft.server.packs.PathPackResources.listPath(namespace, this.root.resolve(namespace).toAbsolutePath(), parts, resourceOutput))
                 .ifError(dataResult -> LOGGER.error("Invalid path {}: {}", path, dataResult.message()));
     }
 
-    @Override
     public Set<String> getNamespaces(@Nullable PackType type) {
         try {
             try (Stream<Path> walker = Files.walk(this.root, 1)) {

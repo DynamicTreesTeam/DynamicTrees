@@ -8,30 +8,27 @@ import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 
 public class NetherFungusLogic extends GrowthLogicKit {
 
     public static final ConfigurationProperty<Integer> MIN_CAP_HEIGHT = ConfigurationProperty.integer("min_cap_height");
 
-    public NetherFungusLogic(final ResourceLocation registryName) {
+    public NetherFungusLogic(final Identifier registryName) {
         super(registryName);
     }
 
-    @Override
     protected GrowthLogicKitConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(MIN_CAP_HEIGHT, 3)
                 .with(HEIGHT_VARIATION, 8);
     }
 
-    @Override
     protected void registerProperties() {
         this.register(MIN_CAP_HEIGHT, HEIGHT_VARIATION);
     }
 
-    @Override
     public Direction selectNewDirection(GrowthLogicKitConfiguration configuration, DirectionSelectionContext context) {
         final Direction newDir = super.selectNewDirection(configuration, context);
         if (context.signal().isInTrunk() && newDir != Direction.UP) { // Turned out of trunk
@@ -40,7 +37,6 @@ public class NetherFungusLogic extends GrowthLogicKit {
         return newDir;
     }
 
-    @Override
     public int[] populateDirectionProbabilityMap(GrowthLogicKitConfiguration configuration,
                                                  DirectionManipulationContext context) {
         final int[] probMap = super.populateDirectionProbabilityMap(configuration, context);
@@ -52,7 +48,7 @@ public class NetherFungusLogic extends GrowthLogicKit {
             } else if (!context.species().isMegaSpecies()) {
                 for (Direction direction : CoordUtils.HORIZONTALS) {
                     if (TreeHelper.isBranch(
-                            context.level().getBlockState(context.pos().offset(direction.getOpposite().getNormal())))) {
+                            context.level().getBlockState(context.pos().offset(direction.getOpposite().getUnitVec3i())))) {
                         probMap[direction.get3DDataValue()] = 0;
                     }
                 }
@@ -71,7 +67,6 @@ public class NetherFungusLogic extends GrowthLogicKit {
                 configuration.get(HEIGHT_VARIATION));//Vary the height energy by a psuedorandom hash function
     }
 
-    @Override
     public float getEnergy(GrowthLogicKitConfiguration configuration, PositionalSpeciesContext context) {
         return Math.min(configuration.getLowestBranchHeight(
                         new PositionalSpeciesContext(context.level(), context.pos(), context.species())) +
@@ -80,7 +75,6 @@ public class NetherFungusLogic extends GrowthLogicKit {
                 super.getEnergy(configuration, context));
     }
 
-    @Override
     public int getLowestBranchHeight(GrowthLogicKitConfiguration configuration, PositionalSpeciesContext context) {
         // Vary the lowest branch height by a psuedorandom hash function
         return (int) (super.getLowestBranchHeight(configuration, context) *

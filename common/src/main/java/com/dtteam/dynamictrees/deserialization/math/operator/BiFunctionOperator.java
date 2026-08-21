@@ -18,7 +18,6 @@ public class BiFunctionOperator implements MathOperator {
 		this.function = function;
 	}
 
-	@Override
 	public double apply(MathContext mc) {
 		double a = value1.apply(mc);
 		double b = value2.apply(mc);

@@ -8,6 +8,8 @@ import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.model.baked.BasicBranchBlockBakedModel;
 import com.dtteam.dynamictrees.model.baked.BasicRootsBlockBakedModel;
 import com.dtteam.dynamictrees.model.baked.BreakingOverlayModel;
+import com.dtteam.dynamictrees.model.baked.PalmFrondGeometry;
+import com.dtteam.dynamictrees.model.baked.PalmLeavesBakedModel;
 import com.dtteam.dynamictrees.model.baked.SurfaceRootBlockBakedModel;
 import com.dtteam.dynamictrees.model.baked.ThickBranchBlockBakedModel;
 import com.dtteam.dynamictrees.model.baked.WinterLeavesBlockStateModel;
@@ -40,6 +42,7 @@ public class DTModelLoadingPlugin implements ModelLoadingPlugin {
     private static final Map<Identifier, BlockStateModel> BRANCH_MODEL_CACHE = new HashMap<>();
     private static final Map<Identifier, BlockStateModel> ROOT_MODEL_CACHE = new HashMap<>();
     private static final Map<Identifier, BlockStateModel> UNDERGROUND_ROOTS_MODEL_CACHE = new HashMap<>();
+    private static final Map<Identifier, BlockStateModel> PALM_MODEL_CACHE = new HashMap<>();
     private static boolean modelsInitialized = false;
     private static SimpleModelWrapper winterLeavesPart;
 
@@ -49,6 +52,7 @@ public class DTModelLoadingPlugin implements ModelLoadingPlugin {
         BRANCH_MODEL_CACHE.clear();
         ROOT_MODEL_CACHE.clear();
         UNDERGROUND_ROOTS_MODEL_CACHE.clear();
+        PALM_MODEL_CACHE.clear();
         winterLeavesPart = null;
         pluginContext.modifyModelOnLoad().register(ModelModifier.WRAP_PHASE, DTModelLoadingPlugin::assignMissingParticle);
         pluginContext.modifyBlockModelAfterBake().register(ModelModifier.WRAP_PHASE, this::modifyModelAfterBake);
@@ -239,6 +243,11 @@ public class DTModelLoadingPlugin implements ModelLoadingPlugin {
             if (branchModel instanceof BasicBranchBlockBakedModel baked) {
                 return new BreakingOverlayModel(baked, baked.collectQuads(state, new int[6], null));
             }
+        }
+
+        BlockStateModel palmWrapped = PalmFrondGeometry.wrap(state, model, context.baker(), PALM_MODEL_CACHE, PalmLeavesBakedModel::new);
+        if (palmWrapped != model) {
+            return palmWrapped;
         }
 
         if (block instanceof DynamicLeavesBlock leaves && leaves.getLeavesProperties().leavesPerishInWinter()) {

@@ -30,6 +30,10 @@ public final class BreakingOverlayModel extends DynamicTreesBlockStateModel {
         this.breakingPart = breakingQuads.isEmpty() ? null : partFromQuads(breakingQuads, inner.particleMaterial());
     }
 
+    public DynamicTreesBlockStateModel inner() {
+        return inner;
+    }
+
     @Override
     public void collectParts(RandomSource random, List<BlockStateModelPart> output) {
         if (breakingPart != null) {

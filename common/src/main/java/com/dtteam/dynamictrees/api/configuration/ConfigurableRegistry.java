@@ -30,7 +30,6 @@ public final class ConfigurableRegistry<V extends ConfigurableRegistryEntry<V, C
         this.templates = templates;
     }
 
-    @Override
     public ConfigurableRegistry<V, C> register(V value) {
         super.register(value);
         if (this.templates != null) {

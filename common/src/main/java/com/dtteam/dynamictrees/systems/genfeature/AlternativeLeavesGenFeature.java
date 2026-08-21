@@ -11,7 +11,7 @@ import com.dtteam.dynamictrees.systems.nodemapper.FindEndsNode;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -27,11 +27,10 @@ public class AlternativeLeavesGenFeature extends GenFeature {
     public static final ConfigurationProperty<LeavesProperties> ALT_LEAVES = ConfigurationProperty.property("alternative_leaves", LeavesProperties.class);
     public static final ConfigurationProperty<Block> ALT_LEAVES_BLOCK = ConfigurationProperty.block("alternative_leaves_block");
 
-    public AlternativeLeavesGenFeature(ResourceLocation registryName) {
+    public AlternativeLeavesGenFeature(Identifier registryName) {
         super(registryName);
     }
 
-    @Override
     protected void registerProperties() {
         this.register(ALT_LEAVES, ALT_LEAVES_BLOCK, PLACE_CHANCE, QUANTITY);
     }
@@ -41,7 +40,6 @@ public class AlternativeLeavesGenFeature extends GenFeature {
                 .with(PLACE_CHANCE, 0.5f).with(QUANTITY, 5);
     }
 
-    @Override
     public boolean shouldApply(Species species, GenFeatureConfiguration configuration) {
         configuration.get(ALT_LEAVES).ifValid(properties -> {
             properties.setFamily(species.getFamily());
@@ -50,13 +48,11 @@ public class AlternativeLeavesGenFeature extends GenFeature {
         return true;
     }
 
-    @Override
     protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
         final BlockPosBounds bounds = context.species().getFamily().expandLeavesBlockBounds(new BlockPosBounds(context.endPoints()));
         return this.setAltLeaves(configuration, context.level(), bounds, context.isWorldGen(), context.species());
     }
 
-    @Override
     protected boolean postGrow(GenFeatureConfiguration configuration, PostGrowContext context) {
         if (context.fertility() == 0) {
             return false;

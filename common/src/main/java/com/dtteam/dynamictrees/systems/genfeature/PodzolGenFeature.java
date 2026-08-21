@@ -15,7 +15,7 @@ import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LightLayer;
@@ -32,16 +32,14 @@ public class PodzolGenFeature extends GenFeature {
     public static final ConfigurationProperty<Integer> MAX_HEIGHT = ConfigurationProperty.integer("max_height");
     public static final ConfigurationProperty<Boolean> KILL_PLANTS = ConfigurationProperty.bool("kill_plants");
 
-    public PodzolGenFeature(ResourceLocation registryName) {
+    public PodzolGenFeature(Identifier registryName) {
         super(registryName);
     }
 
-    @Override
     protected void registerProperties() {
         register(KILL_PLANTS, DARK_THRESHOLD, SPREAD_DISTANCE, PODZOL_BLOCK, MAX_HEIGHT);
     }
 
-    @Override
     protected GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(KILL_PLANTS, false)
@@ -51,7 +49,6 @@ public class PodzolGenFeature extends GenFeature {
                 .with(MAX_HEIGHT, 32);
     }
 
-    @Override
     protected boolean postGrow(GenFeatureConfiguration configuration, PostGrowContext context) {
         if (!DTConfigs.SERVER.generatePodzol.get()) return false;
 

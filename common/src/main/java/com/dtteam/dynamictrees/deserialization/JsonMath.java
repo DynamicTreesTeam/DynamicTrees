@@ -129,7 +129,6 @@ public class JsonMath implements MathOperator {
             this.functions = functionArray;
         }
 
-        @Override
         public double apply(MathContext mc) {
             double r = 0;
             for (MathOperator f : functions) {
@@ -149,7 +148,6 @@ public class JsonMath implements MathOperator {
             this.functions = functionArray;
         }
         
-        @Override
         public double apply(MathContext mc) {
 
             Double r = null;
@@ -171,7 +169,6 @@ public class JsonMath implements MathOperator {
             this.functions = functionArray;
         }
         
-        @Override
         public double apply(MathContext mc) {
            double r = 1.0f;
             for (MathOperator f : functions) {
@@ -190,7 +187,6 @@ public class JsonMath implements MathOperator {
             this.functions = functionArray;
         }
 
-        @Override
         public double apply(MathContext mc) {
             Double r = null;
             for (MathOperator f : functions) {
@@ -210,7 +206,6 @@ public class JsonMath implements MathOperator {
             this.functions = functionArray;
         }
 
-        @Override
         public double apply(MathContext mc) {
 
             if (functions.length == 4) {

@@ -8,7 +8,7 @@ import com.dtteam.dynamictrees.deserialization.JsonHelper;
 import com.dtteam.dynamictrees.deserialization.deserializer.ResourceLocationDeserializer;
 import com.dtteam.dynamictrees.utility.NullUtils;
 import com.google.gson.JsonObject;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -24,7 +24,6 @@ public final class FruitResourceLoader extends JsonRegistryResourceLoader<Fruit>
         super(Fruit.REGISTRY, FRUITS);
     }
 
-    @Override
     public void registerAppliers() {
         this.loadAppliers
                 .register("max_age", Integer.class, Fruit::setMaxAge);
@@ -35,11 +34,14 @@ public final class FruitResourceLoader extends JsonRegistryResourceLoader<Fruit>
 
         // Item is needed on datagen and setup
         this.gatherDataAppliers
-                .register("item_stack", Item.class, (fruit, item) -> fruit.setItemStack(new ItemStack(item)))
+                .register("item_stack", Item.class, (fruit, item) -> {
+                    fruit.setDropItem(item);
+                    com.dtteam.dynamictrees.compat.DeferredItemStacks.setWhenBound(fruit::setItemStack, item);
+                })
                 .register("drop_count", Integer.class, Fruit::setDropCount)
                 .register("min_drop_count", Integer.class, Fruit::setMinDropCount)
                 .register("max_drop_count", Integer.class, Fruit::setMaxDropCount);
-        this.setupAppliers.register("item_stack", Item.class, (fruit, item) -> fruit.setItemStack(new ItemStack(item)));
+        this.setupAppliers.register("item_stack", Item.class, (fruit, item) -> com.dtteam.dynamictrees.compat.DeferredItemStacks.setWhenBound(fruit::setItemStack, item));
 
         this.reloadAppliers
                 .register("item_stack", ItemStack.class, Fruit::setItemStack)
@@ -49,7 +51,6 @@ public final class FruitResourceLoader extends JsonRegistryResourceLoader<Fruit>
                 .register("mature_action", Growable.MatureAction.class, Fruit::setMatureAction);
     }
 
-    @Override
     protected void applyLoadAppliers(JsonRegistryResourceLoader<Fruit>.LoadData loadData, JsonObject json) {
         super.applyLoadAppliers(loadData, json);
         final JsonObject propertiesJson = getBlockPropertiesJson(json);
@@ -86,7 +87,7 @@ public final class FruitResourceLoader extends JsonRegistryResourceLoader<Fruit>
      * using the fruit's registry name)
      */
     @Nullable
-    private ResourceLocation getBlockRegistryName(Fruit fruit, JsonObject json) {
+    private Identifier getBlockRegistryName(Fruit fruit, JsonObject json) {
         return NullUtils.applyIfNonnull(json.get("block_registry_name"), element ->
                 ResourceLocationDeserializer.create(fruit.getRegistryName().getNamespace())
                         .deserialize(element)

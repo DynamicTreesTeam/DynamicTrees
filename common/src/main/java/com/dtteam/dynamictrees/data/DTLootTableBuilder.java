@@ -1,5 +1,9 @@
 package com.dtteam.dynamictrees.data;
 
+import net.minecraft.advancements.predicates.DataComponentMatchers;
+import net.minecraft.core.component.predicates.DataComponentPredicates;
+import net.minecraft.core.component.predicates.EnchantmentsPredicate;
+
 import com.dtteam.dynamictrees.loot.DTLootParameterSets;
 import com.dtteam.dynamictrees.loot.condition.SeasonalSeedDropChance;
 import com.dtteam.dynamictrees.loot.condition.VoluntarySeedDropChance;
@@ -7,7 +11,7 @@ import com.dtteam.dynamictrees.loot.entry.SeedItemLootPoolEntry;
 import com.dtteam.dynamictrees.loot.function.MultiplyByLogsCount;
 import com.dtteam.dynamictrees.loot.function.MultiplyBySticksCount;
 import com.dtteam.dynamictrees.utility.ItemUtils;
-import net.minecraft.advancements.critereon.*;
+import net.minecraft.advancements.predicates.*;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.Item;
@@ -25,7 +29,7 @@ import net.minecraft.world.level.storage.loot.entries.LootPoolSingletonContainer
 import net.minecraft.world.level.storage.loot.functions.ApplyExplosionDecay;
 import net.minecraft.world.level.storage.loot.functions.LimitCount;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
+import net.minecraft.util.context.ContextKeySet;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.predicates.*;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
@@ -40,11 +44,15 @@ public class DTLootTableBuilder {
         HolderLookup.RegistryLookup<Enchantment> registrylookup = registries.lookupOrThrow(Registries.ENCHANTMENT);
         return MatchTool.toolMatches(
                 ItemPredicate.Builder.item()
-                        .withSubPredicate(
-                                ItemSubPredicates.ENCHANTMENTS,
-                                ItemEnchantmentsPredicate.enchantments(
-                                        List.of(new EnchantmentPredicate(registrylookup.getOrThrow(Enchantments.SILK_TOUCH), MinMaxBounds.Ints.atLeast(1)))
-                                )
+                        .withComponents(
+                                DataComponentMatchers.Builder.components()
+                                        .partial(
+                                                DataComponentPredicates.ENCHANTMENTS,
+                                                EnchantmentsPredicate.enchantments(
+                                                        List.of(new EnchantmentPredicate(registrylookup.getOrThrow(Enchantments.SILK_TOUCH), MinMaxBounds.Ints.atLeast(1)))
+                                                )
+                                        )
+                                        .build()
                         )
         );
     }
@@ -54,8 +62,17 @@ public class DTLootTableBuilder {
     }
 
     private static LootItemCondition.Builder hasShearsOrSilkTouch(HolderLookup.Provider registries){
-        LootItemCondition.Builder hasShears = MatchTool.toolMatches(ItemPredicate.Builder.item().of(Items.SHEARS));
+        LootItemCondition.Builder hasShears = MatchTool.toolMatches(ItemPredicate.Builder.item().of(registries.lookupOrThrow(Registries.ITEM), Items.SHEARS));
         return hasShears.or(hasSilkTouch(registries));
+    }
+
+    /** 26.2 item codecs reject {@code minecraft:air}; never emit it as a loot entry. */
+    private static Item lootItemOrStick(Item item) {
+        return item == null || item == Items.AIR ? Items.STICK : item;
+    }
+
+    private static boolean isLootable(Item item) {
+        return item != null && item != Items.AIR;
     }
 
     protected static LootTable.Builder createSelfDropDispatchTable(Block block, LootItemCondition.Builder conditionBuilder, LootPoolEntryContainer.Builder<?> alternativeBuilder) {
@@ -72,7 +89,7 @@ public class DTLootTableBuilder {
                         .when(SeasonalSeedDropChance.seasonalSeedDropChance())
         ).withPool(
                 LootPool.lootPool().setRolls(ConstantValue.exactly(1)).when(hasNoShearsOrSilkTouch(registries))
-                        .add(LootItem.lootTableItem(stickItem)
+                        .add(LootItem.lootTableItem(lootItemOrStick(stickItem))
                                 .apply(SetItemCountFunction.setCount(
                                         UniformGenerator.between(1.0F, 2.0F)
                                 ))
@@ -101,10 +118,10 @@ public class DTLootTableBuilder {
         );
     }
 
-    public static LootTable.Builder createLeavesDrops(float[] seedChances, LootContextParamSet parameterSet, HolderLookup.Provider registries) {
+    public static LootTable.Builder createLeavesDrops(float[] seedChances, ContextKeySet parameterSet, HolderLookup.Provider registries) {
         return createLeavesDrops(seedChances, parameterSet, Items.STICK, registries);
     }
-    public static LootTable.Builder createLeavesDrops(float[] seedChances, LootContextParamSet parameterSet, Item stickItem, HolderLookup.Provider registries) {
+    public static LootTable.Builder createLeavesDrops(float[] seedChances, ContextKeySet parameterSet, Item stickItem, HolderLookup.Provider registries) {
         return LootTable.lootTable().withPool(
                 LootPool.lootPool().setRolls(ConstantValue.exactly(1)).add(
                         SeedItemLootPoolEntry.lootTableSeedItem()
@@ -126,7 +143,7 @@ public class DTLootTableBuilder {
         ).setParamSet(parameterSet);
     }
 
-    public static LootTable.Builder createPalmLeavesDrops(float[] seedChances, LootContextParamSet parameterSet, HolderLookup.Provider registries) {
+    public static LootTable.Builder createPalmLeavesDrops(float[] seedChances, ContextKeySet parameterSet, HolderLookup.Provider registries) {
         return LootTable.lootTable().withPool(
                 LootPool.lootPool().setRolls(ConstantValue.exactly(1)).add(
                         SeedItemLootPoolEntry.lootTableSeedItem()
@@ -149,6 +166,9 @@ public class DTLootTableBuilder {
     }
 
     public static LootTable.Builder createVoluntaryDrops(Item seedItem, HolderLookup.Provider registries) {
+        if (!isLootable(seedItem)) {
+            return LootTable.lootTable().setParamSet(DTLootParameterSets.VOLUNTARY);
+        }
         return LootTable.lootTable().withPool(
                 LootPool.lootPool().setRolls(ConstantValue.exactly(1)).add(
                         LootItem.lootTableItem(seedItem)
@@ -166,7 +186,7 @@ public class DTLootTableBuilder {
                 )
         ).withPool(
                 LootPool.lootPool().setRolls(ConstantValue.exactly(1)).add(
-                        LootItem.lootTableItem(stickItem)
+                        LootItem.lootTableItem(lootItemOrStick(stickItem))
                                 .apply(MultiplyBySticksCount.multiplyBySticksCount())
                                 .apply(ApplyExplosionDecay.explosionDecay())
                 )
@@ -183,6 +203,9 @@ public class DTLootTableBuilder {
                 ConstantValue.exactly(countMax) :
                 UniformGenerator.between(countMin, countMax);
         //Apply the count to the item builder only if it's not just 1.
+        if (!isLootable(fruitItem)) {
+            return LootTable.lootTable().setParamSet(LootContextParamSets.BLOCK);
+        }
         LootPoolSingletonContainer.Builder<?> itemBuilder = LootItem.lootTableItem(fruitItem);
         if (!(countMin == countMax && countMax == 1)){
             itemBuilder.apply(SetItemCountFunction.setCount(numberProvider));

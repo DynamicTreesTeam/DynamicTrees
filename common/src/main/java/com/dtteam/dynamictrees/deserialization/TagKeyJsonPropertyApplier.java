@@ -4,10 +4,10 @@ import com.dtteam.dynamictrees.deserialization.applier.Applier;
 import com.dtteam.dynamictrees.deserialization.applier.PropertyApplier;
 import com.dtteam.dynamictrees.deserialization.applier.PropertyApplierResult;
 import com.google.gson.JsonElement;
-import net.minecraft.ResourceLocationException;
+import net.minecraft.IdentifierException;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import org.apache.commons.lang3.function.TriFunction;
 import org.apache.logging.log4j.util.TriConsumer;
@@ -32,26 +32,24 @@ public class TagKeyJsonPropertyApplier<K, O, V> extends PropertyApplier<O, Float
 
     @SuppressWarnings("unchecked")
     @Nullable
-    @Override
     public PropertyApplierResult applyIfShould(String key, Object object, JsonElement input) {
         if (!this.objectClass.isInstance(object))
             return null;
 
         try {
-            TagKey<K> tagKey = TagKey.create(this.registryKey, ResourceLocation.parse(key.charAt(0) == '#' ? key.substring(1) : key));
+            TagKey<K> tagKey = TagKey.create(this.registryKey, Identifier.parse(key.charAt(0) == '#' ? key.substring(1) : key));
             return JsonDeserializers.getOrThrow(Float.class).deserialize(input).map(value -> this.tagKeyFunction.apply(tagKey, (O) object, value))
                     .orElseApply(
                             PropertyApplierResult::failure,
                             PropertyApplierResult::addWarnings,
                             null
                     );
-        } catch (ResourceLocationException e) {
+        } catch (IdentifierException e) {
             return PropertyApplierResult.failure(e.getMessage());
         }
     }
 
     @Nullable
-    @Override
     protected PropertyApplierResult applyIfShould(O object, JsonElement input, Applier<O, Float> applier) {
         return null;
     }

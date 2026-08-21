@@ -108,7 +108,6 @@ public class PoissonDisc extends Vec2i {
         return set(x, z).setRadius(radius);
     }
 
-    @Override
     public PoissonDisc set(int x, int z) {
         super.set(x, z);
         return this;
@@ -386,7 +385,6 @@ public class PoissonDisc extends Vec2i {
         return x >= chunkXStart && z >= chunkZStart && x < chunkXStart + 16 && z < chunkZStart + 16;
     }
 
-    @Override
     public String toString() {
         return "Circle x" + x + ", z" + z + ", r" + radius + ", " + (real ? "T" : "F") + ", " + Integer.toHexString(arc);
     }

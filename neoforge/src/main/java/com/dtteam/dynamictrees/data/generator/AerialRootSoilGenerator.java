@@ -7,11 +7,11 @@ import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.provider.DTBlockStateProvider;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.neoforge.client.model.generators.BlockModelBuilder;
-import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
-import net.neoforged.neoforge.client.model.generators.VariantBlockStateBuilder;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @author Max Hyper
@@ -19,20 +19,25 @@ import net.neoforged.neoforge.client.model.generators.VariantBlockStateBuilder;
 public final class AerialRootSoilGenerator extends SoilStateGenerator {
 
     public static final DependencyKey<Block> ROOTS = new DependencyKey<>("roots");
+
     @Override
     public void generate(DTDataProvider.BlockState prov, SoilProperties input, Dependencies dependencies) {
-        if (prov instanceof DTBlockStateProvider provider){
-            VariantBlockStateBuilder builder = provider.getVariantBuilder(dependencies.get(SOIL));
-            for (int i=1; i<=8; i++){
-                builder = builder.partialState().with(AerialRootsSoilProperties.RootSoilBlock.RADIUS, i)
-                        .modelForState().modelFile(soilModelBuilder(
-                                provider, input, i,
-                                provider.blockTexture(dependencies.get(SOIL)).getPath(),
-                                dependencies.get(PRIMITIVE_SOIL),
-                                dependencies.get(ROOTS))
-                        ).addModel();
-            }
+        if (!(prov instanceof DTBlockStateProvider provider)) {
+            return;
         }
+        AerialRootsSoilProperties aerialInput = (AerialRootsSoilProperties) input;
+        Block soil = dependencies.get(SOIL);
+        Identifier soilTexture = provider.blockTexture(soil);
+        DTBlockStateProvider.VariantBuilder variants = provider.variants(soil);
+        for (int i = 1; i <= 8; i++) {
+            Identifier modelId = Identifier.fromNamespaceAndPath(soilTexture.getNamespace(), soilTexture.getPath() + "_radius" + i);
+            variants.variant(AerialRootsSoilProperties.RootSoilBlock.RADIUS, i, modelId);
+            provider.parentedBlockModel(modelId,
+                    DynamicTrees.location("block/smartmodel/rooty/aerial_roots_radius" + i),
+                    soilTextures(provider, aerialInput, dependencies),
+                    null);
+        }
+        variants.finish();
     }
 
     @Override
@@ -44,19 +49,24 @@ public final class AerialRootSoilGenerator extends SoilStateGenerator {
                 .append(ROOTS, aerialInput.getFamily().getPrimitiveRoots());
     }
 
-    private BlockModelBuilder soilModelBuilder(BlockStateProvider provider, SoilProperties input, int radius, String name, Block primitiveBlock, Block roots) {
-        AerialRootsSoilProperties aerialInput = (AerialRootsSoilProperties)input;
-        ResourceLocation side = aerialInput.getFamily().getTexturePath(Family.BRANCH).orElse(provider.blockTexture(primitiveBlock));
-        ResourceLocation top = aerialInput.getFamily().getTexturePath(Family.BRANCH_TOP).orElse(ResourceLocationUtils.suffix(provider.blockTexture(primitiveBlock),"_top"));
-        ResourceLocation roots_side = aerialInput.getFamily().getTexturePath(Family.ROOTS_SIDE).orElse(ResourceLocationUtils.suffix(provider.blockTexture(roots), "_side"));
-        ResourceLocation roots_top = aerialInput.getFamily().getTexturePath(Family.ROOTS_SIDE).orElse(ResourceLocationUtils.suffix(provider.blockTexture(roots),"_top"));
-        BlockModelBuilder builder = provider.models().withExistingParent(name+"_radius"+radius,  DynamicTrees.location("block/smartmodel/rooty/aerial_roots_radius"+ radius))
-                .texture("side", side)
-                .texture("end", top)
-                .texture("overlay", roots_side)
-                .texture("overlay_end", roots_top);
-        input.getTexturePath(SoilProperties.ROOTS).ifPresent((r)->builder.texture("roots", r));
-        return builder;
+    private static Map<String, Identifier> soilTextures(DTBlockStateProvider provider, AerialRootsSoilProperties aerialInput,
+                                                        Dependencies dependencies) {
+        Block primitiveBlock = dependencies.get(PRIMITIVE_SOIL);
+        Block roots = dependencies.get(ROOTS);
+        Identifier side = aerialInput.getFamily().getTexturePath(Family.BRANCH).orElse(provider.blockTexture(primitiveBlock));
+        Identifier top = aerialInput.getFamily().getTexturePath(Family.BRANCH_TOP)
+                .orElse(ResourceLocationUtils.suffix(provider.blockTexture(primitiveBlock), "_top"));
+        Identifier rootsSide = aerialInput.getFamily().getTexturePath(Family.ROOTS_SIDE)
+                .orElse(ResourceLocationUtils.suffix(provider.blockTexture(roots), "_side"));
+        Identifier rootsTop = aerialInput.getFamily().getTexturePath(Family.ROOTS_SIDE)
+                .orElse(ResourceLocationUtils.suffix(provider.blockTexture(roots), "_top"));
+        Map<String, Identifier> textures = new LinkedHashMap<>();
+        textures.put("side", side);
+        textures.put("end", top);
+        textures.put("overlay", rootsSide);
+        textures.put("overlay_end", rootsTop);
+        aerialInput.getTexturePath(SoilProperties.ROOTS).ifPresent(r -> textures.put("roots", r));
+        return textures;
     }
 
 }

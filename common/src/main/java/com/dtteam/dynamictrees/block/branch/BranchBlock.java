@@ -33,14 +33,14 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.ReloadableServerRegistries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -89,14 +89,14 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
     /**
      * @param name name of branch, without a {@code _branch} suffix
      */
-    public BranchBlock(ResourceLocation name) {
+    public BranchBlock(Identifier name) {
         this(name, Properties.of().pushReaction(PushReaction.BLOCK));
     }
 
     /**
      * @param name name of branch, without a {@code _branch} suffix
      */
-    public BranchBlock(ResourceLocation name, Properties properties) {
+    public BranchBlock(Identifier name, Properties properties) {
         super(properties); //removes drops from block
         lootTableSupplier = new LootTableSupplier("trees/branches/", name);
     }
@@ -118,7 +118,6 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         return family;
     }
 
-    @Override
     public Family getFamily(BlockState state, BlockGetter level, BlockPos pos) {
         return getFamily();
     }
@@ -150,7 +149,6 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         return this.getFamily().getStrippedBranch().map(other -> other == this).orElse(false);
     }
 
-    @Override
     public abstract int branchSupport(BlockState state, BlockGetter level, BranchBlock branch, BlockPos pos, Direction dir, int radius);
 
     ///////////////////////////////////////////
@@ -197,11 +195,10 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
     // INTERACTION
     ///////////////////////////////////////////
 
-    @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         return TreeHelper.getTreePart(state).getFamily(state, level, pos).onTreeActivated(
                 new Family.TreeActivationContext(level, TreeHelper.findRootNode(level, pos), pos, state, player, hand, stack, hitResult)
-        ) ? ItemInteractionResult.SUCCESS : ItemInteractionResult.FAIL;
+        ) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
     }
 
     public boolean canBeStripped(BlockState state, Level level, BlockPos pos, Player player, ItemStack heldItem) {
@@ -227,12 +224,10 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         );
     }
 
-    @Override
-    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
         return this.getFamily().getBranchItem().map(ItemStack::new).orElse(ItemStack.EMPTY);
     }
 
-    @Override
     protected boolean isPathfindable(BlockState state, PathComputationType pathComputationType) {
         return false;
     }
@@ -245,7 +240,6 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
      * The following 3 methods are overridden by {@link #useItemOn(ItemStack, BlockState, Level, BlockPos, Player, InteractionHand, BlockHitResult)}
      * and they are not normally called. However, they are here for mod compatibility.
      */
-    @Override
     public boolean isValidBonemealTarget(LevelReader levelReader, BlockPos blockPos, BlockState blockState) {
         if (!(levelReader instanceof Level level)) return false;
         BlockPos rootPos = TreeHelper.findRootNode(level, blockPos);
@@ -257,12 +251,10 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         return root.isValidBonemealTarget(levelReader, rootPos, rootState);
     }
 
-    @Override
     public boolean isBonemealSuccess(Level pLevel, RandomSource pRandom, BlockPos pPos, BlockState pState){
         return true;
     }
 
-    @Override
     public void performBonemeal(ServerLevel pLevel, RandomSource pRandom, BlockPos pPos, BlockState pState){
         BlockPos rootPos = TreeHelper.findRootNode(pLevel, pPos);
         if (rootPos == BlockPos.ZERO) return;
@@ -277,7 +269,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
     // RENDERING
     ///////////////////////////////////////////
 
-    public Connections getConnectionData(@NotNull BlockAndTintGetter level, @NotNull BlockPos pos, @NotNull BlockState state) {
+    public Connections getConnectionData(@NotNull BlockGetter level, @NotNull BlockPos pos, @NotNull BlockState state) {
         final Connections connections = new Connections();
 
         if (state.getBlock() != this) {
@@ -299,12 +291,10 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         return true;
     }
 
-    @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
 
-    @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         byte[] radii = new byte[7];
         int radius = getRadius(state);
@@ -360,7 +350,6 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
     // GROWTH
     ///////////////////////////////////////////
 
-    @Override
     public int getRadius(BlockState state) {
         return 1;
     }
@@ -384,7 +373,6 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
     /**
      * Generally, all branch blocks should be analyzed.
      */
-    @Override
     public boolean shouldAnalyse(BlockState state, BlockGetter level, BlockPos pos) {
         return true;
     }
@@ -448,15 +436,15 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
             cutDir = Direction.DOWN;
         }
 
-        Pair<ResourceLocation, Integer> cachedState = getCachedSoilState(level, cutPos.offset(cutDir.getNormal()), false);
+        Pair<Identifier, Integer> cachedState = getCachedSoilState(level, cutPos.offset(cutDir.getUnitVec3i()), false);
         return new BranchDestructionData(species, stateMapper.getBranchConnectionMap(), destroyedLeaves, leavesDropsList, endPoints, volumeSum.getVolume(), cutPos, cutPos, cutDir, toolDir, trunkHeight, cachedState);
     }
 
-    protected static @Nullable Pair<ResourceLocation, Integer> getCachedSoilState(Level level, BlockPos rootPos, boolean hasRoots) {
+    protected static @Nullable Pair<Identifier, Integer> getCachedSoilState(Level level, BlockPos rootPos, boolean hasRoots) {
         BlockState soilState = level.getBlockState(rootPos);
         SoilBlock soilBlock = TreeHelper.getRooty(soilState);
         if (soilBlock != null && soilBlock.fallWithTree(soilState, level, rootPos, hasRoots)){
-            ResourceLocation blockResLoc = BuiltInRegistries.BLOCK.getKey(soilBlock);
+            Identifier blockResLoc = BuiltInRegistries.BLOCK.getKey(soilBlock);
             int stateId = soilBlock.getStateIndex(soilState);
             return Pair.of(blockResLoc, stateId);
         }
@@ -489,7 +477,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
      *                        to the cut {@link BlockPos}.
      */
     public void destroyLeaves(final Level level, final BlockPos cutPos, final Species species, final ItemStack tool, final List<BlockPos> endPoints, final Map<BlockPos, BlockState> destroyedLeaves, final List<ItemStackPos> drops) {
-        if (level.isClientSide || endPoints.isEmpty()) {
+        if (level.isClientSide() || endPoints.isEmpty()) {
             return;
         }
         // Make a bounding volume that holds all of the endpoints and expand the volume for the leaves radius.
@@ -556,7 +544,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         return getPrimitiveLog().isPresent();
     }
 
-    public ResourceLocation getLootTableName() {
+    public Identifier getLootTableName() {
         return lootTableSupplier.getName();
     }
 
@@ -565,7 +553,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
     }
 
     public LootTable.Builder createBranchDrops(HolderLookup.Provider registries) {
-        return DTLootTableBuilder.createBranchDrops(getPrimitiveLog().get(), family.getStick(1).getItem(), registries);
+        return DTLootTableBuilder.createBranchDrops(getPrimitiveLog().get(), family.getStickItem(), registries);
     }
 
     public float getPrimitiveLogs(float volumeIn, List<ItemStack> drops) {
@@ -587,7 +575,6 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         return this;
     }
 
-    @Override
     public void futureBreak(BlockState state, Level level, BlockPos cutPos, LivingEntity entity) {
         // Tries to get the face being pounded on.
         final Direction toolDir = EntityUtils.getHitDirection(entity);
@@ -608,7 +595,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         final float chance = 1.0f;
 
         // Build the final wood drop list taking chance into consideration.
-        final List<ItemStack> woodDropList = woodItems.stream().filter(i -> level.random.nextFloat() <= chance).toList();
+        final List<ItemStack> woodDropList = woodItems.stream().filter(i -> level.getRandom().nextFloat() <= chance).toList();
 
         // Drop the FallingTreeEntity into the level.
         FallingTreeEntity.dropTree(level, destroyData, woodDropList,  FallingTreeEntity.DestroyType.HARVEST);
@@ -645,10 +632,9 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         ItemUtils.damageAxe(entity, heldItem, radius, woodVolume, forBlockBreak);
     }
 
-    @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
-        if (level.isClientSide || destroyMode != DynamicTrees.DestroyMode.SLOPPY) {
-            super.onRemove(state, level, pos, newState, movedByPiston);
+    protected void affectNeighborsAfterRemoval(BlockState state, net.minecraft.server.level.ServerLevel level, BlockPos pos, boolean movedByPiston) {
+        if (level.isClientSide() || destroyMode != DynamicTrees.DestroyMode.SLOPPY) {
+            super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
             return;
         }
 
@@ -662,7 +648,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         boolean foundFire = toBlockState.is(BlockTags.FIRE);
         if (!foundFire){
             for (Direction offset : Direction.values()){
-                BlockPos offPos = pos.offset(offset.getNormal());
+                BlockPos offPos = pos.offset(offset.getUnitVec3i());
                 if (level.getBlockState(offPos).is(BlockTags.FIRE)){
                     foundFire = true;
                     break;
@@ -699,7 +685,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
                 this.sloppyBreak(level, offPos, FallingTreeEntity.DestroyType.VOID);
             }
         }
-        super.onRemove(state, level, pos, newState, movedByPiston);
+        super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
     }
 
     /**
@@ -711,7 +697,6 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         destroyMode = DynamicTrees.DestroyMode.SLOPPY; // Ready the state machine for sloppy breaking again.
     }
 
-    @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         return state;
     }
@@ -747,8 +732,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
      * @param pos       The {@link BlockPos} of the {@link BranchBlock} being exploded.
      * @param explosion The {@link Explosion} destroying the {@link BranchBlock}.
      */
-    @Override
-    protected void onExplosionHit(BlockState state, Level level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> dropConsumer) {
+    protected void onExplosionHit(BlockState state, net.minecraft.server.level.ServerLevel level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> dropConsumer) {
         final SpeciesNode speciesNode = new SpeciesNode();
         final MapSignal signal = analyse(state, level, pos, null, new MapSignal(speciesNode));
         if (signal.foundRoot){ //Some root blocks may need to be reminded the tree exploded (Cough cough AerialRoots cough)
@@ -772,7 +756,6 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         }
     }
 
-    @Override
     public final TreePartType getTreePartType() {
         return TreePartType.BRANCH;
     }

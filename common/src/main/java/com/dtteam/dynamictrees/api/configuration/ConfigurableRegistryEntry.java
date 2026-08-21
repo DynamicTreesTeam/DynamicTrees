@@ -3,7 +3,7 @@ package com.dtteam.dynamictrees.api.configuration;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeature;
 import com.google.common.collect.Sets;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -27,7 +27,7 @@ public abstract class ConfigurableRegistryEntry<T extends ConfigurableRegistryEn
         this.defaultConfiguration = this.createDefaultConfiguration();
     }
 
-    protected ConfigurableRegistryEntry(ResourceLocation registryName) {
+    protected ConfigurableRegistryEntry(Identifier registryName) {
         super(registryName);
         this.registerProperties();
 
@@ -65,7 +65,6 @@ public abstract class ConfigurableRegistryEntry<T extends ConfigurableRegistryEn
      * @param property The {@link ConfigurationProperty} to check for.
      * @return {@code true} if it is registered, {@code false} if not.
      */
-    @Override
     public boolean isPropertyRegistered(@NotNull ConfigurationProperty<?> property) {
         return this.properties.contains(property);
     }
@@ -76,7 +75,6 @@ public abstract class ConfigurableRegistryEntry<T extends ConfigurableRegistryEn
      *
      * @return The {@link Set} of {@link ConfigurationProperty} for this {@link ConfigurableRegistryEntry}.
      */
-    @Override
     public Set<ConfigurationProperty<?>> getRegisteredProperties() {
         return Collections.unmodifiableSet(this.properties);
     }
@@ -87,7 +85,6 @@ public abstract class ConfigurableRegistryEntry<T extends ConfigurableRegistryEn
      *
      * @return The {@link #defaultConfiguration}.
      */
-    @Override
     public C getDefaultConfiguration() {
         return this.defaultConfiguration.copy();
     }

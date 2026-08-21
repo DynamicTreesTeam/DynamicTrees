@@ -13,14 +13,12 @@ public class Vec2iPCA extends Vec2i {
         super(x, z, tight);
     }
 
-    @Override
     public Vec2i set(int x, int z) {
         super.set(x, z);
         radians = super.angle();
         return this;
     }
 
-    @Override
     public double angle() {
         return radians;
     }

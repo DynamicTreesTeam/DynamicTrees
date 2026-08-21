@@ -5,7 +5,7 @@ import com.dtteam.dynamictrees.tree.species.Species;
 import com.google.common.collect.Lists;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.MethodsReturnNonnullByDefault;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.FrontAndTop;
@@ -33,7 +33,6 @@ import java.util.function.Function;
 /**
  * @author Harley O'Connor
  */
-@MethodsReturnNonnullByDefault
 public final class TreePoolElement extends StructurePoolElement {
 
     public static final MapCodec<TreePoolElement> CODEC = RecordCodecBuilder.mapCodec(instance -> instance
@@ -76,26 +75,19 @@ public final class TreePoolElement extends StructurePoolElement {
         return tag;
     }
 
-    @Override
-    public List<StructureTemplate.StructureBlockInfo> getShuffledJigsawBlocks(StructureTemplateManager structureManager, BlockPos pos, Rotation rotation, RandomSource random) {
-        return Lists.newArrayList(
-                new StructureTemplate.StructureBlockInfo(pos, Blocks.JIGSAW.defaultBlockState().setValue(JigsawBlock.ORIENTATION, FrontAndTop.fromFrontAndTop(Direction.DOWN, Direction.SOUTH)),
-                        this.defaultJigsawNBT)
-        );
+    public List<StructureTemplate.JigsawBlockInfo> getShuffledJigsawBlocks(StructureTemplateManager structureTemplateManager, BlockPos pos, Rotation rotation, RandomSource random) {
+        return java.util.List.of();
     }
 
 
-    @Override
     public BoundingBox getBoundingBox(StructureTemplateManager structureManager, BlockPos pos, Rotation rotation) {
         return new BoundingBox(pos.getX(), pos.getY(), pos.getZ(), pos.getX(), pos.getY(), pos.getZ());
     }
 
-    @Override
     public Vec3i getSize(StructureTemplateManager pStructureManager, Rotation pRotation) {
         return Vec3i.ZERO;
     }
 
-    @Override
     public boolean place(StructureTemplateManager structureTemplateManager, WorldGenLevel level, StructureManager structureManager, ChunkGenerator chunkGenerator, BlockPos blockPos, BlockPos blockPos1, Rotation rotation, BoundingBox boundingBox, RandomSource randomSource, LiquidSettings liquidSettings, boolean b) {
         species.plantSapling(level, blockPos, true);
         return true;
@@ -114,7 +106,6 @@ public final class TreePoolElement extends StructurePoolElement {
     }
 
 
-    @Override
     public StructurePoolElementType<?> getType() {
         return DTRegistries.TREE_STRUCTURE_POOL_ELEMENT_TYPE.get();
     }

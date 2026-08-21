@@ -106,7 +106,6 @@ public class ConfigurationProperty<T> {
         return property(identifier, Item.class);
     }
 
-    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -118,12 +117,10 @@ public class ConfigurationProperty<T> {
         return Objects.equals(key, that.key) && Objects.equals(type, that.type);
     }
 
-    @Override
     public int hashCode() {
         return Objects.hash(key, type);
     }
 
-    @Override
     public String toString() {
         return "ConfigurationProperty{" +
                 "identifier='" + key + '\'' +

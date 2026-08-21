@@ -31,7 +31,6 @@ public class ArrayPropertyApplier<T, V, I> extends PropertyApplier<T, List<V>, I
     }
 
     @Nullable
-    @Override
     protected PropertyApplierResult applyIfShould(T object, I input, Applier<T, List<V>> applier) {
         final Result<Iterator<I>, I> iteratorResult = this.iteratorDeserializer.apply(input);
         if (!iteratorResult.success()) {

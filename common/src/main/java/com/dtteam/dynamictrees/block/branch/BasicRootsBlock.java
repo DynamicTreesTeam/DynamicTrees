@@ -29,14 +29,14 @@ import com.dtteam.dynamictrees.utility.ItemUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.ReloadableServerRegistries;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -102,7 +102,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     private int flammability = 5; // Mimic vanilla logs
     private int fireSpreadSpeed = 5; // Mimic vanilla logs
 
-    public BasicRootsBlock(ResourceLocation name, BlockBehaviour.Properties properties) {
+    public BasicRootsBlock(Identifier name, BlockBehaviour.Properties properties) {
         super(name, properties);
         registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false).setValue(LAYER, Layer.EXPOSED));
         rootLootTableSupplier = new LootTableSupplier("trees/roots/", name);
@@ -143,22 +143,18 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         builder.add(RADIUS, LAYER, WATERLOGGED);
     }
 
-    @Override
     public Cell getHydrationCell(BlockGetter level, BlockPos pos, BlockState state, Direction dir, LeavesProperties leavesProperties) {
         return CellNull.NULL_CELL;
     }
 
-    @Override
     public int probabilityForBlock(BlockState state, BlockGetter level, BlockPos pos, BranchBlock from) {
         return 10;
     }
 
-    @Override
     public int getRadiusForConnection(BlockState state, BlockGetter level, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
         return getRadius(state);
     }
 
-    @Override
     public int getRadius(BlockState state) {
         return isSameTree(state) && state.hasProperty(RADIUS) ? state.getValue(RADIUS) : 0;
     }
@@ -167,14 +163,12 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         return getFamily().getMaxSignalDepth();
     }
 
-    @Override
     public int branchSupport(BlockState state, BlockGetter level, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
         if (branch instanceof BasicRootsBlock)
             return isSameTree(branch) ? BasicBranchBlock.setSupport(1, 0) : 0;
         return 0;
     }
 
-    @Override
     public int setRadius(LevelAccessor level, BlockPos pos, int radius, @org.jetbrains.annotations.Nullable Direction originDir, int flags) {
         destroyMode = DynamicTrees.DestroyMode.SET_RADIUS;
         BlockState currentState = level.getBlockState(pos);
@@ -197,13 +191,11 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         return radius;
     }
 
-    @Override
     public BlockState getStateForRadius(int radius) {
         return defaultBlockState().setValue(RADIUS, radius);
     }
 
-    @Override
-    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
         if (isFullBlock(state) && getFamily().getPrimitiveCoveredRoots().isPresent()){
             return new ItemStack(getFamily().getPrimitiveCoveredRoots().get());
         }
@@ -214,7 +206,6 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     // SOUNDS
     //////////////////////////////
 
-    @Override
     protected SoundType getSoundType(BlockState state) {
         Optional<Block> primitive = state.getValue(LAYER).getPrimitive(getFamily());
         return primitive.map(block -> block.defaultBlockState().getSoundType())
@@ -225,27 +216,23 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     // WATER LOGGING
     //////////////////////////////
 
-    @Override
     public FluidState getFluidState(BlockState state) {
         return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
-    @Override
-    public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor level, BlockPos currentPos, BlockPos facingPos) {
+    public BlockState updateShape(BlockState stateIn, LevelReader level, net.minecraft.world.level.ScheduledTickAccess ticks, BlockPos currentPos, Direction facing, BlockPos facingPos, BlockState facingState, RandomSource random) {
         if (stateIn.getValue(WATERLOGGED)) {
-            level.scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+            ticks.scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
-        return super.updateShape(stateIn, facing, facingState, level, currentPos, facingPos);
+        return super.updateShape(stateIn, level, ticks, currentPos, facing, facingPos, facingState, random);
     }
 
-    @Override
-    public boolean canPlaceLiquid(@Nullable Player player, BlockGetter level, BlockPos pos, BlockState state, Fluid fluid) {
+    public boolean canPlaceLiquid(@Nullable LivingEntity player, BlockGetter level, BlockPos pos, BlockState state, Fluid fluid) {
         return !isFullBlock(state)
                 && !state.getValue(BlockStateProperties.WATERLOGGED)
                 && fluid == Fluids.WATER;
     }
 
-    @Override
     public boolean placeLiquid(LevelAccessor pLevel, BlockPos pPos, BlockState pState, FluidState pFluidState) {
         if (canPlaceLiquid(null, pLevel, pPos, pState, pFluidState.getType())) {
             if (!pLevel.isClientSide()) {
@@ -265,11 +252,10 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
 
     private final LootTableSupplier rootLootTableSupplier;
 
-    public ResourceLocation getLootTableName() {
+    public Identifier getLootTableName() {
         return rootLootTableSupplier.getName();
     }
 
-    @Override
     public LootTable getLootTable(ReloadableServerRegistries.Holder lootTables, Species species) {
         return rootLootTableSupplier.get(lootTables, species);
     }
@@ -287,8 +273,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         return pState.canSurvive(level, clickedPos) && level.isUnobstructed(pState, clickedPos, collisioncontext);
     }
 
-    @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
                 if (!isFullBlock(state)) {
             Layer layer = Layer.COVERED;
             if (state.getValue(RADIUS) >= 8){
@@ -305,7 +290,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
                         level.setBlock(pos, newState, 3);
                         if (!player.isCreative()) handStack.shrink(1);
                         level.playSound(null, pos, coverBlock.defaultBlockState().getSoundType().getPlaceSound(), SoundSource.BLOCKS, 1f, 0.8f);
-                        return ItemInteractionResult.SUCCESS;
+                        return InteractionResult.SUCCESS;
                     }
                 }
             }
@@ -313,10 +298,9 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
     }
 
-    @Override
     public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
         if (isFullBlock(state)){
-            level.setBlock(pos, state.setValue(LAYER, Layer.FILLED), level.isClientSide ? 11 : 3);
+            level.setBlock(pos, state.setValue(LAYER, Layer.FILLED), level.isClientSide() ? 11 : 3);
             this.spawnDestroyParticles(level, player, pos, state);
             level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
             Block primitive = state.getValue(LAYER).getPrimitive(getFamily()).orElse(null);
@@ -340,7 +324,6 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
     }
 
-    @Override
     public void futureBreak(BlockState state, Level level, BlockPos cutPos, LivingEntity entity) {
         // Tries to get the face being pounded on.
         final Direction toolDir = EntityUtils.getHitDirection(entity);
@@ -365,7 +348,6 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         this.damageAxe(entity, heldItem, this.getRadius(state), woodVolume, true);
     }
 
-    @Override
     public BranchDestructionData destroyBranchFromNode(Level level, BlockPos cutPos, Direction toolDir, boolean wholeTree, @Nullable final LivingEntity entity) {
         final BlockState blockState = level.getBlockState(cutPos);
         final SpeciesNode speciesNode = new SpeciesNode();
@@ -403,11 +385,10 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
             }
         }
 
-        Pair<ResourceLocation, Integer> cachedState = getCachedSoilState(level, cutPos.offset(cutDir.getNormal()), true);
+        Pair<Identifier, Integer> cachedState = getCachedSoilState(level, cutPos.offset(cutDir.getUnitVec3i()), true);
         return new BranchDestructionData(species, stateMapper.getBranchConnectionMap(), new HashMap<>(), new ArrayList<>(), destroyer.getEnds(), volumeSum.getVolume(), cutPos, basePos, cutDir, toolDir, trunkHeight, cachedState);
     }
 
-    @Override
     public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
         if (isFullBlock(state)) return getFamily().getPrimitiveCoveredRoots().orElse(Blocks.AIR).defaultDestroyTime();
         final int radius = this.getRadius(level.getBlockState(pos));
@@ -417,7 +398,6 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     }
 
     //This is the state that will replace the root when the tree is felled.
-    @Override
     public BlockState getStateForDecay(BlockState state, LevelAccessor level, BlockPos pos) {
         boolean waterlogged = state.hasProperty(BlockStateProperties.WATERLOGGED) && state.getValue(BlockStateProperties.WATERLOGGED);
         Layer layer = state.hasProperty(BasicRootsBlock.LAYER) ? state.getValue(BasicRootsBlock.LAYER) : Layer.EXPOSED;
@@ -426,7 +406,6 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     }
 
     //This allows for the correct tool to be used in the root covering (shovel instead of axe, for example).
-    @Override
     public float getDestroyProgress(BlockState pState, Player pPlayer, BlockGetter pLevel, BlockPos pPos) {
         Optional<Block> covered = getFamily().getPrimitiveCoveredRoots();
         if (pState.hasProperty(LAYER) && pState.getValue(LAYER) == Layer.COVERED && covered.isPresent()){
@@ -439,7 +418,6 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     // ROT
     //////////////////////////////
 
-    @Override
     public boolean checkForRot(LevelAccessor level, BlockPos pos, Species species, int fertility, int radius, RandomSource rand, float chance, boolean rapid) {
 
         if (!rapid && (chance == 0.0f || rand.nextFloat() > chance)) {
@@ -481,7 +459,6 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     // SHAPE
     //////////////////////////////
 
-    @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         if (isFullBlock(state)) {
             return Shapes.block();
@@ -489,7 +466,6 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         return super.getShape(state, level, pos, context);
     }
 
-    @Override
     public VoxelShape getCollisionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
         if (isFullBlock(pState)) {
             VoxelShape fullShape = Shapes.block();
@@ -501,15 +477,13 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         return super.getCollisionShape(pState, pLevel, pPos, pContext);
     }
 
-    @Override
-    public VoxelShape getOcclusionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos) {
+    public VoxelShape getOcclusionShape(BlockState pState) {
         if (isTransparent(pState)){
             return Shapes.empty();
         }
-        return super.getOcclusionShape(pState, pLevel, pPos);
+        return super.getOcclusionShape(pState);
     }
 
-    @Override
     public VoxelShape getVisualShape(BlockState pState, BlockGetter pReader, BlockPos pPos, CollisionContext pContext) {
         if (isTransparent(pState)){
             return Shapes.empty();
@@ -517,7 +491,6 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         return super.getVisualShape(pState, pReader, pPos, pContext);
     }
 
-    @Override
     public boolean skipRendering(BlockState pState, BlockState pAdjacentBlockState, Direction pSide) {
         return (pAdjacentBlockState.is(this) && pAdjacentBlockState.getValue(LAYER).ordinal() >= pState.getValue(LAYER).ordinal())
                 || super.skipRendering(pState, pAdjacentBlockState, pSide);
@@ -565,7 +538,6 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         return signal;
     }
 
-    @Override
     public GrowSignal growSignal(Level level, BlockPos pos, GrowSignal signal) {
         // This is always placed at the beginning of every growSignal function
         if (!signal.step()) {
@@ -648,7 +620,6 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         return signal;
     }
 
-    @Override
     public MapSignal analyse(BlockState blockState, LevelAccessor level, BlockPos pos, @org.jetbrains.annotations.Nullable Direction fromDir, MapSignal signal) {
         // Note: fromDir will be null in the origin node
 

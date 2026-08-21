@@ -9,7 +9,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
-import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
+import com.mojang.serialization.MapCodec;
 
 /**
  * @author Harley O'Connor
@@ -24,14 +24,12 @@ public final class SeasonalSeedDropChance implements LootItemCondition {
     private SeasonalSeedDropChance(Unit unit) {
     }
 
-    @Override
-    public LootItemConditionType getType() {
+    public MapCodec<? extends LootItemCondition> codec() {
         return DTRegistries.SEASONAL_SEED_DROP_CHANCE.get();
     }
 
-    @Override
     public boolean test(LootContext context) {
-        Float seasonalSeedDropFactor = context.getParamOrNull(DTLootContextParams.SEASONAL_SEED_DROP_FACTOR);
+        Float seasonalSeedDropFactor = context.getOptionalParameter(DTLootContextParams.SEASONAL_SEED_DROP_FACTOR);
         assert seasonalSeedDropFactor != null;
         double minimumDropRate = DTConfigs.SERVER.minSeasonalLeavesSeedDropRate.get();
         double adjustedSeasonalSeedDropFactor = Math.min(seasonalSeedDropFactor + minimumDropRate, 1.0F);

@@ -13,13 +13,14 @@ import mezz.jei.api.recipe.vanilla.IJeiBrewingRecipe;
 import mezz.jei.api.recipe.vanilla.IVanillaRecipeFactory;
 import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.registration.ISubtypeRegistration;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Harley O'Connor
@@ -28,7 +29,7 @@ import java.util.List;
 public final class DTJeiPlugin implements IModPlugin {
 
     @Override
-    public ResourceLocation getPluginUid() {
+    public Identifier getPluginUid() {
         return DynamicTrees.location(DynamicTrees.MOD_ID);
     }
 
@@ -36,18 +37,10 @@ public final class DTJeiPlugin implements IModPlugin {
 
         @Override
         public @Nullable Object getSubtypeData(ItemStack itemStack, UidContext uidContext) {
-            if (itemStack.getItem() instanceof DendroPotion){
+            if (itemStack.getItem() instanceof DendroPotion) {
                 return DendroPotion.getPotionType(itemStack);
             }
             return null;
-        }
-
-        @Override
-        public String getLegacyStringSubtypeInfo(ItemStack itemStack, UidContext uidContext) {
-            if (itemStack.getItem() instanceof DendroPotion){
-                return DendroPotion.getPotionType(itemStack).getName();
-            }
-            return "";
         }
     }
 
@@ -60,15 +53,17 @@ public final class DTJeiPlugin implements IModPlugin {
     public void registerRecipes(final IRecipeRegistration registration) {
         final IVanillaRecipeFactory factory = registration.getVanillaRecipeFactory();
         final List<IJeiBrewingRecipe> brewingRecipes = new ArrayList<>();
+        AtomicInteger index = new AtomicInteger();
 
         DendroPotionRecipeHandler.getAllDendroRecipes().forEach(recipe ->
-                brewingRecipes.add(makeJeiBrewingRecipe(factory, recipe.input(), recipe.ingredient(), recipe.output())));
+                brewingRecipes.add(makeJeiBrewingRecipe(factory, recipe.input(), recipe.ingredient(), recipe.output(), index.getAndIncrement())));
 
         registration.addRecipes(RecipeTypes.BREWING, brewingRecipes);
     }
 
-    private static IJeiBrewingRecipe makeJeiBrewingRecipe(IVanillaRecipeFactory factory, final ItemStack inputStack, final ItemStack ingredientStack, ItemStack output) {
-        return factory.createBrewingRecipe(Collections.singletonList(ingredientStack), inputStack, output);
+    private static IJeiBrewingRecipe makeJeiBrewingRecipe(IVanillaRecipeFactory factory, final ItemStack inputStack, final ItemStack ingredientStack, ItemStack output, int index) {
+        return factory.createBrewingRecipe(Collections.singletonList(ingredientStack), inputStack, output,
+                DynamicTrees.location("dendro_brewing_" + index));
     }
 
 }

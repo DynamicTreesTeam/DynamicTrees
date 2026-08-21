@@ -43,7 +43,6 @@ public class RootConnections extends Connections {
      * @param dir    The horizontal direction.
      * @param radius The connection radius for that direction.
      */
-    @Override
     public void setRadius(Direction dir, int radius) {
         // Surface radii uses horizontal index, so use that instead.
         this.radii[dir.get2DDataValue()] = radius;
@@ -80,7 +79,6 @@ public class RootConnections extends Connections {
             this.yOffset = y;
         }
 
-        @Override
         public String getSerializedName() {
             return toString().toLowerCase(Locale.ENGLISH);
         }

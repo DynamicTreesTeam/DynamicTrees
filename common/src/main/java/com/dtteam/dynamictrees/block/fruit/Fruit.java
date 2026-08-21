@@ -18,7 +18,8 @@ import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -83,6 +84,7 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
      * up using vanilla loot tables.
      */
     private ItemStack itemStack;
+    private Item dropItem = Items.AIR;
 
     private float growthChance = 0.2F;
     private float requiredProductionFactor = 0.3F;
@@ -95,7 +97,7 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
     private int minDropCount = 1;
     private int maxDropCount = 1;
 
-    public Fruit(ResourceLocation registryName) {
+    public Fruit(Identifier registryName) {
         super(registryName);
     }
 
@@ -124,7 +126,7 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
      * @param properties the properties of the block. May be the {@linkplain #getDefaultBlockProperties default
      *                   properties} or a modification of them.
      */
-    public final void createBlock(@Nullable ResourceLocation name, Block.Properties properties) {
+    public final void createBlock(@Nullable Identifier name, Block.Properties properties) {
         block = RegistryHandler.addBlock(name == null ? this.getRegistryName() : name, () -> createBlock(properties));
     }
 
@@ -143,7 +145,7 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
     public BlockBehaviour.Properties getDefaultBlockProperties(MapColor mapColor) {
         return BlockBehaviour.Properties.of()
                 .mapColor(mapColor)
-                .noCollission()
+                .noCollision()
                 .sound(SoundType.CROP)
                 .randomTicks()
                 .strength(0.3F);
@@ -202,13 +204,27 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
     public final ItemStack getItemStack() {
         if (itemStack == null) {
             LogManager.getLogger().warn("Invoked too early or item was not set on \"{}\".", getRegistryName());
-            return new ItemStack(Items.AIR);
+            return ItemStack.EMPTY;
         }
         return itemStack.copy();
     }
 
+    public Item getDropItem() {
+        if (itemStack != null && !itemStack.isEmpty()) {
+            return itemStack.getItem();
+        }
+        return dropItem;
+    }
+
+    public void setDropItem(Item item) {
+        this.dropItem = item;
+    }
+
     public void setItemStack(ItemStack itemStack) {
         this.itemStack = itemStack;
+        if (itemStack != null && !itemStack.isEmpty()) {
+            this.dropItem = itemStack.getItem();
+        }
     }
 
     public final float getGrowthChance() {
@@ -284,24 +300,23 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
     }
 
     public boolean shouldGenerateBlockDrops() {
-        return true;
+        return getDropItem() != Items.AIR;
     }
 
-    private final LazyValue<ResourceLocation> blockDropsPath = LazyValue.supplied(() ->
+    private final LazyValue<Identifier> blockDropsPath = LazyValue.supplied(() ->
             ResourceLocationUtils.prefix(BuiltInRegistries.BLOCK.getKey(block.get()),"blocks/"));
 
-    public ResourceLocation getBlockDropsPath() {
+    public Identifier getBlockDropsPath() {
         return blockDropsPath.get();
     }
 
     public LootTable.Builder createBlockDrops(HolderLookup.Provider registries) {
         if (minDropCount > maxDropCount || maxDropCount <= 0)
             throw new IllegalArgumentException("Attempted to create loot tables for "+getRegistryName()+" with an invalid drop count range ["+minDropCount+","+maxDropCount+"].");
-        return DTLootTableBuilder.createFruitPodDrops(block.get(), getItemStack().getItem(), ageProperty, maxAge, minDropCount, maxDropCount, registries);
+        return DTLootTableBuilder.createFruitPodDrops(block.get(), getDropItem(), ageProperty, maxAge, minDropCount, maxDropCount, registries);
     }
 
     @NotNull
-    @Override
     public Fruit reset() {
         canBoneMeal = DTConfigs.SERVER_CONFIG.isLoaded() && DTConfigs.SERVER.canBoneMealFruit.get();
         requiredProductionFactor = 0.3F;

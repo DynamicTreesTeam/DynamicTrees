@@ -2,222 +2,183 @@ package com.dtteam.dynamictrees.model.baked;
 
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.branch.ThickBranchBlock;
-import com.dtteam.dynamictrees.model.ModelHelper;
-import com.dtteam.dynamictrees.model.modeldata.ModelConnections;
-import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.utility.CoordUtils;
-import com.dtteam.dynamictrees.utility.CoordUtils.Surround;
-import com.google.common.collect.Maps;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockElement;
-import net.minecraft.client.renderer.block.model.BlockElementFace;
-import net.minecraft.client.renderer.block.model.BlockFaceUV;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.resources.model.ModelBaker;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.BlockModelRotation;
-import net.minecraft.client.resources.model.Material;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Vec3i;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.client.model.IModelBuilder;
-import net.neoforged.neoforge.client.model.data.ModelData;
-import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-
+import java.util.function.Predicate;
 
 public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
 
-    private final BakedModel[] trunksBark = new BakedModel[16]; // The trunk will always feature bark on its sides.
-    private final BakedModel[] trunksTopBark = new BakedModel[16]; // The trunk will feature bark on its top when there's a branch on top of it.
-    private final BakedModel[] trunksTopRings = new BakedModel[16]; // The trunk will feature rings on its top when there's no branches on top of it.
-    private final BakedModel[] trunksBotRings = new BakedModel[16]; // The trunk will always feature rings on its bottom surface if nothing is below it.
+    private final Material.Baked thickRings;
+    private final List<BakedQuad>[] trunksBark = new List[16];
+    private final List<BakedQuad>[] trunksTopBark = new List[16];
+    private final List<BakedQuad>[] trunksTopRings = new List[16];
+    private final List<BakedQuad>[] trunksBotRings = new List[16];
 
-    public ThickBranchBlockBakedModel(IGeometryBakingContext customData, ResourceLocation barkTextureLocation, ResourceLocation ringsTextureLocation,
-                                      ResourceLocation thickRingsTextureLocation, Function<Material, TextureAtlasSprite> spriteGetter) {
-        super(customData, barkTextureLocation, ringsTextureLocation, spriteGetter);
-        initThickModels(spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, thickRingsTextureLocation)));
+    public ThickBranchBlockBakedModel(TextureAtlasSprite barkTexture, TextureAtlasSprite ringsTexture, TextureAtlasSprite thickRingsTexture) {
+        this(null, new Material.Baked(barkTexture, false), new Material.Baked(ringsTexture, false), new Material.Baked(thickRingsTexture, false));
     }
 
-    public void initThickModels(TextureAtlasSprite thickRingsTexture) {
-//        if (isTextureNull(thickRingsTexture)) {
-//            thickRingsTexture = this.ringsTexture;
-//        }
-
-        for (int i = 0; i < ThickBranchBlock.MAX_RADIUS_THICK - ThickBranchBlock.MAX_RADIUS; i++) {
-            int radius = i + ThickBranchBlock.MAX_RADIUS + 1;
-            trunksBark[i] = bakeTrunkBark(radius, this.barkTexture, true);
-            trunksTopBark[i] = bakeTrunkBark(radius, this.barkTexture, false);
-            trunksTopRings[i] = bakeTrunkRings(radius, thickRingsTexture, Direction.UP);
-            trunksBotRings[i] = bakeTrunkRings(radius, thickRingsTexture, Direction.DOWN);
+    public ThickBranchBlockBakedModel(ModelBaker baker, Material.Baked bark, Material.Baked rings, Material.Baked thickRings) {
+        super(baker, bark, rings);
+        this.thickRings = thickRings;
+        if (baker != null) {
+            initThickModels();
         }
     }
 
-    private boolean isTextureNull(@Nullable TextureAtlasSprite sprite) {
-        return sprite == null || sprite.equals(ModelHelper.getTexture(ResourceLocation.parse("")));
+    private void initThickModels() {
+        for (int i = 0; i < ThickBranchBlock.MAX_RADIUS_THICK - BranchBlock.MAX_RADIUS; i++) {
+            int radius = i + BranchBlock.MAX_RADIUS + 1;
+            trunksBark[i] = bakeTrunk(radius, bark, true);
+            trunksTopBark[i] = bakeTrunk(radius, bark, false);
+            trunksTopRings[i] = bakeTrunkRings(radius, thickRings, Direction.UP);
+            trunksBotRings[i] = bakeTrunkRings(radius, thickRings, Direction.DOWN);
+        }
     }
 
-    public BakedModel bakeTrunkBark(int radius, TextureAtlasSprite bark, boolean side) {
+    private List<Vec3i> trunkOffsets() {
+        List<Vec3i> offsets = new ArrayList<>();
+        for (CoordUtils.Surround dir : CoordUtils.Surround.values()) {
+            offsets.add(dir.getOffset());
+        }
+        offsets.add(new Vec3i(0, 0, 0));
+        return offsets;
+    }
 
-        IModelBuilder<?> builder = ModelHelper.getModelBuilder(this.blockModel.customData, bark);
+    private List<BakedQuad> bakeTrunk(int radius, Material.Baked material, boolean side) {
         AABB wholeVolume = new AABB(8 - radius, 0, 8 - radius, 8 + radius, 16, 8 + radius);
-
-        final Direction[] run = side ? CoordUtils.HORIZONTALS : new Direction[]{Direction.UP, Direction.DOWN};
-        ArrayList<Vec3i> offsets = new ArrayList<>();
-
-        for (Surround dir : Surround.values()) {
-            offsets.add(dir.getOffset()); // 8 surrounding component pieces
-        }
-        offsets.add(new Vec3i(0, 0, 0));//Center
-
-        for (Direction face : run) {
-            final Vec3i dirVector = face.getNormal();
-
-            for (Vec3i offset : offsets) {
-                if (face.getAxis() == Axis.Y || new Vec3(dirVector.getX(), dirVector.getY(), dirVector.getZ()).add(new Vec3(offset.getX(), offset.getY(), offset.getZ())).lengthSqr() > 2.25) { //This means that the dir and face share a common direction
-                    Vec3 scaledOffset = new Vec3(offset.getX() * 16, offset.getY() * 16, offset.getZ() * 16);//Scale the dimensions to match standard minecraft texels
-                    AABB partBoundary = new AABB(0, 0, 0, 16, 16, 16).move(scaledOffset).intersect(wholeVolume);
-
-                    Vector3f[] limits = ModelHelper.AABBLimits(partBoundary);
-
-                    Map<Direction, BlockElementFace> mapFacesIn = Maps.newEnumMap(Direction.class);
-
-                    BlockFaceUV uvface = new BlockFaceUV(ModelHelper.modUV(ModelHelper.getUVs(partBoundary, face)), getFaceAngle(Axis.Y, face));
-                    mapFacesIn.put(face, new BlockElementFace(null, -1, null, uvface));
-
-                    BlockElement part = new BlockElement(limits[0], limits[1], mapFacesIn, null, true);
-                    builder.addCulledFace(face, ModelHelper.makeBakedQuad(part, part.faces.get(face), bark, face, BlockModelRotation.X0_Y0));
+        List<BakedQuad> quads = CuboidQuadBaker.newList();
+        Direction[] faces = side ? CoordUtils.HORIZONTALS : new Direction[]{Direction.UP, Direction.DOWN};
+        for (Direction face : faces) {
+            Vec3i dirVector = face.getUnitVec3i();
+            for (Vec3i offset : trunkOffsets()) {
+                if (face.getAxis() != Direction.Axis.Y
+                        && new Vec3(dirVector.getX(), dirVector.getY(), dirVector.getZ())
+                        .add(offset.getX(), offset.getY(), offset.getZ()).lengthSqr() <= 2.25) {
+                    continue;
                 }
-
+                Vec3 scaledOffset = new Vec3(offset.getX() * 16, offset.getY() * 16, offset.getZ() * 16);
+                AABB partBoundary = new AABB(0, 0, 0, 16, 16, 16).move(scaledOffset).intersect(wholeVolume);
+                if (partBoundary.getXsize() <= 0 || partBoundary.getYsize() <= 0 || partBoundary.getZsize() <= 0) {
+                    continue;
+                }
+                Vector3f from = new Vector3f((float) partBoundary.minX, (float) partBoundary.minY, (float) partBoundary.minZ);
+                Vector3f to = new Vector3f((float) partBoundary.maxX, (float) partBoundary.maxY, (float) partBoundary.maxZ);
+                float[] uvs = faceUvs(face, partBoundary);
+                quads.add(CuboidQuadBaker.bake(baker, from, to, face, uvs[0], uvs[1], uvs[2], uvs[3],
+                        CuboidQuadBaker.faceAngle(Direction.Axis.Y, face), material));
             }
         }
-
-        return builder.build();
+        return quads;
     }
 
-    public BakedModel bakeTrunkRings(int radius, TextureAtlasSprite ring, Direction face) {
-        IModelBuilder<?> builder = ModelHelper.getModelBuilder(this.blockModel.customData, ring);
+    private List<BakedQuad> bakeTrunkRings(int radius, Material.Baked material, Direction face) {
         AABB wholeVolume = new AABB(8 - radius, 0, 8 - radius, 8 + radius, 16, 8 + radius);
+        List<BakedQuad> quads = CuboidQuadBaker.newList();
         int wholeVolumeWidth = 48;
-
-        ArrayList<Vec3i> offsets = new ArrayList<>();
-
-        for (Surround dir : Surround.values()) {
-            offsets.add(dir.getOffset()); // 8 surrounding component pieces
-        }
-        offsets.add(new Vec3i(0, 0, 0)); // Center
-
-        for (Vec3i offset : offsets) {
-            Vec3 scaledOffset = new Vec3(offset.getX() * 16, offset.getY() * 16, offset.getZ() * 16); // Scale the dimensions to match standard minecraft texels
+        for (Vec3i offset : trunkOffsets()) {
+            Vec3 scaledOffset = new Vec3(offset.getX() * 16, offset.getY() * 16, offset.getZ() * 16);
             AABB partBoundary = new AABB(0, 0, 0, 16, 16, 16).move(scaledOffset).intersect(wholeVolume);
-
-            Vector3f posFrom = new Vector3f((float) partBoundary.minX, (float) partBoundary.minY, (float) partBoundary.minZ);
-            Vector3f posTo = new Vector3f((float) partBoundary.maxX, (float) partBoundary.maxY, (float) partBoundary.maxZ);
-
-            Map<Direction, BlockElementFace> mapFacesIn = Maps.newEnumMap(Direction.class);
-            float[] uvs = getUvs(face, partBoundary, wholeVolumeWidth);
-
-            BlockFaceUV uvFace = new BlockFaceUV(uvs, getFaceAngle(Axis.Y, face));
-            mapFacesIn.put(face, new BlockElementFace(null, -1, null, uvFace));
-
-            BlockElement part = new BlockElement(posFrom, posTo, mapFacesIn, null, true);
-            builder.addCulledFace(face, ModelHelper.makeBakedQuad(part, part.faces.get(face), ring, face, BlockModelRotation.X0_Y0));
+            if (partBoundary.getXsize() <= 0 || partBoundary.getYsize() <= 0 || partBoundary.getZsize() <= 0) {
+                continue;
+            }
+            Vector3f from = new Vector3f((float) partBoundary.minX, (float) partBoundary.minY, (float) partBoundary.minZ);
+            Vector3f to = new Vector3f((float) partBoundary.maxX, (float) partBoundary.maxY, (float) partBoundary.maxZ);
+            float[] uvs = ringUvs(face, partBoundary, wholeVolumeWidth);
+            quads.add(CuboidQuadBaker.bake(baker, from, to, face, uvs[0], uvs[1], uvs[2], uvs[3], 0, material));
         }
-
-        return builder.build();
+        return quads;
     }
 
-    private static float @NotNull [] getUvs(Direction face, AABB partBoundary, int wholeVolumeWidth) {
+    private static float[] faceUvs(Direction face, AABB partBoundary) {
+        return switch (face.getAxis()) {
+            case Y -> new float[]{(float) partBoundary.minX, (float) partBoundary.minZ, (float) partBoundary.maxX, (float) partBoundary.maxZ};
+            case Z -> new float[]{(float) partBoundary.minX, (float) partBoundary.minY, (float) partBoundary.maxX, (float) partBoundary.maxY};
+            case X -> new float[]{(float) partBoundary.minZ, (float) partBoundary.minY, (float) partBoundary.maxZ, (float) partBoundary.maxY};
+        };
+    }
+
+    private static float[] ringUvs(Direction face, AABB partBoundary, int wholeVolumeWidth) {
         float textureOffsetX = -16f;
         float textureOffsetZ = -16f;
-
         float minX = ((float) ((partBoundary.minX - textureOffsetX) / wholeVolumeWidth)) * 16f;
         float maxX = ((float) ((partBoundary.maxX - textureOffsetX) / wholeVolumeWidth)) * 16f;
         float minZ = ((float) ((partBoundary.minZ - textureOffsetZ) / wholeVolumeWidth)) * 16f;
         float maxZ = ((float) ((partBoundary.maxZ - textureOffsetZ) / wholeVolumeWidth)) * 16f;
-
         if (face == Direction.DOWN) {
             minZ = ((float) ((partBoundary.maxZ - textureOffsetZ) / wholeVolumeWidth)) * 16f;
             maxZ = ((float) ((partBoundary.minZ - textureOffsetZ) / wholeVolumeWidth)) * 16f;
         }
-
         return new float[]{minX, minZ, maxX, maxZ};
     }
 
-    @NotNull
     @Override
-    public List<BakedQuad> getQuads(@Nullable final BlockState state, @Nullable final Direction side, final RandomSource rand, final ModelData extraData, @Nullable RenderType renderType) {
-        if (state == null || side != null) {
-            return Collections.emptyList();
-        }
-
-        int coreRadius = this.getRadius(state);
-
+    public List<BakedQuad> collectQuads(BlockState state, int[] connections, Direction forceRingDir) {
+        int coreRadius = getRadius(state);
         if (coreRadius <= BranchBlock.MAX_RADIUS) {
-            return super.getQuads(state, null, rand, extraData, renderType);
+            return super.collectQuads(state, connections, forceRingDir);
         }
-
-        coreRadius = Mth.clamp(coreRadius, 9, 24);
-
-        List<BakedQuad> quads = new ArrayList<>(30);
-
-        int[] connections = new int[]{0, 0, 0, 0, 0, 0};
-        Direction forceRingDir = null;
-        int twigRadius = 1;
-
-        ModelConnections connectionsData = extraData.get(ModelConnections.CONNECTIONS_PROPERTY);
-        if (connectionsData != null) {
-            connections = connectionsData.getAllRadii();
-            forceRingDir = connectionsData.getRingOnly();
-            Family family = connectionsData.getFamily();
-            if (family.isValid()) {
-                twigRadius = family.getPrimaryThickness();
+        if (baker == null) {
+            return List.of();
+        }
+        coreRadius = Mth.clamp(coreRadius, 9, ThickBranchBlock.MAX_RADIUS_THICK);
+        int index = coreRadius - 9;
+        int numConnections = 0;
+        for (int radius : connections) {
+            if (radius != 0) {
+                numConnections++;
             }
         }
-
-        //Count number of connections
-        int numConnections = 0;
-        for (int i : connections) {
-            numConnections += (i != 0) ? 1 : 0;
-        }
-
         if (numConnections == 0 && forceRingDir != null) {
-            return quads;
+            return List.of();
         }
-
+        int[] conn = connections.clone();
+        int twigRadius = 1;
+        if (state.getBlock() instanceof BranchBlock branchBlock) {
+            twigRadius = Math.max(1, branchBlock.getFamily().getPrimaryThickness());
+        }
+        List<BakedQuad> out = new ArrayList<>();
         if (forceRingDir != null) {
-            connections[forceRingDir.get3DDataValue()] = 0;
-            quads.addAll(this.trunksBotRings[coreRadius - 9].getQuads(state, forceRingDir, rand, extraData, renderType));
+            conn[forceRingDir.get3DDataValue()] = 0;
+            addFace(out, trunksBotRings[index], forceRingDir);
         }
-
-        boolean branchesAround = connections[2] + connections[3] + connections[4] + connections[5] != 0;
+        boolean branchesAround = conn[2] + conn[3] + conn[4] + conn[5] != 0;
         for (Direction face : Direction.values()) {
-            quads.addAll(this.trunksBark[coreRadius - 9].getQuads(state, face, rand, extraData, renderType));
+            addFace(out, trunksBark[index], face);
             if (face == Direction.UP || face == Direction.DOWN) {
-                if (connections[face.get3DDataValue()] < twigRadius && !branchesAround) {
-                    quads.addAll(this.trunksTopRings[coreRadius - 9].getQuads(state, face, rand, extraData, renderType));
-                } else if (connections[face.get3DDataValue()] < coreRadius) {
-                    quads.addAll(this.trunksTopBark[coreRadius - 9].getQuads(state, face, rand, extraData, renderType));
+                if (conn[face.get3DDataValue()] < twigRadius && !branchesAround) {
+                    addFace(out, trunksTopRings[index], face);
+                } else if (conn[face.get3DDataValue()] < coreRadius) {
+                    addFace(out, trunksTopBark[index], face);
                 }
             }
         }
-
-        return quads;
+        return out;
     }
 
+    @Override
+    public void collectParts(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random, List<BlockStateModelPart> parts) {
+        int[] connections = new int[]{0, 0, 0, 0, 0, 0};
+        if (state.getBlock() instanceof BranchBlock branchBlock) {
+            connections = branchBlock.getConnectionData(level, pos, state).getAllRadii();
+        }
+        addPart(parts, collectQuads(state, connections, null));
+    }
 }

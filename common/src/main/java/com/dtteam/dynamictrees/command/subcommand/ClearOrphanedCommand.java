@@ -12,17 +12,14 @@ import net.minecraft.world.level.Level;
  */
 public final class ClearOrphanedCommand extends ChunkBasedCommand {
 
-    @Override
     protected String getName() {
         return CommandConstants.CLEAR_ORPHANED;
     }
 
-    @Override
     protected int getPermissionLevel() {
         return 0;
     }
 
-    @Override
     protected void processChunk(CommandSourceStack source, Level level, ChunkPos chunkPos, int radius) {
         sendSuccessAndLog(source, Component.translatable("commands.dynamictrees.success.clear_orphaned",
                 aqua(ChunkTreeHelper.removeOrphanedBranchNodes(level, chunkPos, radius))));

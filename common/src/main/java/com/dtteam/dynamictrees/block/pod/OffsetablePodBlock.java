@@ -19,7 +19,6 @@ public class OffsetablePodBlock extends PodBlock{
         super(properties, pod);
     }
 
-    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         if (pod != null)
             builder.add(pod.getOffsetProperty());
@@ -27,7 +26,6 @@ public class OffsetablePodBlock extends PodBlock{
     }
 
     @Nullable
-    @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockState state = super.getStateForPlacement(context);
         if (state == null) return null;
@@ -38,18 +36,18 @@ public class OffsetablePodBlock extends PodBlock{
     }
 
     @SuppressWarnings("deprecation")
-    @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, net.minecraft.world.level.redstone.Orientation orientation, boolean isMoving) {
+        BlockPos neighborPos = pos;
+        BlockPos fromPos = pos;
         Direction direction = state.getValue(FACING);
         int currentOffset = state.getValue(pod.getOffsetProperty());
-        int newOffset = TreeHelper.getRadius(level, pos.offset(direction.getNormal()));
+        int newOffset = TreeHelper.getRadius(level, pos.offset(direction.getUnitVec3i()));
         if (currentOffset != newOffset && pod.isValidRadius(newOffset)){
             level.setBlock(pos, state.setValue(pod.getOffsetProperty(), newOffset), 2);
         }
-        super.neighborChanged(state, level, pos, block, fromPos, isMoving);
+        super.neighborChanged(state, level, pos, block, orientation, isMoving);
     }
 
-    @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         Direction dir = state.getValue(FACING);
         VoxelShape shape = super.getShape(state, level, pos, context);

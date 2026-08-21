@@ -7,10 +7,10 @@ mod_version = "${mod_version}${fabricVersionAppend}"
 version = mod_version
 
 dependencies {
-    minecraft "com.mojang:minecraft:${fabric_minecraft_version}"
+    minecraft "com.mojang:minecraft:${minecraft_version}"
     implementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     implementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
-    implementation "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${project.fabric_forge_config_api_port_version}"
+    implementation "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${project.forge_config_api_port_version}"
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -41,7 +41,7 @@ loom {
             ideConfigGenerated(true)
             runDir('runs/datagen')
             vmArg("-Dfabric-api.datagen")
-            vmArg("-Dfabric-api.datagen.output-dir=${project(':common').file('src/generated/resources')}")
+            vmArg("-Dfabric-api.datagen.output-dir=${project(':common').file('src/generated/client/resources')}")
             vmArg("-Dfabric-api.datagen.modid=${mod_id}")
         }
     }
@@ -82,54 +82,12 @@ loom {
 
 }
 
-def common26Dir = layout.buildDirectory.dir("generated/sources/common26")
-def itemDefsDir = layout.buildDirectory.dir("generated/resources/itemdefs")
-
-tasks.register('transformCommonFor26', Exec) {
-    def srcDir = project(':common').file('src/main/java')
-    def destDir = common26Dir
-    def script = file('scripts/transform_common_26.py')
-    inputs.dir(srcDir)
-    inputs.file(script)
-    outputs.dir(destDir)
-    workingDir = project.projectDir
-    commandLine 'python', script.absolutePath, srcDir.absolutePath, destDir.get().asFile.absolutePath
-}
-
-tasks.register('generateItemDefsFor26', Exec) {
-    def script = file('scripts/generate_item_defs_26.py')
-    def commonMain = project(':common').file('src/main/resources')
-    def commonGenerated = project(':common').file('src/generated/resources')
-    inputs.file(script)
-    inputs.dir(commonMain)
-    inputs.dir(commonGenerated)
-    outputs.dir(itemDefsDir)
-    workingDir = project.projectDir
-    commandLine 'python', script.absolutePath, commonMain.absolutePath, commonGenerated.absolutePath, itemDefsDir.get().asFile.absolutePath
-}
-
-sourceSets.main.java.srcDir(common26Dir)
 sourceSets.main.resources { srcDir 'src/generated/resources' }
-sourceSets.main.resources.srcDir(itemDefsDir)
 
 processResources {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
-    dependsOn('generateItemDefsFor26')
-    filesMatching('pack.mcmeta') {
-        filter { String line ->
-            line.contains('"pack_format": 8')
-                    ? '        "min_format": [88, 0],\n        "max_format": [107, 1]'
-                    : line
-        }
-    }
 }
 
 tasks.named('compileJava', JavaCompile) {
-    dependsOn('transformCommonFor26')
     options.compilerArgs << '-Xmaxerrs' << '10000'
-}
-
-tasks.named('sourcesJar', Jar) {
-    dependsOn('transformCommonFor26')
-    from(common26Dir)
 }

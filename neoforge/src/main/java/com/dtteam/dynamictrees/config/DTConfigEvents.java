@@ -7,7 +7,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.config.ModConfigEvent;
 
-@EventBusSubscriber(modid = DynamicTrees.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = DynamicTrees.MOD_ID)
 public class DTConfigEvents {
 
     @SubscribeEvent

@@ -14,12 +14,13 @@ import com.dtteam.dynamictrees.data.DTLootTableBuilder;
 import com.dtteam.dynamictrees.treepack.Resettable;
 import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
 import com.google.common.collect.Maps;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -110,6 +111,7 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
      * up using vanilla loot tables.
      */
     private ItemStack itemStack;
+    private Item dropItem = Items.AIR;
 
     private float growthChance = 0.2F;
     private float requiredProductionFactor = 0.3F;
@@ -125,7 +127,7 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
     private BiFunction<LevelContext, BlockPos, Float> seasonalFactorGetter = (l, b)-> 1.0f;
     private TriPredicate<LevelContext, BlockPos, Float> floweringPeriodPredicate = (l, b, s)-> false;
 
-    public Pod(ResourceLocation registryName) {
+    public Pod(Identifier registryName) {
         super(registryName);
     }
 
@@ -154,7 +156,7 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
      * @param properties the properties of the block. May be the {@linkplain #getDefaultBlockProperties default
      *                   properties} or a modification of them.
      */
-    public final void createBlock(@Nullable ResourceLocation name, Block.Properties properties) {
+    public final void createBlock(@Nullable Identifier name, Block.Properties properties) {
         block = RegistryHandler.addBlock(name == null ? this.getRegistryName() : name, () -> createBlock(properties));
     }
 
@@ -175,7 +177,7 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
     public BlockBehaviour.Properties getDefaultBlockProperties(MapColor mapColor) {
         return BlockBehaviour.Properties.of()
                 .mapColor(mapColor)
-                .noCollission()
+                .noCollision()
                 .pushReaction(PushReaction.DESTROY)
                 .sound(SoundType.CROP)
                 .randomTicks()
@@ -232,20 +234,31 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
     public final ItemStack getItemStack() {
         if (itemStack == null) {
             LogManager.getLogger().warn("Invoked too early or item was not set on \"" + getRegistryName() + "\".");
-            return new ItemStack(Items.AIR);
+            return ItemStack.EMPTY;
         }
         return itemStack.copy();
     }
 
-    /**
-     * @return {@code true} if the given {@code itemStack} matches this Pod's item
-     */
+    public Item getDropItem() {
+        if (itemStack != null && !itemStack.isEmpty()) {
+            return itemStack.getItem();
+        }
+        return dropItem;
+    }
+
+    public void setDropItem(Item item) {
+        this.dropItem = item;
+    }
+
     public boolean isItem(ItemStack itemStack) {
         return ItemStack.matches(this.itemStack, itemStack);
     }
 
     public void setItemStack(ItemStack itemStack) {
         this.itemStack = itemStack;
+        if (itemStack != null && !itemStack.isEmpty()) {
+            this.dropItem = itemStack.getItem();
+        }
     }
 
     public final float getGrowthChance() {
@@ -320,20 +333,20 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
     }
 
     public boolean shouldGenerateBlockDrops() {
-        return true;
+        return getDropItem() != Items.AIR;
     }
 
-    private final LazyValue<ResourceLocation> blockDropsPath = LazyValue.supplied(() ->
+    private final LazyValue<Identifier> blockDropsPath = LazyValue.supplied(() ->
             ResourceLocationUtils.prefix(BuiltInRegistries.BLOCK.getKey(block.get()), "blocks/"));
 
-    public ResourceLocation getBlockDropsPath() {
+    public Identifier getBlockDropsPath() {
         return blockDropsPath.get();
     }
 
     public LootTable.Builder createBlockDrops(HolderLookup.Provider registries) {
         if (minDropCount > maxDropCount || maxDropCount <= 0)
             throw new IllegalArgumentException("Attempted to create loot tables for "+getRegistryName()+" with an invalid drop count range ["+minDropCount+","+maxDropCount+"].");
-        return DTLootTableBuilder.createFruitPodDrops(block.get(), itemStack.getItem(), ageProperty, maxAge, minDropCount, maxDropCount, registries);
+        return DTLootTableBuilder.createFruitPodDrops(block.get(), getDropItem(), ageProperty, maxAge, minDropCount, maxDropCount, registries);
     }
 
     public void setMaxRadius(int maxRadius) {
@@ -359,7 +372,6 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
     }
 
     @NotNull
-    @Override
     public Pod reset() {
         canBoneMeal = DTConfigs.SERVER_CONFIG.isLoaded() && DTConfigs.SERVER.canBoneMealPods.get();
         requiredProductionFactor = 0.3F;

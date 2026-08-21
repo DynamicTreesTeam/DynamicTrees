@@ -17,13 +17,13 @@ import com.dtteam.dynamictrees.tree.species.UndergroundRootsSpecies;
 import com.dtteam.dynamictrees.utility.Optionals;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
-import net.minecraft.resources.ResourceLocation;
+import com.dtteam.dynamictrees.data.tags.TagAppender;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.ToolMaterial;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -46,11 +46,10 @@ public class UndergroundRootsFamily extends Family {
     private Supplier<Item> rootsItem;
     private Block primitiveRoots, primitiveRootsFilled, primitiveRootsCovered;
 
-    public UndergroundRootsFamily(ResourceLocation name) {
+    public UndergroundRootsFamily(Identifier name) {
         super(name);
     }
 
-    @Override
     public void setCommonSpecies(Species species) {
         super.setCommonSpecies(species);
         if (!(species instanceof UndergroundRootsSpecies)) {
@@ -77,24 +76,23 @@ public class UndergroundRootsFamily extends Family {
     // DYNAMIC ROOTS
     ///////////////////////////////////////////
 
-    @Override
     public void setupBlocks() {
         super.setupBlocks();
         this.setRoots(this.createRoots(this.getBranchName()));
         this.setRootsItem(this.createRootsItem(this.getBranchName(), this.roots));
     }
 
-    protected Supplier<BranchBlock> createRoots(final ResourceLocation name) {
+    protected Supplier<BranchBlock> createRoots(final Identifier name) {
         return RegistryHandler.addBlock(suffix(name, getRootsNameSuffix()), () -> createRootsBlock(name));
     }
-    protected BranchBlock createRootsBlock(ResourceLocation name) {
+    protected BranchBlock createRootsBlock(Identifier name) {
         final BasicRootsBlock branch = new BasicRootsBlock(name, this.getProperties());
         if (this.isFireProof()) {
             branch.setFireSpreadSpeed(0).setFlammability(0);
         }
         return branch;
     }
-    public Supplier<BlockItem> createRootsItem(final ResourceLocation registryName, final Supplier<BranchBlock> rootsSup) {
+    public Supplier<BlockItem> createRootsItem(final Identifier registryName, final Supplier<BranchBlock> rootsSup) {
         return RegistryHandler.addItem(suffix(registryName, getRootsNameSuffix()), () -> new BlockItem(rootsSup.get(), new Item.Properties()));
     }
 
@@ -118,7 +116,6 @@ public class UndergroundRootsFamily extends Family {
         return Optionals.ofItem(rootsItem);
     }
 
-    @Override
     public Optional<BranchBlock> getBranchForRootsPlacement(LevelAccessor level, Species species, BlockPos pos) {
         return getRoots();
     }
@@ -136,19 +133,17 @@ public class UndergroundRootsFamily extends Family {
                     DynamicTrees.location("roots_item")
             ));
 
-    @Override
     public void generateStateData(DTDataProvider.BlockState provider) {
         super.generateStateData(provider);
         this.rootsStateGenerator.get().generate(provider, this);
     }
 
-    @Override
     public void generateItemModelData(DTDataProvider.ItemModel provider) {
         super.generateItemModelData(provider);
         this.rootsItemModelGenerator.get().generate(provider, this);
     }
 
-    public ResourceLocation getBranchItemParentLocation() {
+    public Identifier getBranchItemParentLocation() {
         return DynamicTrees.location("item/branch");
     }
 
@@ -160,13 +155,12 @@ public class UndergroundRootsFamily extends Family {
      * {@code null} = can harvest with hand
      */
     @Nullable
-    public Tier getDefaultRootsHarvestTier() {
+    public ToolMaterial getDefaultRootsHarvestTier() {
         return null;
     }
 
     protected int rootSystemSoilTypeFlags = 0;
 
-    @Override
     public boolean isAcceptableSoilForRootSystem(BlockState soilBlockState){
         return soilBlockState.getBlock() instanceof AerialRootsSoilProperties.RootSoilBlock || SoilHelper.isSoilAcceptable(soilBlockState, rootSystemSoilTypeFlags);
     }
@@ -176,7 +170,6 @@ public class UndergroundRootsFamily extends Family {
         return this;
     }
 
-    @Override
     public boolean hasRootSystem() {
         return true;
     }
@@ -221,7 +214,7 @@ public class UndergroundRootsFamily extends Family {
     public void setPrimitiveRoots(Block primitiveRoots) {
         this.primitiveRoots = primitiveRoots;
         if (this.roots != null) {
-            this.roots.get().setPrimitiveLogDrops(new ItemStack(primitiveRoots));
+            com.dtteam.dynamictrees.compat.DeferredItemStacks.setWhenBound(stack -> this.roots.get().setPrimitiveLogDrops(stack), primitiveRoots);
         }
     }
     public void setPrimitiveRootsFilled(Block primitiveRootsFilled) {
@@ -241,8 +234,7 @@ public class UndergroundRootsFamily extends Family {
         return Optionals.ofBlock(primitiveRootsCovered);
     }
 
-    @Override
-    public void addGeneratedBlockTags (Function<TagKey<Block>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tagAppender){
+    public void addGeneratedBlockTags (Function<TagKey<Block>, TagAppender<Block>> tagAppender){
         super.addGeneratedBlockTags(tagAppender);
         //Create roots tag and root harvest tag if the family is mangrove-like.
         getRoots().ifPresent(roots -> {

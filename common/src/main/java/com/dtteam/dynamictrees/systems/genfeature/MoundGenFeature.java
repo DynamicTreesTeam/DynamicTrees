@@ -9,7 +9,7 @@ import com.dtteam.dynamictrees.systems.genfeature.context.PreGenerationContext;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.utility.CoordUtils.Surround;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -25,16 +25,14 @@ public class MoundGenFeature extends GenFeature {
     public static final ConfigurationProperty<Integer> MOUND_CUTOFF_RADIUS = ConfigurationProperty.integer("mound_cutoff_radius");
     public static final ConfigurationProperty<Boolean> OFFSET = ConfigurationProperty.bool("offset");
 
-    public MoundGenFeature(ResourceLocation registryName) {
+    public MoundGenFeature(Identifier registryName) {
         super(registryName);
     }
 
-    @Override
     protected void registerProperties() {
         this.register(MOUND_CUTOFF_RADIUS, OFFSET);
     }
 
-    @Override
     protected GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(MOUND_CUTOFF_RADIUS, 5)
@@ -49,7 +47,6 @@ public class MoundGenFeature extends GenFeature {
      * @param context       The {@link GenFeatureContext}.
      * @return The modified {@link BlockPos} of the rooty dirt that is one block higher.
      */
-    @Override
     protected BlockPos preGenerate(GenFeatureConfiguration configuration, PreGenerationContext context) {
         final LevelAccessor level = context.level();
         BlockPos rootPos = context.pos();
@@ -76,7 +73,6 @@ public class MoundGenFeature extends GenFeature {
      * to cleanup the overhanging trunk that happens when a thick tree is generated next to a drop off.  Only runs when
      * the radius is greater than 8.
      */
-    @Override
     protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
         // A mound was already generated in preGen and worldgen test
         if (context.radius() >= configuration.get(MOUND_CUTOFF_RADIUS) || !context.isWorldGen()) {

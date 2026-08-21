@@ -13,9 +13,8 @@ import net.minecraft.commands.Commands;
  */
 public abstract class SimpleSubCommand extends SubCommand {
 
-    @Override
     public ArgumentBuilder<CommandSourceStack, ?> register() {
-        return Commands.literal(this.getName()).requires(commandSource -> commandSource.hasPermission(this.getPermissionLevel()))
+        return Commands.literal(this.getName()).requires(commandSource -> true)
                 .executes(context -> executesSuccess(() -> this.execute(context)));
     }
 
@@ -32,12 +31,10 @@ public abstract class SimpleSubCommand extends SubCommand {
      *
      * @return A permission level of {@code 0}.
      */
-    @Override
     protected int getPermissionLevel() {
         return 0;
     }
 
-    @Override
     @SuppressWarnings("all") // This is never used so we just return null.
     public ArgumentBuilder<CommandSourceStack, ?> registerArgument() {
         return null;

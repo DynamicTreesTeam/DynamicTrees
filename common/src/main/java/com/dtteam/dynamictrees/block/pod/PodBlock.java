@@ -12,7 +12,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -55,24 +55,20 @@ public class PodBlock extends HorizontalDirectionalBlock implements Bonemealable
         this.registerDefaultState(this.stateDefinition.any());
     }
 
-    @Override
     protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
         return CODEC;
     }
 
-    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
         if (pod != null)
             builder.add(pod.getAgeProperty());
     }
 
-    @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return pod.getBlockShape(getFacing(state), getAge(state));
     }
 
-    @Override
     protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         doTick(state, level, pos, random);
     }
@@ -129,18 +125,17 @@ public class PodBlock extends HorizontalDirectionalBlock implements Bonemealable
     /**
      * {@inheritDoc}
      */
-    @Override
     public void performMatureAction(LevelAccessor level, BlockPos pos, BlockState state) {
     }
 
-    @Override
-    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, net.minecraft.world.level.redstone.Orientation orientation, boolean movedByPiston) {
+        BlockPos neighborPos = pos;
+        BlockPos fromPos = pos;
         if (!this.isSupported(level, pos, state)) {
             drop(level, pos, state);
         }
     }
 
-    @Override
     public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         return isSupported(level, pos, state);
     }
@@ -152,15 +147,13 @@ public class PodBlock extends HorizontalDirectionalBlock implements Bonemealable
      *
      * @return {@code true} if this block is supported
      */
-    @Override
     public boolean isSupported(LevelReader level, BlockPos pos, BlockState state) {
         final BlockState branchState = level.getBlockState(pos.relative(state.getValue(FACING)));
         return TreeHelper.getBranchOpt(branchState).map(branch -> pod.isValidRadius(branch.getRadius(branchState))).orElse(false);
     }
 
-//    @Override
-//    public List<ItemStack> getDrops(BlockState pState, LootParams.Builder level) {
-//        ResourceKey<LootTable> resourcekey = this.getLootTable();
+////    public List<ItemStack> getDrops(BlockState pState, LootParams.Builder level) {
+//        ResourceKey<LootTable> resourcekey = this.getLootTable().orElseThrow();
 //        if (resourcekey == BuiltInLootTables.EMPTY) return Collections.emptyList();
 //        else {
 //            LootParams lootParams = level.withParameter(LootContextParams.BLOCK_STATE, pState).create(LootContextParamSets.BLOCK);
@@ -175,8 +168,7 @@ public class PodBlock extends HorizontalDirectionalBlock implements Bonemealable
 //        }
 //    }
 
-    @Override
-    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
         return pod.getItemStack();
     }
 
@@ -189,26 +181,21 @@ public class PodBlock extends HorizontalDirectionalBlock implements Bonemealable
         return false;
     }
 
-    @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        return harvest(state, level, pos) ? ItemInteractionResult.SUCCESS : ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        return harvest(state, level, pos) ? InteractionResult.SUCCESS : InteractionResult.TRY_WITH_EMPTY_HAND;
     }
-    @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         return harvest(state, level, pos) ? InteractionResult.SUCCESS : InteractionResult.PASS;
     }
 
-    @Override
     public boolean isValidBonemealTarget(LevelReader levelReader, BlockPos blockPos, BlockState blockState) {
         return pod.canBoneMeal() && getAge(blockState) < pod.getMaxAge();
     }
 
-    @Override
     public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state) {
         return true;
     }
 
-    @Override
     public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
         final int age = getAge(state);
         final int newAge = Math.min(age + 1, pod.getMaxAge());
@@ -238,7 +225,6 @@ public class PodBlock extends HorizontalDirectionalBlock implements Bonemealable
     }
 
     @Nullable
-    @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockState state = this.defaultBlockState().setValue(pod.getAgeProperty(), 0);
         BlockPos pos = context.getClickedPos();
@@ -255,7 +241,6 @@ public class PodBlock extends HorizontalDirectionalBlock implements Bonemealable
         return null;
     }
 
-    @Override
     protected boolean isPathfindable(BlockState state, PathComputationType pathComputationType) {
         return false;
     }

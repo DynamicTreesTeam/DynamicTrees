@@ -28,7 +28,7 @@ public class DendroPotion extends Item implements SubstanceEffectProvider, Empti
         private final boolean active;
         private final String name;
         private final int color;
-        private final ItemStack ingredient;
+        private final Item ingredientItem;
         private final int baseIndex;
 
         DendroPotionType(int index, boolean active, String name, int color, Item ingredient) {
@@ -40,7 +40,7 @@ public class DendroPotion extends Item implements SubstanceEffectProvider, Empti
             this.active = active;
             this.name = name;
             this.color = color;
-            this.ingredient = new ItemStack(ingredient);
+            this.ingredientItem = ingredient;
             this.baseIndex = baseIndex;
         }
 
@@ -61,7 +61,7 @@ public class DendroPotion extends Item implements SubstanceEffectProvider, Empti
         }
 
         public ItemStack getIngredient() {
-            return this.ingredient;
+            return com.dtteam.dynamictrees.compat.DeferredItemStacks.of(this.ingredientItem);
         }
 
         public Component getDescription() {
@@ -89,7 +89,6 @@ public class DendroPotion extends Item implements SubstanceEffectProvider, Empti
     }
 
     @Nullable
-    @Override
     public SubstanceEffect getSubstanceEffect(ItemStack itemStack) {
         return switch (getPotionType(itemStack)) {
             case BURGEONING -> new GrowthSubstance();
@@ -100,16 +99,14 @@ public class DendroPotion extends Item implements SubstanceEffectProvider, Empti
         };
     }
 
-    @Override
-    public String getDescriptionId(ItemStack stack) {
-        return this.getDescriptionId() + "." + getPotionType(stack).getName();
+    public Component getName(ItemStack stack) {
+        return Component.translatable(this.getDescriptionId() + "." + getPotionType(stack).getName());
     }
 
     public int getColor(ItemStack stack, int tint) {
         return tint == 0 ? getPotionType(stack).getColor() : 0xFFFFFFFF;
     }
 
-    @Override
     public ItemStack getEmptyContainer() {
         return new ItemStack(Items.GLASS_BOTTLE);
     }

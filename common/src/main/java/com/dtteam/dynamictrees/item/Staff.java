@@ -19,7 +19,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.Unit;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -59,7 +59,6 @@ public class Staff extends Item {
         DTRegistries.CREATIVE_TAB_ITEMS.add(this);
     }
 
-    @Override
     public float getDestroySpeed(ItemStack stack, BlockState state) {
         if (state.getBlock() instanceof BranchBlock || state.getBlock() instanceof TrunkShellBlock) {
             return 64.0f;
@@ -67,7 +66,6 @@ public class Staff extends Item {
         return super.getDestroySpeed(stack, state);
     }
 
-    @Override
     public boolean mineBlock(ItemStack stack, Level level, BlockState state, BlockPos pos, LivingEntity entityLiving) {
         if (state.getBlock() instanceof BranchBlock || state.getBlock() instanceof TrunkShellBlock) {
             if (damage(stack)) {
@@ -79,19 +77,17 @@ public class Staff extends Item {
     }
 
     // This extends the reach of the wand if the player is creative
-    @Override
-    public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
+    public InteractionResult use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
         if (pLevel.isClientSide() || !pPlayer.isCreative()) return super.use(pLevel, pPlayer, pUsedHand);
         ItemStack handItem = pPlayer.getItemInHand(pUsedHand).copy();
         HitResult hitResult = pPlayer.pick(REACH_DISTANCE, 0.0F, false);
         if (hitResult.getType() == HitResult.Type.BLOCK)
             if (useOn(new UseOnContext(pPlayer, pUsedHand, (BlockHitResult) hitResult)) == InteractionResult.SUCCESS){
-                return InteractionResultHolder.success(handItem);
+                return InteractionResult.SUCCESS.heldItemTransformedTo(handItem);
             }
-        return InteractionResultHolder.pass(handItem);
+        return InteractionResult.PASS; // pass(handItem);
     }
 
-    @Override
     public InteractionResult useOn(UseOnContext context) {
         Level level = context.getLevel();
         ItemStack heldStack = context.getPlayer().getItemInHand(context.getHand());
@@ -115,7 +111,7 @@ public class Staff extends Item {
                     setCode(heldStack, code);
                     String rootCode = new RootsJoCode(level, rootPos, context.getPlayer().getDirection()).toString();
                     setRootsCode(heldStack, rootCode);
-                    if (level.isClientSide) { // Make sure this doesn't run on the server
+                    if (level.isClientSide()) { // Make sure this doesn't run on the server
                         Minecraft.getInstance().keyboardHandler.setClipboard(code); // Put the code in the system clipboard to annoy everyone.
                     }
                 }
@@ -145,12 +141,10 @@ public class Staff extends Item {
         return InteractionResult.FAIL;
     }
 
-    @Override
     public boolean isBarVisible(ItemStack pStack) {
         return hasMaxDamage(pStack);
     }
 
-    @Override
     public int getBarWidth(ItemStack stack) {
         int damage = getDamage(stack) / getMaxDamage(stack);
         return 1 - damage;
@@ -228,7 +222,7 @@ public class Staff extends Item {
             Species species = getSpecies(itemStack);
 
             if (itemStack.has(DTRegistries.STAFF_HANDLE_COLOR_DATA_COMPONENT.get())) {
-                color = itemStack.getOrDefault(DTRegistries.STAFF_HANDLE_COLOR_DATA_COMPONENT.get(), new DyedItemColor(color, false)).rgb();
+                color = itemStack.getOrDefault(DTRegistries.STAFF_HANDLE_COLOR_DATA_COMPONENT.get(), new DyedItemColor(color)).rgb();
             } else if (species.isValid()) {
                 color = species.getFamily().woodBarkColor;
             }
@@ -248,7 +242,7 @@ public class Staff extends Item {
     }
 
     public Staff setColor(ItemStack itemStack, int color) {
-        itemStack.set(DTRegistries.STAFF_CRYSTAL_COLOR_DATA_COMPONENT.get(), new DyedItemColor(color, false));
+        itemStack.set(DTRegistries.STAFF_CRYSTAL_COLOR_DATA_COMPONENT.get(), new DyedItemColor(color));
         return this;
     }
 
@@ -274,14 +268,13 @@ public class Staff extends Item {
         return "";
     }
 
-    @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.translatable("tooltip.dynamictrees.species", this.getSpecies(stack).getTextComponent()));
-        tooltipComponents.add(Component.translatable("tooltip.dynamictrees.jo_code", new JoCode(this.getCode(stack)).getTextComponent()));
+    public void appendHoverText(ItemStack stack, TooltipContext context, net.minecraft.world.item.component.TooltipDisplay display, java.util.function.Consumer<net.minecraft.network.chat.Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.accept(Component.translatable("tooltip.dynamictrees.species", this.getSpecies(stack).getTextComponent()));
+        tooltipComponents.accept(Component.translatable("tooltip.dynamictrees.jo_code", new JoCode(this.getCode(stack)).getTextComponent()));
         String rootsCode = getRootsCode(stack);
         if (!rootsCode.isEmpty())
-            tooltipComponents.add(Component.translatable("tooltip.dynamictrees.roots_jo_code", new RootsJoCode(rootsCode).getTextComponent()));
-        super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
+            tooltipComponents.accept(Component.translatable("tooltip.dynamictrees.roots_jo_code", new RootsJoCode(rootsCode).getTextComponent()));
+        super.appendHoverText(stack, context, display, tooltipComponents, tooltipFlag);
     }
 
 }

@@ -10,7 +10,7 @@ import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -33,16 +33,14 @@ public class ShroomlightGenFeature extends GenFeature {
     private static final Direction[] HORIZONTALS = CoordUtils.HORIZONTALS;
     private static final double VANILLA_GROW_CHANCE = .005f;
 
-    public ShroomlightGenFeature(ResourceLocation registryName) {
+    public ShroomlightGenFeature(Identifier registryName) {
         super(registryName);
     }
 
-    @Override
     protected void registerProperties() {
         this.register(SHROOMLIGHT_BLOCK, MAX_HEIGHT, CAN_GROW_PREDICATE, PLACE_CHANCE, MAX_COUNT);
     }
 
-    @Override
     protected GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(SHROOMLIGHT_BLOCK, Blocks.SHROOMLIGHT)
@@ -53,7 +51,6 @@ public class ShroomlightGenFeature extends GenFeature {
                 .with(MAX_COUNT, 4);
     }
 
-    @Override
     protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
         boolean placed = this.placeShroomlightsInValidPlace(configuration, context.level(), context.pos(), true);
         if (placed){
@@ -67,7 +64,6 @@ public class ShroomlightGenFeature extends GenFeature {
         return false;
     }
 
-    @Override
     protected boolean postGrow(GenFeatureConfiguration configuration, PostGrowContext context) {
         return context.natural() && configuration.get(CAN_GROW_PREDICATE).test(context.level(), context.pos().above())
                 && context.fertility() != 0 && this.placeShroomlightsInValidPlace(configuration, context.level(), context.pos(), false);

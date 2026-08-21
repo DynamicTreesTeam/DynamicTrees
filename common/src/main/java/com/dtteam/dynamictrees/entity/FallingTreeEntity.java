@@ -31,7 +31,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -48,8 +48,12 @@ import java.util.Objects;
  * @author ferreusveritas
  */
 public class FallingTreeEntity extends Entity implements ModelTracker {
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
+    }
 
-    public static final EntityDataAccessor<CompoundTag> voxelDataParameter = SynchedEntityData.defineId(FallingTreeEntity.class, EntityDataSerializers.COMPOUND_TAG);
+
+    public static final EntityDataAccessor<String> voxelDataParameter = SynchedEntityData.defineId(FallingTreeEntity.class, EntityDataSerializers.STRING);
 
     //Not needed in client
     protected List<ItemStack> payload = new ArrayList<>(0);
@@ -106,7 +110,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
         if (destroyData.getNumBranches() == 0) { //If the entity contains no branches there's no reason to create it at all
             DynamicTrees.LOG.error("Warning: Tried to create a EntityFallingTree with no branch blocks. This shouldn't be possible.");
             new Exception().printStackTrace();
-            kill();
+            discard();
             return this;
         }
         BlockPos basePos = destroyData.basePos;
@@ -168,20 +172,20 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
     public void setupFromNBT(CompoundTag tag) {
         destroyData = new BranchDestructionData(tag);
         if (destroyData.getNumBranches() == 0) {
-            kill();
+            discard();
         }
-        destroyType = DestroyType.values()[tag.getInt("destroytype")];
-        geomCenter = new Vec3(tag.getDouble("geomx"), tag.getDouble("geomy"), tag.getDouble("geomz"));
-        massCenter = new Vec3(tag.getDouble("massx"), tag.getDouble("massy"), tag.getDouble("massz"));
+        destroyType = DestroyType.values()[tag.getIntOr("destroytype", 0)];
+        geomCenter = new Vec3(tag.getDoubleOr("geomx", 0.0D), tag.getDoubleOr("geomy", 0.0D), tag.getDoubleOr("geomz", 0.0D));
+        massCenter = new Vec3(tag.getDoubleOr("massx", 0.0D), tag.getDoubleOr("massy", 0.0D), tag.getDoubleOr("massz", 0.0D));
 
         this.setBoundingBox(this.buildAABBFromDestroyData(this.destroyData).move(this.getX(), this.getY(), this.getZ()));
         this.cullingBB = this.cullingNormalBB.move(this.getX(), this.getY(), this.getZ());
 
-        volume = tag.getFloat("volume");
-        hasLeaves = tag.getBoolean("hasleaves");
-        species = Species.REGISTRY.get(tag.getString("species"));
+        volume = tag.getFloatOr("volume", 0.0F);
+        hasLeaves = tag.getBooleanOr("hasleaves", false);
+        species = Species.REGISTRY.get(tag.getStringOr("species", ""));
 
-        onFire = tag.getBoolean("onfire");
+        onFire = tag.getBooleanOr("onfire", false);
     }
 
     public void buildClient() {
@@ -199,7 +203,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
 
         cleanupShellBlocks(destroyData);
 
-        Minecraft.getInstance().levelRenderer.setBlocksDirty(renderBounds.getMin().getX(), renderBounds.getMin().getY(), renderBounds.getMin().getZ(), renderBounds.getMax().getX(), renderBounds.getMax().getY(), renderBounds.getMax().getZ());//This forces the client to rerender the chunks
+        ; ;//This forces the client to rerender the chunks
     }
 
     protected void cleanupShellBlocks(BranchDestructionData destroyData) {
@@ -239,7 +243,6 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
         return normalBB;
     }
 
-    @Override
     public AABB getBoundingBoxForCulling() {
         return this.cullingBB;
     }
@@ -272,7 +275,6 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
         return species;
     }
 
-    @Override
     public void setPos(double x, double y, double z) {
         //This comes to the client as a packet from the server. But it doesn't set up the bounding box correctly
         this.setPosRaw(x, y, z);
@@ -281,18 +283,17 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
         this.cullingBB = cullingNormalBB != null ? cullingNormalBB.move(x, y, z) : new AABB(BlockPos.ZERO);
     }
 
-    @Override
     public void tick() {
         super.tick();
 
-        if (this.level().isClientSide && !this.clientBuilt) {
+        if (this.level().isClientSide() && !this.clientBuilt) {
             this.buildClient();
             if (!isAlive()) {
                 return;
             }
         }
 
-        if (!this.level().isClientSide && this.firstUpdate) {
+        if (!this.level().isClientSide() && this.firstUpdate) {
             this.updateNeighbors();
         }
 
@@ -303,7 +304,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
 
         if (this.shouldDie()) {
             this.dropPayLoad();
-            this.kill();
+            this.discard();
             this.modelCleanup();
         }
 
@@ -331,7 +332,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
         }
 
         //Update each of the blocks that need to be updated
-        toUpdate.forEach(pos -> level().neighborChanged(pos, Blocks.AIR, pos));
+        toUpdate.forEach(pos -> level().neighborChanged(pos, Blocks.AIR, null));
     }
 
     protected AnimationHandler selectAnimationHandler() {
@@ -362,7 +363,6 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
         return AnimHandlerDrop;
     }
 
-    @Override
     public void modelCleanup() {
         if (level().isClientSide()){
             FallingTreeEntityModelTrackerCache.cleanupModels(level(), this);
@@ -379,7 +379,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
     }
 
     public void dropPayLoad() {
-        if (!level().isClientSide) {
+        if (!level().isClientSide()) {
             currentAnimationHandler.dropPayload(this);
         }
     }
@@ -388,7 +388,6 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
         return tickCount > 20 && currentAnimationHandler.shouldDie(this); //Give the entity 20 ticks to receive it's data from the server.
     }
 
-    @Override
     public boolean shouldRender(double x, double y, double z) {
         return currentAnimationHandler.shouldRender(this, x, y, z);
     }
@@ -402,7 +401,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
      */
     public static void standardDropLogsPayload(FallingTreeEntity entity) {
         Level level = entity.level();
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             BlockPos cutPos = entity.getDestroyData().cutPos;
             entity.getPayload().forEach(i -> spawnItemAsEntity(level, cutPos, i));
         }
@@ -410,7 +409,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
 
     public static void standardDropLeavesPayLoad(FallingTreeEntity entity) {
         Level level = entity.level();
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             BlockPos cutPos = entity.getDestroyData().cutPos;
             entity.getDestroyData().leavesDrops.forEach(bis -> Block.popResource(level, cutPos.offset(bis.pos), bis.stack));
         }
@@ -421,7 +420,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
      * the loot.
      */
     public static void spawnItemAsEntity(Level level, BlockPos pos, ItemStack stack) {
-        if (!level.isClientSide && !stack.isEmpty() && level.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS) && !Services.MISC.isLevelRestoringBlockSnapshots(level)) { // do not drop items while restoring blockstates, prevents item dupe
+        if (!level.isClientSide() && !stack.isEmpty() && ((net.minecraft.server.level.ServerLevel) level).getGameRules().get(GameRules.BLOCK_DROPS) && !Services.MISC.isLevelRestoringBlockSnapshots(level)) { // do not drop items while restoring blockstates, prevents item dupe
             ItemEntity entityitem = new ItemEntity(level, (double) pos.getX() + 0.5F, (double) pos.getY() + 0.5F, (double) pos.getZ() + 0.5F, stack);
             entityitem.setDeltaMovement(0, 0, 0);
             entityitem.setDefaultPickUpDelay();
@@ -429,9 +428,8 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
         }
     }
 
-    @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        builder.define(voxelDataParameter, new CompoundTag());
+        builder.define(voxelDataParameter, "");
     }
 
 
@@ -439,49 +437,42 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
     public void setVoxelData(CompoundTag tag) {
         this.setBoundingBox(this.buildAABBFromDestroyData(this.destroyData).move(this.getX(), this.getY(), this.getZ()));
         this.cullingBB = this.cullingNormalBB.move(this.getX(), this.getY(), this.getZ());
-        getEntityData().set(voxelDataParameter, tag);
+        getEntityData().set(voxelDataParameter, tag.toString());
     }
 
     public CompoundTag getVoxelData() {
-        return getEntityData().get(voxelDataParameter);
-    }
-
-    @Override
-    protected void readAdditionalSaveData(CompoundTag compound) {
-        CompoundTag vox = (CompoundTag) compound.get("vox");
-        setupFromNBT(vox);
-        setVoxelData(vox);
-
-        if (compound.contains("payload")) {
-            final ListTag nbtList = (ListTag) compound.get("payload");
-
-            for (Tag tag : Objects.requireNonNull(nbtList)) {
-                if (tag instanceof CompoundTag compTag) {
-                    ItemStack.parse(level().registryAccess(),compTag).ifPresent(t->this.payload.add(t)); ;
-                }
-            }
+        try {
+            String snbt = getEntityData().get(voxelDataParameter);
+            return snbt == null || snbt.isEmpty() ? new CompoundTag() : net.minecraft.nbt.TagParser.parseCompoundFully(snbt);
+        } catch (Exception e) {
+            return new CompoundTag();
         }
     }
 
-    @Override
-    protected void addAdditionalSaveData(CompoundTag compound) {
-        compound.put("vox", getVoxelData());
+    protected void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput input) {
+        input.read("vox", CompoundTag.CODEC).ifPresent(vox -> {
+            setupFromNBT(vox);
+            setVoxelData(vox);
+        });
+        for (ItemStack stack : input.listOrEmpty("payload", ItemStack.CODEC)) {
+            this.payload.add(stack);
+        }
+    }
 
+    protected void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput output) {
+        output.store("vox", CompoundTag.CODEC, getVoxelData());
         if (!payload.isEmpty()) {
-            ListTag list = new ListTag();
-
+            net.minecraft.world.level.storage.ValueOutput.TypedOutputList<ItemStack> list = output.list("payload", ItemStack.CODEC);
             for (ItemStack stack : payload) {
-                list.add(stack.save(level().registryAccess(), compound));
+                list.add(stack);
             }
-
-            compound.put("payload", list);
         }
     }
 
     public static FallingTreeEntity dropTree(Level level, BranchDestructionData destroyData, List<ItemStack> woodDropList, DestroyType destroyType) {
         //Spawn the appropriate item entities into the level
         if (!level.isClientSide()) {// Only spawn entities server side
-            FallingTreeEntity entity = DTRegistries.FALLING_TREE.get().create(level);
+            FallingTreeEntity entity = DTRegistries.FALLING_TREE.get().create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
             if (entity == null) return null;
             entity.setData(destroyData, woodDropList, destroyType);
             if (entity.isAlive()) {

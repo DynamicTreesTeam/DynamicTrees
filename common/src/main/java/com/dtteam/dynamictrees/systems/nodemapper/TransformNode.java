@@ -21,7 +21,6 @@ public class TransformNode implements NodeInspector {
         this.toSpecies = toTree;
     }
 
-    @Override
     public boolean run(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
         BranchBlock branch = TreeHelper.getBranch(state);
 
@@ -45,7 +44,6 @@ public class TransformNode implements NodeInspector {
         return true;
     }
 
-    @Override
     public boolean returnRun(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
         return false;
     }

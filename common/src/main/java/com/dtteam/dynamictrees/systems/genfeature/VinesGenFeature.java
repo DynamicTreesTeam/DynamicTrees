@@ -12,7 +12,7 @@ import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -46,16 +46,14 @@ public class VinesGenFeature extends GenFeature {
     public static final ConfigurationProperty<Block> TIP_BLOCK = ConfigurationProperty.block("tip_block");
     public static final ConfigurationProperty<VineType> VINE_TYPE = ConfigurationProperty.property("vine_type", VineType.class);
 
-    public VinesGenFeature(ResourceLocation registryName) {
+    public VinesGenFeature(Identifier registryName) {
         super(registryName);
     }
 
-    @Override
     protected void registerProperties() {
         this.register(QUANTITY, MAX_LENGTH, VERTICAL_SPREAD, RAY_DISTANCE, BLOCK, TIP_BLOCK, VINE_TYPE, FRUITING_RADIUS);
     }
 
-    @Override
     public GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(QUANTITY, 4)
@@ -68,7 +66,6 @@ public class VinesGenFeature extends GenFeature {
                 .with(FRUITING_RADIUS, -1);
     }
 
-    @Override
     protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
         if (!context.isWorldGen() || context.endPoints().isEmpty()) {
             return false;
@@ -94,7 +91,6 @@ public class VinesGenFeature extends GenFeature {
         return true;
     }
 
-    @Override
     protected boolean postGrow(GenFeatureConfiguration configuration, PostGrowContext context) {
         final LevelAccessor level = context.level();
         final BlockPos rootPos = context.pos();

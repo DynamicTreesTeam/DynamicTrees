@@ -14,7 +14,6 @@ public class ComparisonOperator implements MathOperator {
 		this.operator = operator;
 	}
 	
-	@Override
 	public double apply(MathContext mc) {
 		final double leftValue = left.apply(mc);
 		final double rightValue = right.apply(mc);

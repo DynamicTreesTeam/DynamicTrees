@@ -1,4 +1,2 @@
-@MethodsReturnNonnullByDefault
 package com.dtteam.dynamictrees.treepack;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
