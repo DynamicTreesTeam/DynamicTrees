@@ -2,6 +2,7 @@
   "variants": {
     "": {
       "type": "dynamictrees:branch",
+      "fabric:type": "dynamictrees:branch",
       "family": "dynamictrees:pale_oak",
       "textures": {
         "bark": "minecraft:block/pale_oak_log",

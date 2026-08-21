@@ -2,6 +2,7 @@
   "variants": {
     "": {
       "type": "dynamictrees:branch",
+      "fabric:type": "dynamictrees:branch",
       "family": "dynamictrees:birch",
       "textures": {
         "bark": "minecraft:block/stripped_birch_log",

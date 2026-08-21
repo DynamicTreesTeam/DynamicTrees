@@ -3,6 +3,7 @@
     {
       "apply": {
         "type": "dynamictrees:roots",
+        "fabric:type": "dynamictrees:roots",
         "opaque": false,
         "textures": {
           "side": "minecraft:block/mangrove_roots_side",
@@ -16,6 +17,7 @@
     {
       "apply": {
         "type": "dynamictrees:roots",
+        "fabric:type": "dynamictrees:roots",
         "opaque": true,
         "textures": {
           "side": "minecraft:block/muddy_mangrove_roots_side",
@@ -37,6 +39,7 @@
     {
       "apply": {
         "type": "dynamictrees:roots_moss",
+        "fabric:type": "dynamictrees:roots_moss",
         "textures": {
           "moss": "minecraft:block/moss_block"
         }

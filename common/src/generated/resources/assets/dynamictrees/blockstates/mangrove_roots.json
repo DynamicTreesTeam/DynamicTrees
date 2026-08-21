@@ -5,6 +5,7 @@
     },
     "layer=exposed": {
       "type": "dynamictrees:roots",
+      "fabric:type": "dynamictrees:roots",
       "opaque": false,
       "textures": {
         "side": "minecraft:block/mangrove_roots_side",
@@ -13,6 +14,7 @@
     },
     "layer=filled": {
       "type": "dynamictrees:roots",
+      "fabric:type": "dynamictrees:roots",
       "opaque": true,
       "textures": {
         "side": "minecraft:block/muddy_mangrove_roots_side",

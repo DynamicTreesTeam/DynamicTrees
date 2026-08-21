@@ -2,6 +2,7 @@
   "variants": {
     "": {
       "type": "dynamictrees:aerial_roots_soil",
+      "fabric:type": "dynamictrees:aerial_roots_soil",
       "family": "dynamictrees:mangrove",
       "textures": {
         "end": "minecraft:block/mangrove_log_top",

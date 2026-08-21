@@ -2,6 +2,7 @@
   "variants": {
     "": {
       "type": "dynamictrees:potted_dynamic_sapling",
+      "fabric:type": "dynamictrees:potted_dynamic_sapling",
       "model": "minecraft:block/flower_pot"
     }
   }

@@ -2,6 +2,7 @@
   "variants": {
     "": {
       "type": "dynamictrees:surface_root",
+      "fabric:type": "dynamictrees:surface_root",
       "textures": {
         "bark": "minecraft:block/pale_oak_log"
       }
