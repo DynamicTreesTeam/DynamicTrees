@@ -55,7 +55,7 @@ public class DendroPotionRecipeHandler {
     }
 
     public static ItemStack setPotion(ItemStack pStack, String potionName) {
-        Optional<Holder.Reference<Potion>> potion = BuiltInRegistries.POTION.getHolder(ResourceKey.create(Registries.POTION, Identifier.parse(potionName)));
+        Optional<Holder.Reference<Potion>> potion = BuiltInRegistries.POTION.get(ResourceKey.create(Registries.POTION, Identifier.parse(potionName)));
         potion.ifPresent(holder -> pStack.set(DataComponents.POTION_CONTENTS, new PotionContents(holder)));
 
         return pStack;

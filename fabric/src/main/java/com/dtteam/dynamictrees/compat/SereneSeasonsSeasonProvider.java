@@ -26,7 +26,7 @@ public class SereneSeasonsSeasonProvider implements SeasonProvider {
     @Override
     public boolean shouldSnowMelt(Level level, BlockPos pos) {
         if (ModConfig.seasons.generateSnowAndIce && seasonValue < SeasonHelper.WINTER_START) {
-            return level.getBiome(pos).value().warmEnoughToRain(pos);
+            return level.getBiome(pos).value().warmEnoughToRain(pos, level.getSeaLevel());
         }
         return false;
     }
