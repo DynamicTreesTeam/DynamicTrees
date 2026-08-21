@@ -1,7 +1,6 @@
 package com.dtteam.dynamictrees.registry;
 
 import com.dtteam.dynamictrees.DynamicTrees;
-import com.dtteam.dynamictrees.recipe.DendroPotionRecipeHandler;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.serialization.MapCodec;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityDataRegistry;
@@ -45,7 +44,10 @@ public class FabricRegistryLoader extends RegistryLoader {
 
     public static void setup (){
         DTRegistries.setup();
-        DendroPotionRecipeHandler.getAllDendroRecipes();
+        // DendroPotionRecipeHandler.getAllDendroRecipes() is intentionally not called eagerly
+        // here: it builds ItemStacks from vanilla item Holders that aren't bound yet this early
+        // in mod init ("Components not bound yet" NPE). It's lazily populated and cached on
+        // first real use instead, via MixinPotionBrewing's injections into PotionBrewing.
     }
 
     @Override
