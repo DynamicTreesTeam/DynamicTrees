@@ -212,7 +212,7 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return Null.applyIfNonnull(this.getMuse(level, state, pos), muse -> Shapes.create(muse.state.getShape(level, muse.pos).bounds().move(muse.museOffset)), Shapes.empty());
+        return Null.applyIfNonnull(this.getMuse(level, state, pos), muse -> ThickBranchBlock.getShellShape(muse.state.getShape(level, muse.pos), muse.museOffset), Shapes.empty());
     }
 
     @Override

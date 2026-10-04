@@ -28,10 +28,53 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 public class ThickBranchBlock extends BasicBranchBlock implements Musable {
 
     public static final int MAX_RADIUS_THICK = 24;
+    private static final VoxelShape[] THICK_SHAPES = createThickShapes();
+    private static final Map<VoxelShape, VoxelShape[][]> SHELL_SHAPES = createShellShapes();
+
+    private static VoxelShape[] createThickShapes() {
+        VoxelShape[] shapes = new VoxelShape[MAX_RADIUS_THICK + 1];
+        for (int r = MAX_RADIUS + 1; r <= MAX_RADIUS_THICK; r++) {
+            shapes[r] = createThickShape(r);
+        }
+        return shapes;
+    }
+
+    private static Map<VoxelShape, VoxelShape[][]> createShellShapes() {
+        Map<VoxelShape, VoxelShape[][]> shapes = new IdentityHashMap<>();
+        for (int r = MAX_RADIUS + 1; r <= MAX_RADIUS_THICK; r++) {
+            VoxelShape[][] offsets = new VoxelShape[5][5];
+            for (int x = -2; x <= 2; x++) {
+                for (int z = -2; z <= 2; z++) {
+                    offsets[x + 2][z + 2] = Shapes.create(THICK_SHAPES[r].bounds().move(x, 0, z));
+                }
+            }
+            shapes.put(THICK_SHAPES[r], offsets);
+        }
+        return shapes;
+    }
+
+    static VoxelShape getShellShape(VoxelShape shape, BlockPos offset) {
+        VoxelShape[][] offsets = SHELL_SHAPES.get(shape);
+        int x = offset.getX();
+        int z = offset.getZ();
+        if (offsets != null && offset.getY() == 0 && x >= -2 && x <= 2 && z >= -2 && z <= 2) {
+            return offsets[x + 2][z + 2];
+        }
+        // Custom muse shapes and offsets retain their original calculation.
+        return Shapes.create(shape.bounds().move(offset));
+    }
+
+    private static VoxelShape createThickShape(int radius) {
+        final double size = radius / 16.0;
+        return Shapes.create(new AABB(0.5 - size, 0.0, 0.5 - size, 0.5 + size, 1.0, 0.5 + size));
+    }
+
 
     protected static final IntegerProperty RADIUS_DOUBLE = IntegerProperty.create("radius", 1, MAX_RADIUS_THICK); //39 ?
 
@@ -201,8 +244,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
             return super.getShape(state, level, pos, context);
         }
 
-        final double radius = thisRadius / 16.0;
-        return Shapes.create(new AABB(0.5 - radius, 0.0, 0.5 - radius, 0.5 + radius, 1.0, 0.5 + radius));
+        return thisRadius <= MAX_RADIUS_THICK ? THICK_SHAPES[thisRadius] : createThickShape(thisRadius);
     }
 
     @Override
