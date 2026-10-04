@@ -1,5 +1,7 @@
 package com.ferreusveritas.dynamictrees.systems.genfeature;
 
+import com.ferreusveritas.dynamictrees.util.RotCycleGuard;
+
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.configuration.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.systems.genfeature.context.PostRotContext;
@@ -43,7 +45,7 @@ public class RotSoilGenFeature extends GenFeature {
         }
 
         // Change rooty dirt to rotted soil.
-        level.setBlock(belowPos, configuration.get(ROTTEN_SOIL).defaultBlockState(), Block.UPDATE_ALL);
+        RotCycleGuard.wrote(level.setBlock(belowPos, configuration.get(ROTTEN_SOIL).defaultBlockState(), Block.UPDATE_ALL));
         return true;
     }
 

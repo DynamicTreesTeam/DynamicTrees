@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.block.branch;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.util.RotCycleGuard;
 import com.ferreusveritas.dynamictrees.api.cell.Cell;
 import com.ferreusveritas.dynamictrees.api.cell.CellNull;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
@@ -159,19 +160,28 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
             }
         }
 
-        boolean didRot = species.rot(level, pos, neigh & 0x0F, radius, fertility, rand, rapid, fertility > 0); // Unreinforced branches are destroyed.
+        if (RotCycleGuard.cut(this, species, level, pos, radius, fertility, rand, rapid, false)) {
+            return false;
+        }
+        try {
+            boolean didRot = species.rot(level, pos, neigh & 0x0F, radius, fertility, rand, rapid, fertility > 0); // Unreinforced branches are destroyed.
 
-        if (rapid && didRot) {// Speedily postRot back dead branches if this block rotted
-            for (Direction dir : Direction.values()) {// The logic here is that if this block rotted then
-                BlockPos neighPos = pos.relative(dir);// the neighbors might be rotted too.
-                BlockState neighState = level.getBlockState(neighPos);
-                if (neighState.getBlock() == this) { // Only check blocks logs that are the same as this one
-                    this.checkForRot(level, neighPos, species, fertility, getRadius(neighState), rand, 1.0f, true);
+            if (rapid && didRot) {// Speedily postRot back dead branches if this block rotted
+                for (Direction dir : Direction.values()) {// The logic here is that if this block rotted then
+                    BlockPos neighPos = pos.relative(dir);// the neighbors might be rotted too.
+                    BlockState neighState = level.getBlockState(neighPos);
+                    if (neighState.getBlock() == this) { // Only check blocks logs that are the same as this one
+                        this.checkForRot(level, neighPos, species, fertility, getRadius(neighState), rand, 1.0f, true);
+                    }
                 }
             }
-        }
 
-        return didRot;
+            return didRot;
+        } finally {
+            if (rapid) {
+                RotCycleGuard.exit(this, level, pos);
+            }
+        }
     }
 
     ///////////////////////////////////////////

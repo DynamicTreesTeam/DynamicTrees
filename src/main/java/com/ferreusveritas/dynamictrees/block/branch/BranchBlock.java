@@ -1,5 +1,7 @@
 package com.ferreusveritas.dynamictrees.block.branch;
 
+import com.ferreusveritas.dynamictrees.util.RotCycleGuard;
+
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.FutureBreakable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
@@ -730,9 +732,9 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         FluidState state = Optional.ofNullable(CoordUtils.getStateSafe(level, pos))
                 .orElse(Blocks.AIR.defaultBlockState()).getFluidState();
         if (state.isEmpty())
-            level.removeBlock(pos, false);
+            RotCycleGuard.wrote(level.removeBlock(pos, false));
         else
-            level.setBlock(pos, state.createLegacyBlock(), 3);
+            RotCycleGuard.wrote(level.setBlock(pos, state.createLegacyBlock(), 3));
         destroyMode = DynamicTrees.DestroyMode.SLOPPY;
     }
 

@@ -1,5 +1,7 @@
 package com.ferreusveritas.dynamictrees.systems.genfeature;
 
+import com.ferreusveritas.dynamictrees.util.RotCycleGuard;
+
 import com.ferreusveritas.dynamictrees.api.configuration.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.systems.genfeature.context.PostRotContext;
 import net.minecraft.core.BlockPos;
@@ -53,7 +55,7 @@ public class MushroomRotGenFeature extends GenFeature {
             return false;
         }
 
-        level.setBlock(pos, mushroom.defaultBlockState(), 3);
+        RotCycleGuard.wrote(level.setBlock(pos, mushroom.defaultBlockState(), 3));
         return true;
     }
 
