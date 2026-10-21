@@ -119,7 +119,9 @@ public class ClientModEventHandler {
         for (SoilProperties soil : SoilProperties.REGISTRY) {
             if (soil.getBlock().isEmpty()) continue;
             SoilBlock roots = soil.getBlock().get();
-            event.register((state, level, pos, tintIndex) -> roots.colorMultiplier(event.getBlockColors(), state, level, pos, tintIndex), roots);
+            event.register((state, level, pos, tintIndex) -> tintIndex == soil.getFoliageTintIndex()
+                    ? event.getBlockColors().getColor(roots.getPrimitiveSoilState(state), level, pos, tintIndex)
+                    : roots.colorMultiplier(state, level, pos, tintIndex), roots);
             setRenderLayerCutoutMipped(roots);
         }
 

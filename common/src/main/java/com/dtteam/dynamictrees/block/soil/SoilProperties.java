@@ -200,6 +200,14 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
         this.block = () -> substituteSoilProperties.block.get();
     }
 
+    public int getFoliageTintIndex() {
+        return foliageTintIndex;
+    }
+
+    public int getRootsTintIndex() {
+        return rootsTintIndex;
+    }
+
     public void setFoliageTintIndex(int foliageTintIndex) {
         this.foliageTintIndex = foliageTintIndex;
     }

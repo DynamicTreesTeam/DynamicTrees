@@ -99,7 +99,9 @@ public class DynamicTreesFabricClient implements ClientModInitializer {
             if (soil.getBlock().isEmpty()) continue;
             SoilBlock roots = soil.getBlock().get();
             ColorProviderRegistry.BLOCK.register(
-                    (state, level, pos, tintIndex) -> roots.colorMultiplier(blockColors, state, level, pos, tintIndex),
+                    (state, level, pos, tintIndex) -> tintIndex == soil.getFoliageTintIndex()
+                            ? blockColors.getColor(roots.getPrimitiveSoilState(state), level, pos, tintIndex)
+                            : roots.colorMultiplier(state, level, pos, tintIndex),
                     roots
             );
             BlockRenderLayerMap.INSTANCE.putBlock(roots, RenderType.cutoutMipped());
