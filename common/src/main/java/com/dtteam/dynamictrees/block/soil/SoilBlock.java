@@ -17,7 +17,6 @@ import com.dtteam.dynamictrees.tree.ChunkTreeHelper;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
-import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -529,11 +528,11 @@ public class SoilBlock extends BlockWithDynamicHardness implements TreePart, Ent
     // RENDERING
     ///////////////////////////////////////////
 
-    public int colorMultiplier(BlockColors blockColors, BlockState state, @Nullable BlockAndTintGetter level, @Nullable BlockPos pos, int tintIndex) {
+    public int colorMultiplier(BlockState state, @Nullable BlockAndTintGetter level, @Nullable BlockPos pos, int tintIndex) {
         final int white = 0xFFFFFFFF;
-        if (tintIndex == getSoilProperties().foliageTintIndex)
-            return blockColors.getColor(getPrimitiveSoilState(state), level, pos, tintIndex);
-        else if (tintIndex == getSoilProperties().rootsTintIndex)
+        if (tintIndex == getSoilProperties().getFoliageTintIndex())
+            return 0xFFFFFFFF;
+        else if (tintIndex == getSoilProperties().getRootsTintIndex())
             return state.getBlock() instanceof SoilBlock ? rootColor(state, level, pos) : white;
         return white;
     }
