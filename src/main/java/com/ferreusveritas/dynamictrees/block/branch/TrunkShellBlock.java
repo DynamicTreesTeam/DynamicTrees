@@ -135,12 +135,17 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
         return false;
     }
 
+    @Nullable
     public Surround getMuseDir(BlockState state, BlockPos pos) {
-        return state.getValue(CORE_DIR);
+        if (state.hasProperty(CORE_DIR))
+            return state.getValue(CORE_DIR);
+        return null;
     }
 
     public boolean museDoesNotExist(BlockGetter level, BlockState state, BlockPos pos) {
-        final BlockPos musePos = pos.offset(this.getMuseDir(state, pos).getOffset());
+        CoordUtils.Surround dir = this.getMuseDir(state, pos);
+        if (dir == null) return true;
+        final BlockPos musePos = pos.offset(dir.getOffset());
         return CoordUtils.getStateSafe(level, musePos) == null;
     }
 
@@ -157,6 +162,7 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
     @Nullable
     public ShellMuse getMuseUnchecked(BlockGetter level, BlockState state, BlockPos pos, BlockPos originalPos) {
         final Surround museDir = getMuseDir(state, pos);
+        if (museDir == null) return null;
         final BlockPos musePos = pos.offset(museDir.getOffset());
         final BlockState museState = CoordUtils.getStateSafe(level, musePos);
 
@@ -168,7 +174,9 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
         if (block instanceof Musable && ((Musable) block).isMusable(level, museState, musePos)) {
             return new ShellMuse(museState, musePos, museDir, musePos.subtract(originalPos));
         } else if (block instanceof TrunkShellBlock) { // If its another trunkshell, then this trunkshell is on another layer. IF they share a common direction, we return that shell's muse.
-            final Vec3i offset = ((TrunkShellBlock) block).getMuseDir(museState, musePos).getOffset();
+            CoordUtils.Surround dir = ((TrunkShellBlock) block).getMuseDir(museState, musePos);
+            if (dir == null) return null; //should never happen but there's no reason not to check anyway.
+            final Vec3i offset = dir.getOffset();
             if (new Vec3(offset.getX(), offset.getY(), offset.getZ()).add(new Vec3(museDir.getOffset().getX(), museDir.getOffset().getY(), museDir.getOffset().getZ())).lengthSqr() > 2.25) {
                 return (((TrunkShellBlock) block).getMuseUnchecked(level, museState, musePos, originalPos));
             }
